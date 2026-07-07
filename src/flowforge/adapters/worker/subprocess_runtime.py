@@ -46,8 +46,23 @@ class SubprocessWorkerRuntime(WorkerRuntime):
                 job.stdout = stdout_bytes.decode("utf-8", errors="replace")
                 job.stderr = stderr_bytes.decode("utf-8", errors="replace")
 
+                # Challenge #9: Check for structured output result.json
+                result_json_path = "result.json"
+                structured_data = None
+                if os.path.exists(result_json_path):
+                    try:
+                        with open(result_json_path, "r", encoding="utf-8") as f:
+                            import json
+                            structured_data = json.load(f)
+                    except Exception:
+                        pass
+
                 if proc.returncode == 0:
-                    job.status = "COMPLETED"
+                    if structured_data and structured_data.get("status") == "FAILED":
+                        job.status = "FAILED"
+                        job.stderr = (job.stderr or "") + f"\n[Structured error]: {structured_data.get('error', 'Execution failed via result.json')}"
+                    else:
+                        job.status = "COMPLETED"
                 else:
                     job.status = "FAILED"
                     
@@ -68,6 +83,13 @@ class SubprocessWorkerRuntime(WorkerRuntime):
         except Exception as e:
             job.status = "FAILED"
             job.stderr = f"Exception occurred during execution: {str(e)}"
+
+        # Clean up temporary result.json if it exists
+        if os.path.exists("result.json"):
+            try:
+                os.remove("result.json")
+            except Exception:
+                pass
 
         job.ended_at = datetime.now(timezone.utc)
         return job

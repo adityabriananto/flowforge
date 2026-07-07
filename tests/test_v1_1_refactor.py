@@ -1,19 +1,26 @@
 import sys
 import os
 import uuid
+import json
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, AsyncMock, patch
 
 # Add src/ folder to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
-from flowforge.domain.models import Workflow, WorkflowInstance, StateConfig
+from flowforge.domain.models import Workflow, WorkflowInstance, StateConfig, Job
 from flowforge.domain.engine import StateMachine, InvalidTransitionError
 from flowforge.domain.yaml_loader import load_workflow_from_yaml, load_workflow_from_file
 from flowforge.domain.capability_resolver import CapabilityResolver
 from flowforge.domain.prompt_builder import PromptPipeline
 from flowforge.domain.artifact_manager import ArtifactManager
 from flowforge.domain.memory import Memory, LessonLearnedStore
+from flowforge.ports.execution_provider import ExecutionProvider
+from flowforge.adapters.execution.cli_provider import CliExecutionProvider
+from flowforge.adapters.execution.api_provider import ApiExecutionProvider
+from flowforge.domain.provider_config import CliProviderConfig
+from flowforge.domain.workspace_sandbox import WorkspaceSandbox
+from flowforge.adapters.worker.subprocess_runtime import SubprocessWorkerRuntime
 
 # 1. Test Transition Table
 def test_transition_table_execution():
@@ -188,3 +195,108 @@ def test_plugin_auto_discovery():
     manager = PluginManager()
     manager.discover_and_register_plugins()
     assert len(manager.plugins) == 0  # No plugins registered in test env
+
+# 8. Test Execution Provider (Challenge #10 & #2)
+@pytest.mark.asyncio
+async def test_execution_providers():
+    config = CliProviderConfig(executable="fake-cli", command="run", args=["--dry-run"])
+    cli_provider = CliExecutionProvider(config)
+    
+    # Verify execution runs successfully with standard fallback format
+    res = await cli_provider.execute("Optimize loops", {"artifacts": ["main.py"]})
+    assert res["status"] in ["SUCCESS", "FAILED"]
+    assert res["artifacts"] == ["main.py"]
+    assert "metrics" in res
+    
+    # Verify API Provider calls LlmConnector (Challenge #10)
+    mock_connector = AsyncMock()
+    mock_connector.generate_text.return_value = "optimized_code"
+    api_provider = ApiExecutionProvider(mock_connector)
+    
+    api_res = await api_provider.execute("Refactor function", {"artifacts": ["utils.py"]})
+    assert api_res["status"] == "SUCCESS"
+    assert api_res["content"] == "optimized_code"
+    assert api_res["artifacts"] == ["utils.py"]
+
+# 9. Test Workspace Sandbox & Git branching (Challenge #3, #6 & #7)
+@pytest.mark.asyncio
+async def test_workspace_sandbox(tmp_path):
+    # Initialize a dummy git repo as the main repository
+    import subprocess
+    subprocess.run(["git", "init"], cwd=str(tmp_path), capture_output=True, check=True)
+    subprocess.run(["git", "config", "user.name", "Test User"], cwd=str(tmp_path), check=True)
+    subprocess.run(["git", "config", "user.email", "test@user.com"], cwd=str(tmp_path), check=True)
+    
+    # Commit a starting file to HEAD
+    start_file = tmp_path / "hello.txt"
+    start_file.write_text("initial")
+    subprocess.run(["git", "add", "hello.txt"], cwd=str(tmp_path), check=True)
+    subprocess.run(["git", "commit", "-m", "initial commit"], cwd=str(tmp_path), check=True)
+    
+    sandbox = WorkspaceSandbox(str(tmp_path))
+    
+    # 1. Clone sandbox
+    sandbox_path = await sandbox.clone_sandbox()
+    assert os.path.exists(sandbox_path)
+    assert os.path.exists(os.path.join(sandbox_path, "hello.txt"))
+    
+    try:
+        # Verify no change initially
+        assert await sandbox.verify_git_diff(sandbox_path) == "NO_CHANGE"
+        
+        # Modify a file inside sandbox
+        mod_file = os.path.join(sandbox_path, "hello.txt")
+        with open(mod_file, "w") as f:
+            f.write("modified")
+            
+        # Verify status is now SUCCESS (changes exist)
+        assert await sandbox.verify_git_diff(sandbox_path) == "SUCCESS"
+        
+        # 2. Create auto-commit branch
+        job_id = "9999"
+        branch_name = await sandbox.create_auto_commit_branch(sandbox_path, job_id)
+        assert branch_name == "flowforge/JOB-9999"
+        
+        # Check current branch in sandbox
+        branch_res = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=sandbox_path,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        assert branch_res.stdout.strip() == "flowforge/JOB-9999"
+        
+    finally:
+        sandbox.cleanup(sandbox_path)
+
+# 10. Test Subprocess Runtime JSON Parsing (Challenge #9)
+@pytest.mark.asyncio
+async def test_subprocess_runtime_json_output(tmp_path):
+    runtime = SubprocessWorkerRuntime()
+    job = Job(id=uuid.uuid4(), instance_id=uuid.uuid4(), state_name="CODING", status="PENDING")
+    
+    # Script python dummy yang menulis result.json
+    script_content = """
+import json
+with open("result.json", "w") as f:
+    json.dump({
+        "status": "FAILED",
+        "error": "syntax error on line 4",
+        "artifacts": []
+    }, f)
+"""
+    script_file = tmp_path / "run_cli.py"
+    script_file.write_text(script_content)
+    
+    # Jalankan script di runtime. Meskipun exit code process adalah 0, 
+    # karena result.json bernilai FAILED, status Job harus FAILED! (Challenge #9)
+    # We change cwd locally inside runtime execution boundary in tests
+    old_cwd = os.getcwd()
+    os.chdir(str(tmp_path))
+    try:
+        updated_job = await runtime.execute_job(job, str(script_file))
+        assert updated_job.status == "FAILED"
+        assert "[Structured error]" in updated_job.stderr
+    finally:
+        os.chdir(old_cwd)
