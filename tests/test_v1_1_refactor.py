@@ -429,3 +429,13 @@ def test_cli_subcommands(tmp_path):
         
     finally:
         os.chdir(old_cwd)
+
+# 16. Test Dogfooding Self-CI/CD FFWL Loading (Challenge #4)
+def test_dogfooding_cicd_workflow():
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    ffwl_path = os.path.join(root_dir, "workflow.ff.yaml")
+    workflow = load_workflow_from_file(ffwl_path)
+    assert workflow.name == "FlowForge Self-CI/CD Workflow"
+    assert workflow.initial_state == "ANALYSIS"
+    assert workflow.transitions[("ANALYSIS", "SUCCESS")] == "TESTING"
+    assert workflow.transitions[("TESTING", "SUCCESS")] == "AUDIT"

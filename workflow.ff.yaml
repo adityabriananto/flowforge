@@ -1,0 +1,47 @@
+name: "FlowForge Self-CI/CD Workflow"
+version: "1.2.0"
+initial_state: "ANALYSIS"
+
+roles:
+  architect:
+    capability: "architecture"
+    policy: "quality-first"
+  reviewer:
+    capability: "review"
+    policy: "quality-first"
+  qa_engineer:
+    capability: "testing"
+    policy: "cost-first"
+
+states:
+  ANALYSIS:
+    name: "PR Requirements Analysis"
+    worker_type: "subprocess"
+    script: "agents/analyze_pr.py"
+  TESTING:
+    name: "Automated QA Test Suite"
+    worker_type: "subprocess"
+    script: "agents/run_tests.py"
+  AUDIT:
+    name: "Security & Coverage Audit"
+    worker_type: "subprocess"
+    script: "agents/audit_code.py"
+  APPROVAL:
+    name: "Lead Dev Approval Gate"
+    require_human: true
+    on_approve: "RELEASE"
+    on_reject: "ANALYSIS"
+  RELEASE:
+    name: "Git Tag & Deploy"
+    worker_type: "subprocess"
+    script: "agents/deploy.py"
+  COMPLETED:
+    name: "CI/CD Completed successfully"
+    is_final: true
+
+transitions:
+  - from: "ANALYSIS", event: "SUCCESS", to: "TESTING"
+  - from: "TESTING", event: "SUCCESS", to: "AUDIT"
+  - from: "TESTING", event: "FAILURE", to: "ANALYSIS"
+  - from: "AUDIT", event: "SUCCESS", to: "APPROVAL"
+  - from: "RELEASE", event: "SUCCESS", to: "COMPLETED"
