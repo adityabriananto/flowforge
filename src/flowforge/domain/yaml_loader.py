@@ -1,5 +1,6 @@
 import uuid
 import re
+import os
 from typing import Dict, Any
 from flowforge.domain.models import Workflow, StateConfig
 
@@ -119,3 +120,22 @@ def load_workflow_from_yaml(yaml_content: str) -> Workflow:
         states=states,
         transitions=transitions
     )
+
+def load_workflow_from_file(file_path: str) -> Workflow:
+    """
+    Loads a Workflow from a file on disk. 
+    Strictly verifies the file identity using the standard extension '.ff.yaml'.
+    """
+    if not file_path.endswith(".ff.yaml"):
+        raise ValueError(
+            f"Invalid FlowForge workflow file extension: '{file_path}'. "
+            f"Workflow definition files must strictly end with '.ff.yaml' as the system standard."
+        )
+        
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Workflow file not found: {file_path}")
+        
+    with open(file_path, "r", encoding="utf-8") as f:
+        content = f.read()
+        
+    return load_workflow_from_yaml(content)

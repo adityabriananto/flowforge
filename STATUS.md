@@ -14,7 +14,7 @@ Sprint 11 -- Refactor & Foundation (v1.1)
 
 ## Overall Progress
 
-100% (v1.1 Foundation Complete)
+100% (v1.1 Advanced Complete)
 
 ## Completed
 
@@ -74,18 +74,18 @@ Sprint 11 -- Refactor & Foundation (v1.1)
 -   README & STATUS v1.0.0 update
 -   Sprint 10 Completion Review & Production Ready Sign-off
 -   State Machine Transition Table implementation di `src/flowforge/domain/engine.py`
--   YAML Workflow Loader (`yaml_loader.py`) di `src/flowforge/domain/yaml_loader.py`
--   Capability Resolver (`capability_resolver.py`) untuk dynamic LLM providers
--   Prompt Builder & Context Loader (`prompt_builder.py`) terpusat
--   Artifact Manager (`artifact_manager.py`) untuk AI output tracking
--   Memory Module (`memory.py`) untuk short & long-term memory
+-   YAML Workflow Loader (`yaml_loader.py`) di `src/flowforge/domain/yaml_loader.py` (.ff.yaml)
+-   Dynamic Capability Fallback Resolver (`capability_resolver.py`)
+-   Prompt Pipeline (Memory, Artifact, Workspace, Git loaders) di `prompt_builder.py`
+-   Rich Artifact Types (MARKDOWN, JSON, YAML, PNG, SQL, PATCH, DIFF, BINARY)
+-   Lesson Learned Memory Engine (`LessonLearnedStore` di `memory.py`)
 -   Auto-Discovery Plugins via pip entrypoints (`importlib.metadata`)
 -   Workflow Timeline & Execution Metrics di React Dashboard
 -   v1.1 Refactor unit testing suite (`pytest`) di `tests/test_v1_1_refactor.py`
 
 ## Current Task
 
--   v1.1 Release Sign-off
+-   v1.1 Advanced Sign-off
 
 ## Next Tasks
 
