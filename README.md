@@ -1,62 +1,193 @@
-# FlowForge - AI Workflow Orchestration Framework
+# FlowForge 🛠️
 
-**Project:** FlowForge  
-**Version:** v1.0.0  
-**Status:** Production Ready (100% Completed)  
+[![Python Unit Tests](https://github.com/adityabriananto/flowforge/actions/workflows/python-tests.yml/badge.svg)](https://github.com/adityabriananto/flowforge)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
----
+FlowForge is an **Engineering Runtime** designed to orchestrate **Human Workers**, **AI Workers**, and **System Workers** through data-driven State Machines, Policy Engines, and Event-Driven Runtimes. 
 
-## Purpose
-
-FlowForge adalah *AI Workflow Orchestration Framework* standar industri untuk software engineering. Sistem memperlakukan agen AI sebagai *Worker* yang menjalankan unit pekerjaan (*Job*) di dalam alur kerja (*Workflow*) terstruktur yang dikendalikan oleh mesin status (*State Machine*).
-
-## Core Principles
-
--   **Workflow First**: Semua integrasi AI terstruktur dalam alur kerja yang terdefinisi dengan jelas.
--   **Vendor Agnostic**: Fleksibilitas penuh untuk menggunakan model AI (Claude & Codex) dan database (PostgreSQL/SQLite) tanpa terikat vendor.
--   **Human In Control (HITL)**: Menjamin kontrol penuh manusia untuk persetujuan kode dan keputusan penting melalui WebSocket real-time sync.
--   **Event Driven & Observable**: Seluruh transisi status memicu event log yang terdokumentasi (audit trail).
--   **Clean & Hexagonal Architecture**: Pemisahan yang ketat antara core domain logic (framework agnostic) dengan detail infrastruktur (ports & adapters).
+Unlike simple LLM wrappers, FlowForge abstracts LLMs and external software tools into pluggable, sandboxed, and policy-governed execution units, making it resilient, scalable, and fully decoupled from third-party vendor APIs.
 
 ---
 
-## Key Features (v1.0.0)
+## 🎯 Core Philosophy: What is FlowForge?
 
-1. **Lightweight State Machine Core**: Mesin status kustom murni (zero external dependency) ditulis dalam Python OOP standard yang aman dan portable.
-2. **Asynchronous Persistence Layer**: Integrasi dengan database PostgreSQL/SQLite menggunakan SQLAlchemy 2.x asinkron dan repositori pattern.
-3. **Isolated Subprocess Worker Runtime**: Runtime eksekusi script Python Worker yang terisolasi secara asinkron dengan kontrol waktu (timeout) dan pembersihan environment variables.
-4. **Claude & Codex Connectors**: Konektor asinkron (`httpx`) untuk API Anthropic Claude dan OpenAI Codex dengan log masking API Key yang aman.
-5. **FastAPI REST API & WebSocket Sync**: Endpoint FastAPI untuk instansiasi workflow, kontrol transisi status, log audit, serta broadcast WebSocket *push-only* ke dashboard.
-6. **React Dashboard**: UI dashboard premium dark-mode glassmorphism yang responsif, visualisasi grafik State Machine interaktif, split diff viewer, panel persetujuan HITL, dan audit trail log viewer.
-7. **Plugin SDK**: Lifecycle hooks asinkron (`pre_transition`, `post_transition`, `on_worker_start`, `on_worker_end`) untuk memperluas fungsionalitas core engine.
-8. **Git Integration**: Integrasi asinkron git binary untuk checkout branch, commit hasil pekerjaan AI, dan push remote.
+> *"The future of software engineering isn't just writing prompts. It is the coordinated collaboration of humans, automated systems, and AI models working together in structured workflows."*
+
+FlowForge is built as a pure, lightweight, and framework-agnostic **Core** with ports and adapters (Hexagonal Architecture). If the React Dashboard is removed, FlowForge runs otonomously via CLI. If Anthropic or OpenAI change their APIs, FlowForge remains 100% operational through dynamic execution provider abstraction.
 
 ---
 
-## How to Run & Verify
+## ✨ Key Features (v1.2)
 
-### 1. Requirements
-- Python 3.13+
-- Node.js 22+
-- Package manager `uv` (diinstal secara global)
+- 📝 **FlowForge Workflow Language (FFWL)**: Define state configurations, transitions, and roles declaratively using strict `.ff.yaml` specifications.
+- ⚙️ **Capability Policy Engine**: Dynamically routes agent tasks using strategy policies (`quality-first` vs `cost-first`) and fallback prioritization loaded from YAML profiles.
+- 🔗 **Middleware-based Prompt Pipeline**: Resolves prompts deterministically via a pipeline chain (`Loader ➔ Transformer ➔ Validator ➔ Renderer`) allowing third-party plugins to register custom stages.
+- 📦 **Workspace Sandbox Isolation**: AI modifications are isolated by physically cloning repository dependencies into temporary workspaces before auto-staging and committing changes to `flowforge/JOB-<id>` branches.
+- 🤖 **Structured JSON Worker Outputs**: Evaluations are determined by structured JSON outputs (`result.json` containing metrics, duration, token usage, and artifacts) instead of relying solely on OS exit codes.
+- 🧩 **Zero-Config Plugin Auto-Discovery**: Auto-registers external LLM providers and plugin connectors via Python package `entry_points` (`flowforge.providers`).
+- 💻 **Developer Experience CLI**: Standalone developer tools (`init`, `run`, `doctor`, `replay`) for console-based workflow executions.
+- 📊 **Real-time Glassmorphism Dashboard**: Monitor transitions and live execution metrics (elapsed time, tokens, cost, retries) via WebSocket sync.
 
-### 2. Run Backend Server
-Jalankan server API FastAPI di localhost port 8000:
-```bash
-uv run fastapi dev src/flowforge/entrypoints/api/main.py
+---
+
+## 🏗️ Hexagonal Architecture
+
+```mermaid
+graph TD
+    subgraph Entrypoints
+        CLI["Developer CLI (flowforge init/run)"]
+        FastAPI["FastAPI REST & WebSockets"]
+    end
+
+    subgraph Core Domain [flowforge-core]
+        StateMachine["StateMachine (Transitions Table)"]
+        YamlLoader["FFWL YAML Loader (.ff.yaml)"]
+        PolicyEngine["Capability Policy Engine"]
+        PromptPipeline["Middleware Prompt Pipeline"]
+    end
+
+    subgraph Ports [Abstract Interfaces]
+        EP["ExecutionProvider Port"]
+        WP["Workspace Port"]
+        DB["Database Repository Port"]
+    end
+
+    subgraph Adapters [Concretes]
+        CliExec["CliExecutionProvider (Claude/Codex CLI)"]
+        ApiExec["ApiExecutionProvider (Anthropic/OpenAI API)"]
+        LocalWS["LocalWorkspace Sandbox (Local Git Clone)"]
+        SqliteDB["SQLAlchemy Repository (SQLite/PostgreSQL)"]
+    end
+
+    CLI --> Core Domain
+    FastAPI --> Core Domain
+    Core Domain --> Ports
+    EP --> CliExec
+    EP --> ApiExec
+    WP --> LocalWS
+    DB --> SqliteDB
 ```
 
-### 3. Run React Dashboard (Frontend)
-Masuk ke folder `dashboard`, instal dependencies, dan jalankan server pengembangan:
-```bash
-cd dashboard
-npm install
-npm run dev
-```
-Buka browser Anda di `http://localhost:5173`. Klik **Bootstrap FlowForge Demo** untuk mensimulasikan alur kerja agen coding AI.
+---
 
-### 4. Run Test Suite (QA Verification)
-Jalankan seluruh 25 unit dan integration tests asinkron secara otomatis menggunakan `uv`:
+## 🚀 Installation
+
+Install FlowForge globally in your local environment:
+
 ```bash
-uv run --with pytest --with pytest-asyncio --with aiosqlite --with sqlalchemy --with httpx --with pytest-httpx --with fastapi pytest tests/
+# Clone the repository
+git clone git@github.com:adityabriananto/flowforge.git
+cd flowforge
+
+# Install package with dependencies locally
+pip install .
 ```
+
+---
+
+## 📖 How to Use
+
+### 1. Initialize a New Project
+Run the `init` command to generate project structures, starter configs, and LLM provider profiles:
+
+```bash
+flowforge init
+```
+This generates the following structure in your current working directory:
+```
+├── providers/
+│   ├── claude.yaml       # Claude capability & cost profile
+│   └── gemini.yaml       # Gemini capability & cost profile
+└── workflow.ff.yaml      # Declarative FFWL YAML specification
+```
+
+### 2. Configure Your Workflow (`workflow.ff.yaml`)
+Define your states, roles, and allowed event transitions:
+
+```yaml
+name: "Autonomous Engineering Pipeline"
+version: "1.2.0"
+initial_state: "CODING"
+
+roles:
+  architect:
+    capability: "architecture"
+    policy: "quality-first"
+  coder:
+    capability: "coding"
+    policy: "cost-first"
+
+states:
+  CODING:
+    name: "AI Coding Session"
+    worker_type: "subprocess"
+    script: "agents/coder.py"
+  TESTING:
+    name: "Automated QA suite"
+    worker_type: "subprocess"
+    script: "agents/run_tests.py"
+  COMPLETED:
+    name: "Success Gate"
+    is_final: true
+
+transitions:
+  - { from: "CODING", event: "SUCCESS", to: "TESTING" }
+  - { from: "TESTING", event: "SUCCESS", to: "COMPLETED" }
+  - { from: "TESTING", event: "FAILURE", to: "CODING" }
+```
+
+### 3. Diagnose Environment Health
+Check if prerequisites (Git, SQLite database, provider profiles) are set up correctly:
+
+```bash
+flowforge doctor
+```
+
+### 4. Execute Workflow Locally
+Run your FFWL YAML workflow autonomously:
+
+```bash
+flowforge run workflow.ff.yaml
+```
+
+### 5. Replay Audit Logs
+Inspect previous execution transitions and costs by replaying logs:
+
+```bash
+flowforge replay <workflow_instance_uuid>
+```
+
+---
+
+## 🛠️ Local Development & Testing
+
+### Running Tests
+Execute the comprehensive Pytest suite (covering State Machines, Repository, Prompt Pipeline, Workspace Sandbox, API, and CLI commands):
+
+```bash
+# Install development dependencies
+pip install -e .
+
+# Run pytest
+pytest tests/
+```
+
+### Starting the Web UI & FastAPI Server
+If you want to use the React Dashboard with real-time WebSocket state syncing:
+
+1. **Start the Backend Server**:
+   ```bash
+   uv run --with websockets uvicorn flowforge.entrypoints.api.main:app --host 127.0.0.1 --port 8000
+   ```
+2. **Start the Frontend Dashboard**:
+   ```bash
+   cd dashboard/
+   npm install
+   npm run dev
+   ```
+3. Open your browser at **[http://localhost:5173/](http://localhost:5173/)** to access the premium monitoring interface.
+
+---
+
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
