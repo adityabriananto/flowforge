@@ -10,11 +10,11 @@ v0.1.0
 
 ## Current Sprint
 
-Sprint 11 -- Refactor & Foundation (v1.1)
+Sprint 12 -- Resiliency, Scheduling & Policy Engine (v1.2)
 
 ## Overall Progress
 
-100% (v1.1 Enterprise Complete)
+100% (v1.2 Policy Engine & Workspace Abstraction Complete)
 
 ## Completed
 
@@ -82,17 +82,21 @@ Sprint 11 -- Refactor & Foundation (v1.1)
 -   Execution Provider Abstraction (`ExecutionProvider`, `CliExecutionProvider`, `ApiExecutionProvider`)
 -   Isolated Sandbox Workspace & Git Auto-Commit Branching (`WorkspaceSandbox`)
 -   Structured JSON Output Processor (`result.json`) di Subprocess Worker
+-   Penyusunan dokumen usulan formal RFC-001 s.d RFC-005 di `docs/rfcs/`
+-   Restrukturisasi Clean Architecture modul domain ke `services/`
+-   Port & Adapter Workspace Sandbox (`Workspace` port & `LocalWorkspace` adapter)
+-   Capability Policy Engine (`CapabilityPolicyEngine` dengan strategi `quality-first` vs `cost-first`)
 -   Auto-Discovery Plugins via pip entrypoints (`importlib.metadata`)
 -   Workflow Timeline & Execution Metrics di React Dashboard
 -   v1.1 Refactor unit testing suite (`pytest`) di `tests/test_v1_1_refactor.py`
 
 ## Current Task
 
--   v1.1 Enterprise Sign-off
+-   v1.2 Release Sign-off
 
 ## Next Tasks
 
--   Sprint 12 -- Resiliency & Scheduling (v1.2) (Multi worker, retry, scheduler, timeout, queue)
+-   Sprint 13 -- Distributed Worker & Broker (v1.3) (Redis, Docker, Kubernetes)
 
 ## Blockers
 
