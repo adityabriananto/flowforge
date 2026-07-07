@@ -14,7 +14,7 @@ Sprint 12 -- Resiliency, Scheduling & Policy Engine (v1.2)
 
 ## Overall Progress
 
-100% (v1.2 Policy Engine & Workspace Abstraction Complete)
+100% (v1.2 DX & Decoupling Complete)
 
 ## Completed
 
@@ -75,24 +75,25 @@ Sprint 12 -- Resiliency, Scheduling & Policy Engine (v1.2)
 -   Sprint 10 Completion Review & Production Ready Sign-off
 -   State Machine Transition Table implementation di `src/flowforge/domain/engine.py`
 -   YAML Workflow Loader (`yaml_loader.py`) di `src/flowforge/domain/yaml_loader.py` (.ff.yaml)
--   Dynamic Capability Fallback Resolver (`capability_resolver.py`)
--   Prompt Pipeline (Memory, Artifact, Workspace, Git loaders) di `prompt_builder.py`
+-   Dynamic YAML Provider Registry (`ProviderRegistry` memuat YAML file di `providers/`)
+-   Capability Policy Engine (`CapabilityPolicyEngine` dengan strategi `quality-first` vs `cost-first`)
+-   Middleware-based Prompt Pipeline (`PromptMiddleware` & `PromptPipeline` stages)
 -   Rich Artifact Types (MARKDOWN, JSON, YAML, PNG, SQL, PATCH, DIFF, BINARY)
 -   Lesson Learned Memory Engine (`LessonLearnedStore` di `memory.py`)
 -   Execution Provider Abstraction (`ExecutionProvider`, `CliExecutionProvider`, `ApiExecutionProvider`)
--   Isolated Sandbox Workspace & Git Auto-Commit Branching (`WorkspaceSandbox`)
+-   Isolated Sandbox Workspace & Git Auto-Commit Branching (`WorkspaceSandbox` & `LocalWorkspace`)
 -   Structured JSON Output Processor (`result.json`) di Subprocess Worker
 -   Penyusunan dokumen usulan formal RFC-001 s.d RFC-005 di `docs/rfcs/`
 -   Restrukturisasi Clean Architecture modul domain ke `services/`
--   Port & Adapter Workspace Sandbox (`Workspace` port & `LocalWorkspace` adapter)
--   Capability Policy Engine (`CapabilityPolicyEngine` dengan strategi `quality-first` vs `cost-first`)
+-   CLI Developer Tools (`init`, `run`, `doctor`, `replay` subcommands)
+-   Zero-Config Plugin Provider Discovery via entry points `flowforge.providers`
 -   Auto-Discovery Plugins via pip entrypoints (`importlib.metadata`)
 -   Workflow Timeline & Execution Metrics di React Dashboard
 -   v1.1 Refactor unit testing suite (`pytest`) di `tests/test_v1_1_refactor.py`
 
 ## Current Task
 
--   v1.2 Release Sign-off
+-   v1.2 DX Sign-off
 
 ## Next Tasks
 

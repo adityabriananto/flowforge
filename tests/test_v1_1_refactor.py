@@ -25,6 +25,15 @@ from flowforge.adapters.worker.subprocess_runtime import SubprocessWorkerRuntime
 # Import v1.2 new Clean Architecture components
 from flowforge.services.resolver.policy_engine import CapabilityPolicyEngine
 from flowforge.adapters.workspace.local_workspace import LocalWorkspace
+from flowforge.services.resolver.provider_registry import ProviderRegistry
+from flowforge.services.prompt.prompt_pipeline import (
+    PromptPipeline as ServicePromptPipeline,
+    WorkspaceLoaderStage,
+    MemoryLoaderStage,
+    ArtifactLoaderStage,
+    GitLoaderStage
+)
+from flowforge.entrypoints.cli.main import cmd_init, cmd_run, cmd_doctor, cmd_replay
 
 # 1. Test Transition Table
 def test_transition_table_execution():
@@ -58,7 +67,6 @@ def test_transition_table_execution():
     event2 = engine.transition(instance, "APPROVE")
     assert instance.current_state == "IMPLEMENTATION"
 
-    # Invalid event on current state should raise error
     with pytest.raises(InvalidTransitionError):
         engine.transition(instance, "APPROVE")
 
@@ -68,13 +76,14 @@ def test_yaml_loader_and_ff_extension(tmp_path):
 name: "AI Coder Workflow"
 version: "1.1.0"
 initial_state: "ANALYSIS"
+roles:
+  architect:
+    capability: architecture
+    policy: quality-first
 states:
   ANALYSIS:
     name: "Requirements Analysis"
     require_human: false
-  ARCHITECTURE:
-    name: "System Architecture"
-    require_human: true
 transitions:
   - from: "ANALYSIS", event: "SUCCESS", to: "ARCHITECTURE"
 """
@@ -106,22 +115,17 @@ def test_dynamic_capability_resolver():
     mock_codex = MagicMock()
     mock_gemini = MagicMock()
     
-    # Only register codex and gemini
     resolver.register_provider("codex", mock_codex)
     resolver.register_provider("gemini", mock_gemini)
     
-    # Resolve coding capability: fallback coding list = ["codex", "gpt", "qwen"] -> codex is available!
     provider = resolver.resolve_best_provider("coding")
     assert provider == mock_codex
 
-    # Resolve architecture capability: fallback list = ["claude", "gpt", "gemini"]
-    # claude and gpt are NOT registered. gemini IS registered -> resolved provider should fallback to gemini!
     provider = resolver.resolve_best_provider("architecture")
     assert provider == mock_gemini
 
 # 4. Test Prompt Pipeline
 def test_prompt_pipeline(tmp_path):
-    # Template utilizing memory, artifacts, git, and file workspace context
     template = (
         "Memory Context:\n{memory_context}\n\n"
         "Artifact Code:\n{artifact_patch_diff}\n\n"
@@ -130,7 +134,6 @@ def test_prompt_pipeline(tmp_path):
         "Instructions: Fix {bug}"
     )
     
-    # Create workspace file dummy
     workspace_file = tmp_path / "utils.py"
     workspace_file.write_text("def run(): pass")
 
@@ -155,15 +158,12 @@ def test_extended_artifact_manager(tmp_path):
     manager = ArtifactManager(storage_dir=str(tmp_path))
     instance_id = uuid.uuid4()
     
-    # Create markdown type artifact (auto-detected)
     art1 = manager.create_artifact(instance_id, "doc.md", "doc.md", "# Document")
     assert art1.artifact_type == "MARKDOWN"
 
-    # Create png type artifact (custom specified)
     art2 = manager.create_artifact(instance_id, "img.png", "img.png", "binary_data", artifact_type="PNG")
     assert art2.artifact_type == "PNG"
 
-    # Create patch type artifact (auto-detected)
     art3 = manager.create_artifact(instance_id, "code.patch", "code.patch", "@@ -1,3 +1,3 @@")
     assert art3.artifact_type == "PATCH"
 
@@ -172,21 +172,17 @@ def test_extended_artifact_manager(tmp_path):
 async def test_lesson_learned_memory_engine(tmp_path):
     store = LessonLearnedStore(memory_dir=str(tmp_path))
     
-    # Add lessons learned
     store.add_lesson("coder-wf", "Always check index bounds in loops")
     store.add_lesson("coder-wf", "Close DB sessions on exception")
     
     assert len(store.get_lessons("coder-wf")) == 2
     assert "Always check index bounds in loops" in store.get_lessons("coder-wf")
 
-    # Persist to disk
     await store.persist()
     
-    # Verify JSON file structure
     lessons_json = tmp_path / "lessons.json"
     assert os.path.exists(lessons_json)
     
-    # Load back in another instance
     new_store = LessonLearnedStore(memory_dir=str(tmp_path))
     await new_store.load()
     
@@ -198,7 +194,7 @@ def test_plugin_auto_discovery():
     from flowforge.domain.plugin_manager import PluginManager
     manager = PluginManager()
     manager.discover_and_register_plugins()
-    assert len(manager.plugins) == 0  # No plugins registered in test env
+    assert len(manager.plugins) == 0
 
 # 8. Test Execution Provider (Challenge #10 & #2)
 @pytest.mark.asyncio
@@ -235,7 +231,6 @@ async def test_workspace_sandbox(tmp_path):
     
     sandbox = WorkspaceSandbox(str(tmp_path))
     
-    # 1. Clone sandbox
     sandbox_path = await sandbox.clone_sandbox()
     assert os.path.exists(sandbox_path)
     assert os.path.exists(os.path.join(sandbox_path, "hello.txt"))
@@ -302,13 +297,10 @@ def test_capability_policy_engine():
     engine.register_provider("gemini", mock_gemini)
     engine.register_provider("qwen", mock_qwen)
     
-    # cost-first coding fallback is ["qwen", "codex", "gpt"] -> qwen is registered!
     provider1 = engine.resolve_provider_by_policy("coding")
     assert provider1 == mock_qwen
     
-    # Switch to quality-first
     engine.strategy = "quality-first"
-    # quality-first coding fallback is ["claude", "codex", "gpt"] -> claude is registered!
     provider2 = engine.resolve_provider_by_policy("coding")
     assert provider2 == mock_claude
 
@@ -332,7 +324,6 @@ async def test_local_workspace_adapter(tmp_path):
     try:
         assert await workspace.check_diff() == "NO_CHANGE"
         
-        # Modify file inside local workspace adapter
         mod_file = os.path.join(sandbox_path, "hello.txt")
         with open(mod_file, "w") as f:
             f.write("modified-via-adapter")
@@ -352,3 +343,89 @@ async def test_local_workspace_adapter(tmp_path):
         assert branch_res.stdout.strip() == "flowforge/JOB-1234"
     finally:
         workspace.cleanup()
+
+# 13. Test Dynamic YAML Provider Registry (Challenge #16)
+def test_yaml_provider_registry(tmp_path):
+    # Setup dummy provider yaml configurations
+    os.makedirs(tmp_path / "providers", exist_ok=True)
+    
+    claude_yaml = """name: "claude"
+capabilities:
+  reasoning: 95
+  coding: 85
+cost: "high"
+speed: "medium"
+"""
+    gemini_yaml = """name: "gemini"
+capabilities:
+  reasoning: 80
+  coding: 90
+cost: "low"
+speed: "fast"
+"""
+    with open(tmp_path / "providers" / "claude.yaml", "w", encoding="utf-8") as f:
+        f.write(claude_yaml)
+    with open(tmp_path / "providers" / "gemini.yaml", "w", encoding="utf-8") as f:
+        f.write(gemini_yaml)
+        
+    registry = ProviderRegistry(providers_dir=str(tmp_path / "providers"))
+    
+    mock_claude = MagicMock()
+    mock_gemini = MagicMock()
+    registry.register_connector("claude", mock_claude)
+    registry.register_connector("gemini", mock_gemini)
+    
+    # quality-first reasoning resolve should favor claude (95 vs 80)
+    best_quality = registry.resolve_by_policy("reasoning", strategy="quality-first")
+    assert best_quality == mock_claude
+    
+    # cost-first coding resolve should favor gemini due to cost weight modifier (low cost vs high cost)
+    best_cost = registry.resolve_by_policy("coding", strategy="cost-first")
+    assert best_cost == mock_gemini
+
+# 14. Test Middleware-based Prompt Pipeline (Challenge #17)
+@pytest.mark.asyncio
+async def test_middleware_prompt_pipeline(tmp_path):
+    template = "Instruction: {instructions}. Code snippet: {file_run_py}"
+    pipeline = ServicePromptPipeline(template)
+    
+    # Create workspace file dummy
+    workspace_file = tmp_path / "run.py"
+    workspace_file.write_text("print('hello')")
+    
+    pipeline.add_stage(WorkspaceLoaderStage(str(workspace_file)))
+    
+    result = await pipeline.execute_pipeline({"instructions": "Analyze loops"})
+    assert "Analyze loops" in result
+    assert "print('hello')" in result
+
+# 15. Test CLI Subcommands DX Execution
+def test_cli_subcommands(tmp_path):
+    old_cwd = os.getcwd()
+    os.chdir(str(tmp_path))
+    try:
+        # Mock argparse args
+        class Args:
+            pass
+            
+        args_init = Args()
+        cmd_init(args_init)
+        
+        assert os.path.exists("workflow.ff.yaml")
+        assert os.path.exists("providers/claude.yaml")
+        assert os.path.exists("providers/gemini.yaml")
+        
+        args_doctor = Args()
+        cmd_doctor(args_doctor)
+        
+        args_replay = Args()
+        args_replay.instance_id = "test-uuid-1234"
+        cmd_replay(args_replay)
+        
+        # Test cmd_run locally
+        args_run = Args()
+        args_run.file = "workflow.ff.yaml"
+        cmd_run(args_run)
+        
+    finally:
+        os.chdir(old_cwd)

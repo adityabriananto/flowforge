@@ -11,6 +11,7 @@ def parse_yaml_fallback(content: str) -> Dict[str, Any]:
     data = {}
     current_section = None
     current_state = None
+    current_role = None
     
     lines = content.splitlines()
     for line in lines:
@@ -29,10 +30,15 @@ def parse_yaml_fallback(content: str) -> Dict[str, Any]:
                 data[root_match.group(1)] = root_match.group(2)
                 continue
                 
-            section_match = re.match(r'^(states|transitions):$', line_stripped)
+            section_match = re.match(r'^(states|transitions|roles):$', line_stripped)
             if section_match:
                 current_section = section_match.group(1)
-                data[current_section] = {} if current_section == "states" else []
+                if current_section == "states":
+                    data["states"] = {}
+                elif current_section == "roles":
+                    data["roles"] = {}
+                else:
+                    data["transitions"] = []
                 current_state = None
                 continue
                 
@@ -57,6 +63,23 @@ def parse_yaml_fallback(content: str) -> Dict[str, Any]:
                 elif val.isdigit():
                     val = int(val)
                 data["states"][current_state][key] = val
+                continue
+                
+        # Roles definition level (2-space indent)
+        elif current_section == "roles" and indent == 2:
+            role_header = re.match(r'^(\w+):$', line_stripped)
+            if role_header:
+                current_role = role_header.group(1)
+                data["roles"][current_role] = {}
+                continue
+                
+        # Roles properties level (4-space indent)
+        elif current_section == "roles" and indent == 4:
+            prop_match = re.match(r'^(\w+):\s*["\']?(.*?)["\']?$', line_stripped)
+            if prop_match:
+                key = prop_match.group(1)
+                val = prop_match.group(2)
+                data["roles"][current_role][key] = val
                 continue
                 
         # Transitions level (2-space indent starting with list item dash)

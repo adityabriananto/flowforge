@@ -34,6 +34,32 @@ class PluginManager:
         except Exception as e:
             logger.error(f"Error during plugin auto-discovery: {str(e)}")
 
+    def discover_external_providers(self, registry) -> None:
+        """
+        Auto-discovers and registers external LLM providers/connectors 
+        via Python entry points 'flowforge.providers' (Challenge #19).
+        """
+        import sys
+        try:
+            if sys.version_info >= (3, 10):
+                from importlib.metadata import entry_points
+                group = entry_points(group="flowforge.providers")
+            else:
+                from importlib.metadata import entry_points
+                eps = entry_points()
+                group = eps.get("flowforge.providers", [])
+
+            for entry_point in group:
+                try:
+                    provider_class = entry_point.load()
+                    # Instantiate and register provider connector dynamically
+                    provider_instance = provider_class()
+                    registry.register_connector(entry_point.name, provider_instance)
+                except Exception as e:
+                    logger.error(f"Failed to load external provider {entry_point.name}: {str(e)}")
+        except Exception as e:
+            logger.error(f"Error during external provider auto-discovery: {str(e)}")
+
     def register_plugin(self, plugin: FlowForgePlugin) -> None:
         """Explicitly register a plugin instance."""
         if plugin not in self.plugins:
