@@ -1,9 +1,9 @@
 import os
 from typing import Optional
 import httpx
-from flowforge.ports.connector import LlmConnector
+from flowforge.ports.connector import ExecutionConnector
 
-class CodexConnector(LlmConnector):
+class CodexConnector(ExecutionConnector):
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         self.model = model or os.getenv("OPENAI_MODEL", "gpt-4o")

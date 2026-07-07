@@ -1,10 +1,10 @@
 import time
 from typing import Dict, Any
 from flowforge.ports.execution_provider import ExecutionProvider
-from flowforge.ports.connector import LlmConnector
+from flowforge.ports.connector import ExecutionConnector
 
 class ApiExecutionProvider(ExecutionProvider):
-    def __init__(self, connector: LlmConnector):
+    def __init__(self, connector: ExecutionConnector):
         self.connector = connector
 
     async def execute(self, prompt: str, variables: Dict[str, Any]) -> Dict[str, Any]:

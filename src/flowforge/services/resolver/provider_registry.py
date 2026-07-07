@@ -1,7 +1,7 @@
 import os
 import re
 from typing import Dict, Any, List, Optional
-from flowforge.ports.connector import LlmConnector
+from flowforge.ports.connector import ExecutionConnector
 
 def parse_yaml_fallback(content: str) -> Dict[str, Any]:
     """Helper regex parser for YAML provider files."""
@@ -37,16 +37,17 @@ def parse_yaml_fallback(content: str) -> Dict[str, Any]:
 
 class ProviderRegistry:
     """
-    A Dynamic YAML Provider Registry that loads model profiles from providers/*.yaml 
-    and resolves the best provider based on policy strategies (Challenge #16).
+    A Dynamic YAML Provider Registry that loads execution provider profiles from providers/*.yaml 
+    and resolves the best provider based on policy strategies.
+    Completely vendor-agnostic — the registry has zero knowledge of specific provider implementations.
     """
     def __init__(self, providers_dir: Optional[str] = None):
         self.providers_dir = providers_dir or os.path.abspath(os.path.join(os.getcwd(), "providers"))
         self.provider_profiles: Dict[str, Dict[str, Any]] = {}
-        self.connectors: Dict[str, LlmConnector] = {}
+        self.connectors: Dict[str, ExecutionConnector] = {}
 
-    def register_connector(self, name: str, connector: LlmConnector) -> None:
-        """Associate an LLM Connector instance with a registered provider name."""
+    def register_connector(self, name: str, connector: ExecutionConnector) -> None:
+        """Associate an Execution Connector instance with a registered provider name."""
         self.connectors[name.lower()] = connector
 
     def load_profiles(self) -> None:
@@ -71,9 +72,9 @@ class ProviderRegistry:
                 except Exception:
                     pass
 
-    def resolve_by_policy(self, capability: str, strategy: str = "quality-first") -> Optional[LlmConnector]:
+    def resolve_by_policy(self, capability: str, strategy: str = "quality-first") -> Optional[ExecutionConnector]:
         """
-        Dynamically calculates the best LLM provider matching capability using 
+        Dynamically calculates the best execution provider matching capability using 
         weighted scoring based on strategy policy (quality-first / cost-first).
         """
         self.load_profiles()

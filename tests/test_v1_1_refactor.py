@@ -109,20 +109,23 @@ transitions:
 
 # 3. Test Dynamic Capability Fallback List Resolver
 def test_dynamic_capability_resolver():
-    resolver = CapabilityResolver()
+    # Capability map must be explicitly provided — core has zero hardcoded vendor names
+    resolver = CapabilityResolver(custom_mapping={
+        "coding": ["provider_fast", "provider_quality"],
+        "architecture": ["provider_quality", "provider_fast"],
+    })
     
-    mock_claude = MagicMock()
-    mock_codex = MagicMock()
-    mock_gemini = MagicMock()
+    mock_fast = MagicMock()
+    mock_quality = MagicMock()
     
-    resolver.register_provider("codex", mock_codex)
-    resolver.register_provider("gemini", mock_gemini)
+    resolver.register_provider("provider_fast", mock_fast)
+    resolver.register_provider("provider_quality", mock_quality)
     
     provider = resolver.resolve_best_provider("coding")
-    assert provider == mock_codex
+    assert provider == mock_fast
 
     provider = resolver.resolve_best_provider("architecture")
-    assert provider == mock_gemini
+    assert provider == mock_quality
 
 # 4. Test Prompt Pipeline
 def test_prompt_pipeline(tmp_path):
@@ -289,20 +292,28 @@ with open("result.json", "w") as f:
 def test_capability_policy_engine():
     engine = CapabilityPolicyEngine(policy_strategy="cost-first")
     
-    mock_claude = MagicMock()
-    mock_gemini = MagicMock()
-    mock_qwen = MagicMock()
+    mock_provider_a = MagicMock()
+    mock_provider_b = MagicMock()
+    mock_provider_c = MagicMock()
     
-    engine.register_provider("claude", mock_claude)
-    engine.register_provider("gemini", mock_gemini)
-    engine.register_provider("qwen", mock_qwen)
+    engine.register_provider("provider_a", mock_provider_a)
+    engine.register_provider("provider_b", mock_provider_b)
+    engine.register_provider("provider_c", mock_provider_c)
+    
+    # Set policy rules explicitly (no hardcoded vendor names in engine)
+    engine.capability_policy["cost-first"] = {
+        "coding": ["provider_c", "provider_b", "provider_a"],
+    }
+    engine.capability_policy["quality-first"] = {
+        "coding": ["provider_a", "provider_b", "provider_c"],
+    }
     
     provider1 = engine.resolve_provider_by_policy("coding")
-    assert provider1 == mock_qwen
+    assert provider1 == mock_provider_c
     
     engine.strategy = "quality-first"
     provider2 = engine.resolve_provider_by_policy("coding")
-    assert provider2 == mock_claude
+    assert provider2 == mock_provider_a
 
 # 12. Test LocalWorkspace Port & Adapter (v1.2 Challenge #6)
 @pytest.mark.asyncio

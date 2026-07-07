@@ -3,30 +3,53 @@
 [![Python Unit Tests](https://github.com/adityabriananto/flowforge/actions/workflows/python-tests.yml/badge.svg)](https://github.com/adityabriananto/flowforge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-FlowForge is an **Engineering Runtime** designed to orchestrate **Human Workers**, **AI Workers**, and **System Workers** through data-driven State Machines, Policy Engines, and Event-Driven Runtimes. 
+**FlowForge** is a vendor-agnostic **Engineering Runtime** for orchestrating **Human Workers**, **AI Workers**, and **System Workers** through event-driven state machines, policy engines, and sandboxed execution providers.
 
-Unlike simple LLM wrappers, FlowForge abstracts LLMs and external software tools into pluggable, sandboxed, and policy-governed execution units, making it resilient, scalable, and fully decoupled from third-party vendor APIs.
+> FlowForge is **not** an AI wrapper. AI is just one type of worker.  
+> If every AI vendor disappeared tomorrow, FlowForge would still function — because what it orchestrates is **engineering workflows**, not AI prompts.
 
 ---
 
-## 🎯 Core Philosophy: What is FlowForge?
+## 🎯 Core Philosophy
 
 > *"The future of software engineering isn't just writing prompts. It is the coordinated collaboration of humans, automated systems, and AI models working together in structured workflows."*
 
-FlowForge is built as a pure, lightweight, and framework-agnostic **Core** with ports and adapters (Hexagonal Architecture). If the React Dashboard is removed, FlowForge runs otonomously via CLI. If Anthropic or OpenAI change their APIs, FlowForge remains 100% operational through dynamic execution provider abstraction.
+### What Makes FlowForge Different
+
+| Traditional AI Orchestrators | FlowForge |
+|------------------------------|-----------|
+| Tightly coupled to specific AI APIs | **Zero vendor references** in Core — AI is just an adapter |
+| Break when providers change APIs | Core only knows: Worker, Execution, Artifact, Job, State, Policy, Event |
+| Limited to AI-only workflows | Orchestrates Docker, Terraform, Playwright, Jira, Slack, Kubernetes — anything |
+| Require code changes for new providers | `pip install flowforge-provider-X` → auto-discovered, zero code changes |
+
+### The Core Knows Nothing About AI
+
+If you open `flowforge/ports/`, `flowforge/domain/`, or `flowforge/services/`, you will find **zero** references to Claude, OpenAI, GPT, Gemini, Anthropic, or any vendor-specific term. The core only speaks in abstractions:
+
+```
+Worker → ExecutionConnector → ExecutionProvider → Artifact → Event
+```
+
+Vendor-specific implementations (Claude, Codex, Bedrock, etc.) live exclusively in `adapters/` — the outermost ring of the Hexagonal Architecture. This means:
+
+- ✅ **Add a new AI provider**: Create an adapter + YAML profile. Zero core changes.
+- ✅ **Add a non-AI worker** (Docker, Terraform): Create an adapter. Zero core changes.
+- ✅ **Remove all AI providers**: Core keeps running with system and human workers.
 
 ---
 
 ## ✨ Key Features (v1.2)
 
 - 📝 **FlowForge Workflow Language (FFWL)**: Define state configurations, transitions, and roles declaratively using strict `.ff.yaml` specifications.
-- ⚙️ **Capability Policy Engine**: Dynamically routes agent tasks using strategy policies (`quality-first` vs `cost-first`) and fallback prioritization loaded from YAML profiles.
-- 🔗 **Middleware-based Prompt Pipeline**: Resolves prompts deterministically via a pipeline chain (`Loader ➔ Transformer ➔ Validator ➔ Renderer`) allowing third-party plugins to register custom stages.
-- 📦 **Workspace Sandbox Isolation**: AI modifications are isolated by physically cloning repository dependencies into temporary workspaces before auto-staging and committing changes to `flowforge/JOB-<id>` branches.
-- 🤖 **Structured JSON Worker Outputs**: Evaluations are determined by structured JSON outputs (`result.json` containing metrics, duration, token usage, and artifacts) instead of relying solely on OS exit codes.
-- 🧩 **Zero-Config Plugin Auto-Discovery**: Auto-registers external LLM providers and plugin connectors via Python package `entry_points` (`flowforge.providers`).
-- 💻 **Developer Experience CLI**: Standalone developer tools (`init`, `run`, `doctor`, `replay`) for console-based workflow executions.
-- 📊 **Real-time Glassmorphism Dashboard**: Monitor transitions and live execution metrics (elapsed time, tokens, cost, retries) via WebSocket sync.
+- ⚙️ **Capability Policy Engine**: Dynamically routes tasks using strategy policies (`quality-first` vs `cost-first`) with weighted scoring loaded from YAML profiles.
+- 🔗 **Middleware-based Prompt Pipeline**: Resolves prompts via a pipeline chain (`Loader ➔ Transformer ➔ Validator ➔ Renderer`). Third-party plugins can register custom stages.
+- 📦 **Workspace Sandbox Isolation**: Modifications are isolated by cloning repositories into temporary workspaces before auto-staging and committing changes to `flowforge/JOB-<id>` branches.
+- 🤖 **Structured JSON Worker Outputs**: Evaluations use structured JSON (`result.json` containing metrics, duration, token usage, and artifacts) instead of relying solely on OS exit codes.
+- 🧩 **Zero-Config Plugin Auto-Discovery**: Auto-registers external execution providers and connectors via Python `entry_points` (`flowforge.providers`).
+- 💻 **Developer Experience CLI**: Standalone tools (`init`, `run`, `doctor`, `replay`) for console-based workflow execution.
+- 📊 **Real-time Glassmorphism Dashboard**: Monitor transitions and live execution metrics via WebSocket sync.
+- 🔒 **Vendor-Agnostic Core**: Ports, domain, and services contain zero references to any AI vendor.
 
 ---
 
@@ -39,24 +62,28 @@ graph TD
         FastAPI["FastAPI REST & WebSockets"]
     end
 
-    subgraph CoreDomain["Core Domain [flowforge-core]"]
+    subgraph CoreDomain["Core Domain (vendor-agnostic)"]
         StateMachine["StateMachine (Transitions Table)"]
         YamlLoader["FFWL YAML Loader (.ff.yaml)"]
         PolicyEngine["Capability Policy Engine"]
         PromptPipeline["Middleware Prompt Pipeline"]
     end
 
-    subgraph Ports["Ports [Abstract Interfaces]"]
+    subgraph Ports["Ports (Abstract Interfaces)"]
         EP["ExecutionProvider Port"]
+        EC["ExecutionConnector Port"]
         WP["Workspace Port"]
         DB["Database Repository Port"]
     end
 
-    subgraph Adapters["Adapters [Concretes]"]
-        CliExec["CliExecutionProvider (Claude/Codex CLI)"]
-        ApiExec["ApiExecutionProvider (Anthropic/OpenAI API)"]
-        LocalWS["LocalWorkspace Sandbox (Local Git Clone)"]
-        SqliteDB["SQLAlchemy Repository (SQLite/PostgreSQL)"]
+    subgraph Adapters["Adapters (Vendor-Specific Concretes)"]
+        CliExec["CliExecutionProvider"]
+        ApiExec["ApiExecutionProvider"]
+        ConnA["ClaudeConnector"]
+        ConnB["CodexConnector"]
+        ConnC["Your Custom Connector"]
+        LocalWS["LocalWorkspace Sandbox"]
+        SqliteDB["SQLAlchemy Repository"]
     end
 
     CLI --> CoreDomain
@@ -64,6 +91,9 @@ graph TD
     CoreDomain --> Ports
     EP --> CliExec
     EP --> ApiExec
+    EC --> ConnA
+    EC --> ConnB
+    EC --> ConnC
     WP --> LocalWS
     DB --> SqliteDB
 ```
@@ -71,8 +101,6 @@ graph TD
 ---
 
 ## 🚀 Installation
-
-Install FlowForge globally in your local environment:
 
 ```bash
 # Clone the repository
@@ -88,16 +116,16 @@ pip install .
 ## 📖 How to Use
 
 ### 1. Initialize a New Project
-Run the `init` command to generate project structures, starter configs, and LLM provider profiles:
+Generate project structures, starter configs, and execution provider profiles:
 
 ```bash
 flowforge init
 ```
-This generates the following structure in your current working directory:
+This generates:
 ```
 ├── providers/
-│   ├── claude.yaml       # Claude capability & cost profile
-│   └── gemini.yaml       # Gemini capability & cost profile
+│   ├── claude.yaml       # Provider capability & cost profile
+│   └── gemini.yaml       # Provider capability & cost profile
 └── workflow.ff.yaml      # Declarative FFWL YAML specification
 ```
 
@@ -119,61 +147,96 @@ roles:
 
 states:
   CODING:
-    name: "AI Coding Session"
+    name: "Coding Session"
     worker_type: "subprocess"
     script: "agents/coder.py"
   TESTING:
-    name: "Automated QA suite"
+    name: "Automated QA Suite"
     worker_type: "subprocess"
     script: "agents/run_tests.py"
+  APPROVAL:
+    name: "Human Review Gate"
+    require_human: true
+    on_approve: "DEPLOY"
+    on_reject: "CODING"
+  DEPLOY:
+    name: "System Deployment"
+    worker_type: "subprocess"
+    script: "agents/deploy.py"
   COMPLETED:
     name: "Success Gate"
     is_final: true
 
 transitions:
   - { from: "CODING", event: "SUCCESS", to: "TESTING" }
-  - { from: "TESTING", event: "SUCCESS", to: "COMPLETED" }
+  - { from: "TESTING", event: "SUCCESS", to: "APPROVAL" }
   - { from: "TESTING", event: "FAILURE", to: "CODING" }
+  - { from: "DEPLOY", event: "SUCCESS", to: "COMPLETED" }
 ```
 
 ### 3. Diagnose Environment Health
-Check if prerequisites (Git, SQLite database, provider profiles) are set up correctly:
-
 ```bash
 flowforge doctor
 ```
 
 ### 4. Execute Workflow Locally
-Run your FFWL YAML workflow autonomously:
-
 ```bash
 flowforge run workflow.ff.yaml
 ```
 
 ### 5. Replay Audit Logs
-Inspect previous execution transitions and costs by replaying logs:
-
 ```bash
 flowforge replay <workflow_instance_uuid>
 ```
 
 ---
 
+## 🔌 Adding a Custom Execution Provider
+
+FlowForge is designed so that adding a new provider requires **zero changes to the core**:
+
+### Step 1: Create a Provider YAML Profile
+```yaml
+# providers/bedrock.yaml
+name: "bedrock"
+capabilities:
+  reasoning: 88
+  coding: 75
+cost: "medium"
+speed: "fast"
+```
+
+### Step 2: Create an Adapter (Optional)
+```python
+# In your external package: flowforge-provider-bedrock
+from flowforge.ports.connector import ExecutionConnector
+
+class BedrockConnector(ExecutionConnector):
+    async def generate_text(self, prompt, system_instruction=None):
+        # Your implementation here
+        ...
+```
+
+### Step 3: Register via Entry Points
+```toml
+# pyproject.toml of your external package
+[project.entry-points."flowforge.providers"]
+bedrock = "flowforge_provider_bedrock:BedrockConnector"
+```
+
+After `pip install flowforge-provider-bedrock`, FlowForge auto-discovers and registers the provider. **Zero core code changes needed.**
+
+---
+
 ## 🛠️ Local Development & Testing
 
 ### Running Tests
-Execute the comprehensive Pytest suite (covering State Machines, Repository, Prompt Pipeline, Workspace Sandbox, API, and CLI commands):
-
 ```bash
-# Install development dependencies
 pip install -e .
-
-# Run pytest
 pytest tests/
 ```
 
 ### Starting the Web UI & FastAPI Server
-If you want to use the React Dashboard with real-time WebSocket state syncing:
 
 1. **Start the Backend Server**:
    ```bash
@@ -185,9 +248,21 @@ If you want to use the React Dashboard with real-time WebSocket state syncing:
    npm install
    npm run dev
    ```
-3. Open your browser at **[http://localhost:5173/](http://localhost:5173/)** to access the premium monitoring interface.
+3. Open **[http://localhost:5173/](http://localhost:5173/)** to access the monitoring interface.
+
+---
+
+## 🗺️ Roadmap
+
+| Version | Milestone | Status |
+|---------|-----------|--------|
+| v1.0 | Core Engine, Database, API, Dashboard, Git Integration, Plugin SDK | ✅ Complete |
+| v1.1 | FFWL DSL, Prompt Pipeline, Memory Engine, Execution Providers, Workspace Sandbox | ✅ Complete |
+| v1.2 | Policy Engine, Provider Registry, CLI Tools, Zero-Config Discovery, Vendor-Agnostic Core | ✅ Complete |
+| v1.3 | Distributed Workers (Redis, Docker, Kubernetes) | 🔜 Planned |
+| v2.0 | Visual Workflow Designer (Drag & Drop → `.ff.yaml`) | 🔜 Planned |
 
 ---
 
 ## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
