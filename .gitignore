@@ -14,6 +14,18 @@ htmlcov/
 *.sqlite
 *.sqlite3
 
+# Build & Distribution
+*.egg-info/
+*.egg
+build/
+dist/
+sdist/
+wheels/
+*.whl
+
+# Lock files (project uses pyproject.toml)
+uv.lock
+
 # Node / Frontend
 dashboard/node_modules/
 dashboard/dist/
@@ -28,6 +40,10 @@ dashboard/node_modules.tmp/
 *.njsproj
 *.sln
 *.swp
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Others
 flowforge.zip
