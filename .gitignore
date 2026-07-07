@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+*.db
+*.sqlite
+*.sqlite3
+
+# Node / Frontend
+dashboard/node_modules/
+dashboard/dist/
+dashboard/.tmp/
+dashboard/node_modules.tmp/
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Others
+flowforge.zip
+.agents/
+.gemini/
+*.log
