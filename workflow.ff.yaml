@@ -40,8 +40,8 @@ states:
     is_final: true
 
 transitions:
-  - from: "ANALYSIS", event: "SUCCESS", to: "TESTING"
-  - from: "TESTING", event: "SUCCESS", to: "AUDIT"
-  - from: "TESTING", event: "FAILURE", to: "ANALYSIS"
-  - from: "AUDIT", event: "SUCCESS", to: "APPROVAL"
-  - from: "RELEASE", event: "SUCCESS", to: "COMPLETED"
+  - { from: "ANALYSIS", event: "SUCCESS", to: "TESTING" }
+  - { from: "TESTING", event: "SUCCESS", to: "AUDIT" }
+  - { from: "TESTING", event: "FAILURE", to: "ANALYSIS" }
+  - { from: "AUDIT", event: "SUCCESS", to: "APPROVAL" }
+  - { from: "RELEASE", event: "SUCCESS", to: "COMPLETED" }

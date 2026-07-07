@@ -85,7 +85,7 @@ states:
     name: "Requirements Analysis"
     require_human: false
 transitions:
-  - from: "ANALYSIS", event: "SUCCESS", to: "ARCHITECTURE"
+  - { from: "ANALYSIS", event: "SUCCESS", to: "ARCHITECTURE" }
 """
     # Test load from yaml content
     workflow = load_workflow_from_yaml(yaml_content)

@@ -43,9 +43,9 @@ states:
     is_final: true
 
 transitions:
-  - from: "CODING", event: "SUCCESS", to: "TESTING"
-  - from: "TESTING", event: "SUCCESS", to: "COMPLETED"
-  - from: "TESTING", event: "FAILURE", to: "CODING"
+  - { from: "CODING", event: "SUCCESS", to: "TESTING" }
+  - { from: "TESTING", event: "SUCCESS", to: "COMPLETED" }
+  - { from: "TESTING", event: "FAILURE", to: "CODING" }
 """
     with open("workflow.ff.yaml", "w", encoding="utf-8") as f:
         f.write(workflow_yaml)
