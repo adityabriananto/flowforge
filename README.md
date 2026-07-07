@@ -39,29 +39,29 @@ graph TD
         FastAPI["FastAPI REST & WebSockets"]
     end
 
-    subgraph Core Domain [flowforge-core]
+    subgraph CoreDomain["Core Domain [flowforge-core]"]
         StateMachine["StateMachine (Transitions Table)"]
         YamlLoader["FFWL YAML Loader (.ff.yaml)"]
         PolicyEngine["Capability Policy Engine"]
         PromptPipeline["Middleware Prompt Pipeline"]
     end
 
-    subgraph Ports [Abstract Interfaces]
+    subgraph Ports["Ports [Abstract Interfaces]"]
         EP["ExecutionProvider Port"]
         WP["Workspace Port"]
         DB["Database Repository Port"]
     end
 
-    subgraph Adapters [Concretes]
+    subgraph Adapters["Adapters [Concretes]"]
         CliExec["CliExecutionProvider (Claude/Codex CLI)"]
         ApiExec["ApiExecutionProvider (Anthropic/OpenAI API)"]
         LocalWS["LocalWorkspace Sandbox (Local Git Clone)"]
         SqliteDB["SQLAlchemy Repository (SQLite/PostgreSQL)"]
     end
 
-    CLI --> Core Domain
-    FastAPI --> Core Domain
-    Core Domain --> Ports
+    CLI --> CoreDomain
+    FastAPI --> CoreDomain
+    CoreDomain --> Ports
     EP --> CliExec
     EP --> ApiExec
     WP --> LocalWS
