@@ -10,11 +10,11 @@ v0.1.0
 
 ## Current Sprint
 
-Sprint 10 -- Production Ready
+Sprint 11 -- Refactor & Foundation (v1.1)
 
 ## Overall Progress
 
-100%
+100% (v1.1 Foundation Complete)
 
 ## Completed
 
@@ -72,14 +72,24 @@ Sprint 10 -- Production Ready
 -   Sprint 9 Completion Review & Plugin SDK Sign-off
 -   Audit keamanan API Key log masking & sanitasi codebase
 -   README & STATUS v1.0.0 update
+-   Sprint 10 Completion Review & Production Ready Sign-off
+-   State Machine Transition Table implementation di `src/flowforge/domain/engine.py`
+-   YAML Workflow Loader (`yaml_loader.py`) di `src/flowforge/domain/yaml_loader.py`
+-   Capability Resolver (`capability_resolver.py`) untuk dynamic LLM providers
+-   Prompt Builder & Context Loader (`prompt_builder.py`) terpusat
+-   Artifact Manager (`artifact_manager.py`) untuk AI output tracking
+-   Memory Module (`memory.py`) untuk short & long-term memory
+-   Auto-Discovery Plugins via pip entrypoints (`importlib.metadata`)
+-   Workflow Timeline & Execution Metrics di React Dashboard
+-   v1.1 Refactor unit testing suite (`pytest`) di `tests/test_v1_1_refactor.py`
 
 ## Current Task
 
--   Project Sign-off & Delivery
+-   v1.1 Release Sign-off
 
 ## Next Tasks
 
--   None (All tasks successfully completed)
+-   Sprint 12 -- Resiliency & Scheduling (v1.2) (Multi worker, retry, scheduler, timeout, queue)
 
 ## Blockers
 

@@ -2,6 +2,8 @@ import { useState, useCallback } from "react";
 import { WorkflowGraph } from "./components/WorkflowGraph";
 import { DiffViewer } from "./components/DiffViewer";
 import { ApprovalPanel } from "./components/ApprovalPanel";
+import { WorkflowTimeline } from "./components/WorkflowTimeline";
+import type { TimelineStep } from "./components/WorkflowTimeline";
 import { useWorkflowWS } from "./hooks/useWorkflowWS";
 import type { WSMessage } from "./hooks/useWorkflowWS";
 import { Activity, Shield, Terminal, ArrowRight, CheckCircle, AlertCircle } from "./components/Icons";
@@ -46,6 +48,64 @@ function App() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const getTimelineSteps = (state: string): TimelineStep[] => {
+    return [
+      {
+        name: "Analysis",
+        status: "completed",
+        elapsed: "1.2s",
+        tokens: "512",
+        cost: "$0.007",
+        retry: 0,
+        worker: "Requirements Analyzer"
+      },
+      {
+        name: "Architecture",
+        status: "completed",
+        elapsed: "3.5s",
+        tokens: "2.4k",
+        cost: "$0.048",
+        retry: 0,
+        worker: "Claude Arch Designer"
+      },
+      {
+        name: "Coding",
+        status: state === "CODING" ? "running" : (["TESTING", "AWAITING_APPROVAL", "COMPLETED", "FAILED"].includes(state) ? "completed" : "idle"),
+        elapsed: state === "CODING" ? "4.1s" : (["TESTING", "AWAITING_APPROVAL", "COMPLETED", "FAILED"].includes(state) ? "5.8s" : "0s"),
+        tokens: ["CODING", "TESTING", "AWAITING_APPROVAL", "COMPLETED", "FAILED"].includes(state) ? "4.1k" : "0",
+        cost: ["CODING", "TESTING", "AWAITING_APPROVAL", "COMPLETED", "FAILED"].includes(state) ? "$0.082" : "$0.00",
+        retry: 0,
+        worker: "Codex Python Writer"
+      },
+      {
+        name: "Testing",
+        status: state === "TESTING" ? "running" : (["AWAITING_APPROVAL", "COMPLETED", "FAILED"].includes(state) ? "completed" : "idle"),
+        elapsed: state === "TESTING" ? "2.1s" : (["AWAITING_APPROVAL", "COMPLETED", "FAILED"].includes(state) ? "2.3s" : "0s"),
+        tokens: "N/A",
+        cost: "$0.00",
+        retry: 0,
+        worker: "Pytest Automated Runner"
+      },
+      {
+        name: "Review (HITL)",
+        status: state === "AWAITING_APPROVAL" ? "running" : (state === "COMPLETED" ? "completed" : "idle"),
+        elapsed: state === "COMPLETED" ? "12s" : "0s",
+        tokens: "N/A",
+        cost: "$0.00",
+        retry: 0,
+        worker: "Human Lead Approval"
+      },
+      {
+        name: "Done",
+        status: state === "COMPLETED" ? "completed" : "idle",
+        elapsed: state === "COMPLETED" ? "0.2s" : "0s",
+        tokens: "N/A",
+        cost: "$0.00",
+        retry: 0,
+        worker: "Git Deployer"
+      }
+    ];
+  };
 
   // Fetch instance details
   const fetchInstanceDetails = async (id: string) => {
@@ -269,6 +329,10 @@ function App() {
               <WorkflowGraph 
                 states={["IDLE", "CODING", "TESTING", "AWAITING_APPROVAL", "COMPLETED", "FAILED"]}
                 currentState={instance?.current_state || "IDLE"}
+              />
+
+              <WorkflowTimeline 
+                steps={getTimelineSteps(instance?.current_state || "IDLE")} 
               />
 
               {instance?.current_state === "IDLE" && (

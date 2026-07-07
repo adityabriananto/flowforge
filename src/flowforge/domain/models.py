@@ -23,6 +23,7 @@ class Workflow:
     version: str
     initial_state: str
     states: Dict[str, StateConfig]
+    transitions: Dict[tuple[str, str], str] = field(default_factory=dict)  # (from_state, event) -> to_state
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 @dataclass

@@ -14,6 +14,22 @@ class InvalidTransitionError(Exception):
 class StateMachine:
     def __init__(self, workflow: Workflow):
         self.workflow = workflow
+        # Load transitions table, construct from StateConfig if empty (backward compatibility)
+        self.transitions = dict(getattr(workflow, "transitions", {}))
+        if not self.transitions:
+            for state_name, config in workflow.states.items():
+                if not config.require_human:
+                    if config.next_state:
+                        self.transitions[(state_name, "SUCCESS")] = config.next_state
+                        if state_name == workflow.initial_state:
+                            self.transitions[(state_name, "START")] = config.next_state
+                    if config.on_failure:
+                        self.transitions[(state_name, "FAILURE")] = config.on_failure
+                else:
+                    if config.on_approve:
+                        self.transitions[(state_name, "APPROVE")] = config.on_approve
+                    if config.on_reject:
+                        self.transitions[(state_name, "REJECT")] = config.on_reject
 
     def transition(
         self, 
@@ -31,22 +47,8 @@ class StateMachine:
         if not state_config:
             raise ValueError(f"Current state '{current_state_name}' does not exist in workflow definition.")
 
-        next_state_name = None
-
-        # Handling Transitions for standard states
-        if not state_config.require_human:
-            if event == "SUCCESS":
-                next_state_name = state_config.next_state
-            elif event == "FAILURE":
-                next_state_name = state_config.on_failure
-            elif event == "START" and current_state_name == self.workflow.initial_state:
-                next_state_name = state_config.next_state
-        else:
-            # Handling Transitions for HITL (Human In The Loop) states
-            if event == "APPROVE":
-                next_state_name = state_config.on_approve
-            elif event == "REJECT":
-                next_state_name = state_config.on_reject
+        # Resolve next state using the transition table mapping
+        next_state_name = self.transitions.get((current_state_name, event))
 
         # If no valid next state is found, it's an invalid transition
         if not next_state_name:

@@ -9,6 +9,31 @@ class PluginManager:
     def __init__(self):
         self.plugins: List[FlowForgePlugin] = []
 
+    def discover_and_register_plugins(self) -> None:
+        """
+        Auto-discovers and registers plugins via Python package entry points 'flowforge.plugins'.
+        Allows developers to pip install plugins and have them auto-load.
+        """
+        import sys
+        try:
+            if sys.version_info >= (3, 10):
+                from importlib.metadata import entry_points
+                group = entry_points(group="flowforge.plugins")
+            else:
+                from importlib.metadata import entry_points
+                eps = entry_points()
+                group = eps.get("flowforge.plugins", [])
+
+            for entry_point in group:
+                try:
+                    plugin_class = entry_point.load()
+                    plugin_instance = plugin_class()
+                    self.register_plugin(plugin_instance)
+                except Exception as e:
+                    logger.error(f"Failed to auto-discover plugin {entry_point.name}: {str(e)}")
+        except Exception as e:
+            logger.error(f"Error during plugin auto-discovery: {str(e)}")
+
     def register_plugin(self, plugin: FlowForgePlugin) -> None:
         """Explicitly register a plugin instance."""
         if plugin not in self.plugins:
