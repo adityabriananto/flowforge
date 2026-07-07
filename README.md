@@ -259,8 +259,6 @@ pytest tests/
 | v1.0 | Core Engine, Database, API, Dashboard, Git Integration, Plugin SDK | ✅ Complete |
 | v1.1 | FFWL DSL, Prompt Pipeline, Memory Engine, Execution Providers, Workspace Sandbox | ✅ Complete |
 | v1.2 | Policy Engine, Provider Registry, CLI Tools, Zero-Config Discovery, Vendor-Agnostic Core | ✅ Complete |
-| v1.3 | Distributed Workers (Redis, Docker, Kubernetes) | 🔜 Planned |
-| v2.0 | Visual Workflow Designer (Drag & Drop → `.ff.yaml`) | 🔜 Planned |
 
 ---
 
