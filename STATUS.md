@@ -140,10 +140,17 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Pembuatan logika transisi bisnis di EngineeringStateService
 -   Unit Tests baru untuk memvalidasi parser skema, repository, dan transisi state bisnis
 -   Penyusunan dokumen formal RFC-014 & ADR-014 untuk Engineering State
+-   Implementasi domain model EngineeringSession & status transition validation
+-   Pembuatan port interface EngineeringSessionRepository
+-   Implementasi adapter YAMLEngineeringSessionRepository
+-   Pembuatan loader & serializer EngineeringSessionLoader
+-   Pembuatan logika imutabilitas dan handover di EngineeringSessionService
+-   Unit Tests baru untuk memvalidasi asersi imutabilitas, status state machine, dan state integration
+-   Penyusunan dokumen formal RFC-015 & ADR-015 untuk Engineering Session
 
 ## Current Task
 
--   v1.4.1 Engineering State Sign-off
+-   v1.4.2 Engineering Session Sign-off
 
 ## Next Tasks
 
