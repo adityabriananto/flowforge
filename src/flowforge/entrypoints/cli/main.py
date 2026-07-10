@@ -176,21 +176,31 @@ def cmd_replay(args):
     print("  [08:00:20] Workflow COMPLETED successfully.")
 
 def cmd_compile(args):
-    """Compiles a mission YAML and optional Agent Profile into a structured Mission Package (v1.3 FF-014)."""
-    print(f"[FlowForge CLI] Compiling mission file '{args.mission_file}'...")
-    if not os.path.exists(args.mission_file):
-        print(f"[FlowForge CLI] Error: Mission file '{args.mission_file}' not found.", file=sys.stderr)
-        sys.exit(1)
+    """Compiles a mission YAML/Code and optional Agent Profile into a structured Mission Package (v1.3 FF-014)."""
+    from flowforge.services.workspace.mission_lifecycle_manager import MissionLifecycleManager
+    
+    # 1. Resolve mission file path (supports direct path or Mission Code)
+    target_file = args.mission_file
+    if not os.path.exists(target_file):
+        # Look up by Mission Code
+        _, resolved_path = MissionLifecycleManager._find_mission_file(args.mission_file, base_path=".")
+        if resolved_path:
+            target_file = resolved_path
+        else:
+            print(f"Mission {args.mission_file} not found.\nRun:\nflowforge mission list\nfor available Missions.", file=sys.stderr)
+            sys.exit(1)
 
-    # 1. Load Mission using loader
+    print(f"[FlowForge CLI] Compiling mission file '{target_file}'...")
+
+    # 2. Load Mission using loader
     from flowforge.services.mission_loader import MissionLoader
     try:
-        mission = MissionLoader.load_from_file(args.mission_file)
+        mission = MissionLoader.load_from_file(target_file)
     except Exception as e:
         print(f"[FlowForge CLI] Error loading mission: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
-    # 2. Load optional Agent Profile
+    # 3. Load optional Agent Profile
     agent_profile = None
     if args.profile:
         if not os.path.exists(args.profile):
@@ -203,13 +213,13 @@ def cmd_compile(args):
             print(f"[FlowForge CLI] Error loading agent profile: {str(e)}", file=sys.stderr)
             sys.exit(1)
 
-    # 3. Assemble and compile project context (simulate active workflow/sprint if needed)
+    # 4. Assemble and compile project context (simulate active workflow/sprint if needed)
     project_context = {
         "sprint_status": "Active Sprint 13 (v1.3)",
         "workflow_state": "ACTIVE"
     }
 
-    # 4. Invoke compiler
+    # 5. Invoke compiler
     from flowforge.services.compiler.compiler import MissionPackageCompiler
     from flowforge.services.compiler.renderer import MissionPackageRenderer
 
@@ -250,13 +260,17 @@ def cmd_mission(args):
             print("[FlowForge CLI] Missions List:")
             print("\n  [BACKLOG]")
             for m in grouped["backlog"]:
-                print(f"    - [{m['id']}] {m['title']} (Status: {m['status']})")
+                # Print code if available, fallback to id
+                m_label = m.get("code") or m.get("id")
+                print(f"    - [{m_label}] {m['title']} (Status: {m['status']})")
             print("\n  [ACTIVE]")
             for m in grouped["active"]:
-                print(f"    - [{m['id']}] {m['title']} (Status: {m['status']})")
+                m_label = m.get("code") or m.get("id")
+                print(f"    - [{m_label}] {m['title']} (Status: {m['status']})")
             print("\n  [COMPLETED]")
             for m in grouped["completed"]:
-                print(f"    - [{m['id']}] {m['title']} (Status: {m['status']})")
+                m_label = m.get("code") or m.get("id")
+                print(f"    - [{m_label}] {m['title']} (Status: {m['status']})")
         except Exception as e:
             print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
             sys.exit(1)
@@ -264,13 +278,17 @@ def cmd_mission(args):
     elif args.mission_command == "show":
         try:
             mission = MissionLifecycleManager.show_mission(args.mission_id, base_path=".")
-            print(f"[FlowForge CLI] Mission [{mission.id}] Details:")
+            m_label = mission.code or mission.id
+            print(f"[FlowForge CLI] Mission [{m_label}] Details:")
             print(f"  Title: {mission.title}")
             print(f"  Description: {mission.description}")
             print(f"  Status: {mission.status}")
             print(f"  Priority: {mission.priority}")
             print(f"  Deliverables: {', '.join(mission.deliverables)}")
             print(f"  Definition of Done: {', '.join(mission.definition_of_done)}")
+        except FileNotFoundError:
+            print(f"Mission {args.mission_id} not found.\nRun:\nflowforge mission list\nfor available Missions.", file=sys.stderr)
+            sys.exit(1)
         except Exception as e:
             print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
             sys.exit(1)
@@ -281,6 +299,9 @@ def cmd_mission(args):
             print(f"[FlowForge CLI] Mission '{args.mission_id}' started successfully!")
             print(f"  File moved to: {path}")
             print("  PROJECT_STATE.yaml synchronized.")
+        except FileNotFoundError:
+            print(f"Mission {args.mission_id} not found.\nRun:\nflowforge mission list\nfor available Missions.", file=sys.stderr)
+            sys.exit(1)
         except Exception as e:
             print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
             sys.exit(1)
@@ -291,6 +312,9 @@ def cmd_mission(args):
             print(f"[FlowForge CLI] Mission '{args.mission_id}' completed successfully!")
             print(f"  File moved to: {path}")
             print("  PROJECT_STATE.yaml synchronized.")
+        except FileNotFoundError:
+            print(f"Mission {args.mission_id} not found.\nRun:\nflowforge mission list\nfor available Missions.", file=sys.stderr)
+            sys.exit(1)
         except Exception as e:
             print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
             sys.exit(1)

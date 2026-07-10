@@ -121,10 +121,18 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Otomatisasi install misi backlog perdana PROJECT-000 Repository Discovery
 -   Penyusunan dokumen formal RFC-011 & ADR-011 untuk Smart Bootstrap
 -   Unit Tests baru untuk memvalidasi deteksi signature framework, git safety, dan idempotency
+-   Mission domain model extension with code field
+-   MissionLoader handling non-UUID ID strings gracefully
+-   MissionLifecycleManager lookup by Mission Code, id, or filename
+-   PROJECT_STATE.yaml sync with resolved human-friendly Mission Codes
+-   CLI cmd_compile and cmd_mission show/start/complete resolved by Mission Code
+-   Friendly console error outputs specification
+-   Penyusunan dokumen formal RFC-012 & ADR-012 untuk CLI Hardening
+-   Unit Tests baru untuk memvalidasi pencarian Mission Code, compiler, dan console errors
 
 ## Current Task
 
--   v1.3 Smart Project Bootstrap Sign-off
+-   v1.3 CLI UX Hardening Sign-off
 
 ## Next Tasks
 

@@ -49,11 +49,17 @@ class MissionLoader:
 
         # 5. UUID / ID Validation & Duplicate Checks
         mission_id_str = data.get("id")
+        code = data.get("code")
+        
         if mission_id_str:
             try:
                 mission_id = uuid.UUID(str(mission_id_str))
             except ValueError:
-                raise ValueError("Invalid UUID format for mission id")
+                # If ID is not a valid UUID, treat it as the mission code if code is not set,
+                # and generate a fresh UUID for the model representation.
+                if not code:
+                    code = str(mission_id_str)
+                mission_id = uuid.uuid4()
         else:
             mission_id = uuid.uuid4()
 
@@ -81,6 +87,7 @@ class MissionLoader:
 
         return Mission(
             id=mission_id,
+            code=code,
             title=title,
             description=description,
             status=status,

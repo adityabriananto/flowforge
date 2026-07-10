@@ -21,6 +21,7 @@ class Mission:
     title: str
     description: str
     status: MissionState
+    code: Optional[str] = None
     version: str = "1"
     priority: str = "medium"
     owner: Optional[str] = None

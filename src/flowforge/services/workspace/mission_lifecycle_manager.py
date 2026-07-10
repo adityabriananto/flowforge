@@ -37,8 +37,8 @@ class MissionLifecycleManager:
             yaml.dump(state, f, sort_keys=False, default_flow_style=False)
 
     @classmethod
-    def _find_mission_file(cls, mission_id: str, base_path: str = ".") -> tuple[Optional[str], Optional[str]]:
-        """Returns tuple of (folder_name, file_path) if found, otherwise (None, None)."""
+    def _find_mission_file(cls, mission_id_or_code: str, base_path: str = ".") -> tuple[Optional[str], Optional[str]]:
+        """Returns tuple of (folder_name, file_path) if found, otherwise (None, None). Matches ID, Code, or Filename."""
         states = ["backlog", "active", "completed"]
         for state in states:
             folder = os.path.join(base_path, "engineering", "missions", state)
@@ -47,12 +47,20 @@ class MissionLifecycleManager:
             for file_name in os.listdir(folder):
                 if file_name.endswith(".yaml"):
                     file_path = os.path.join(folder, file_name)
+                    name_without_ext = os.path.splitext(file_name)[0]
+                    
+                    # Direct filename match (e.g. PROJECT-000.yaml)
+                    if name_without_ext.lower() == str(mission_id_or_code).lower():
+                        return state, file_path
+                        
                     try:
-                        # Load file to verify ID
                         with open(file_path, "r", encoding="utf-8") as f:
                             data = yaml.safe_load(f)
-                        if data and str(data.get("id")) == str(mission_id):
-                            return state, file_path
+                        if data:
+                            yaml_id = str(data.get("id", ""))
+                            yaml_code = str(data.get("code", ""))
+                            if yaml_id.lower() == str(mission_id_or_code).lower() or yaml_code.lower() == str(mission_id_or_code).lower():
+                                return state, file_path
                     except Exception:
                         pass
         return None, None
@@ -65,16 +73,16 @@ class MissionLifecycleManager:
         mission_id: Optional[str] = None, 
         base_path: str = "."
     ) -> str:
-        """Creates a new mission in backlog using the template."""
+        """Creates a new mission in backlog using the template with UUID id and custom code."""
         # Ensure workspace folders exist
         EngineeringWorkspace.initialize_workspace(base_path)
         
-        m_id = mission_id or str(uuid.uuid4())
+        m_code = mission_id or f"PROJECT-{len(cls.list_missions(base_path)['backlog']) + 1:03d}"
         
-        # Verify duplicate ID
-        state_found, _ = cls._find_mission_file(m_id, base_path)
+        # Verify duplicate ID/Code
+        state_found, _ = cls._find_mission_file(m_code, base_path)
         if state_found:
-            raise ValueError(f"Duplicate Mission ID: A mission with ID '{m_id}' already exists.")
+            raise ValueError(f"Duplicate Mission Code/ID: A mission with Code or ID '{m_code}' already exists.")
 
         template_path = os.path.join(base_path, "engineering", "missions", "templates", "mission.yaml")
         if not os.path.exists(template_path):
@@ -84,12 +92,13 @@ class MissionLifecycleManager:
             template_data = yaml.safe_load(f)
 
         # Update metadata
-        template_data["id"] = m_id
+        template_data["id"] = str(uuid.uuid4())
+        template_data["code"] = m_code
         template_data["title"] = title
         template_data["description"] = description
         template_data["status"] = "BACKLOG"
 
-        dest_file = os.path.join(base_path, "engineering", "missions", "backlog", f"{m_id}.yaml")
+        dest_file = os.path.join(base_path, "engineering", "missions", "backlog", f"{m_code}.yaml")
         with open(dest_file, "w", encoding="utf-8") as f:
             yaml.dump(template_data, f, sort_keys=False, default_flow_style=False)
             
@@ -146,6 +155,8 @@ class MissionLifecycleManager:
         with open(file_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         data["status"] = "ACTIVE"
+        resolved_code = data.get("code") or os.path.splitext(os.path.basename(file_path))[0]
+        
         with open(file_path, "w", encoding="utf-8") as f:
             yaml.dump(data, f, sort_keys=False, default_flow_style=False)
 
@@ -155,10 +166,10 @@ class MissionLifecycleManager:
 
         # Sync PROJECT_STATE.yaml
         project_state = cls.get_project_state(base_path)
-        if mission_id not in project_state["active_missions"]:
-            project_state["active_missions"].append(mission_id)
-        if mission_id in project_state.get("completed_missions", []):
-            project_state["completed_missions"].remove(mission_id)
+        if resolved_code not in project_state["active_missions"]:
+            project_state["active_missions"].append(resolved_code)
+        if resolved_code in project_state.get("completed_missions", []):
+            project_state["completed_missions"].remove(resolved_code)
         cls.write_project_state(project_state, base_path)
 
         return new_path
@@ -177,6 +188,8 @@ class MissionLifecycleManager:
         with open(file_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         data["status"] = "DONE"
+        resolved_code = data.get("code") or os.path.splitext(os.path.basename(file_path))[0]
+        
         with open(file_path, "w", encoding="utf-8") as f:
             yaml.dump(data, f, sort_keys=False, default_flow_style=False)
 
@@ -186,12 +199,12 @@ class MissionLifecycleManager:
 
         # Sync PROJECT_STATE.yaml
         project_state = cls.get_project_state(base_path)
-        if mission_id in project_state["active_missions"]:
-            project_state["active_missions"].remove(mission_id)
+        if resolved_code in project_state["active_missions"]:
+            project_state["active_missions"].remove(resolved_code)
         if "completed_missions" not in project_state:
             project_state["completed_missions"] = []
-        if mission_id not in project_state["completed_missions"]:
-            project_state["completed_missions"].append(mission_id)
+        if resolved_code not in project_state["completed_missions"]:
+            project_state["completed_missions"].append(resolved_code)
         cls.write_project_state(project_state, base_path)
 
         return new_path
