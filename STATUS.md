@@ -92,12 +92,17 @@ Sprint 12 -- Resiliency, Scheduling & Policy Engine (v1.2)
 -   v1.1 Refactor unit testing suite (`pytest`) di `tests/test_v1_1_refactor.py`
 -   Mission Domain Model (`mission.py`) & Lifecycle States dengan MissionState Enum
 -   Mission Skema v1 dan Validasi YAML yang diperketat
--   Unit Tests baru untuk menguji skema, tipe, error parse, dan UUID duplikat
--   Penyusunan dokumen formal RFC-006 & ADR-006 yang disempurnakan
+-   Agent Profile Domain Model (`agent_profile.py`)
+-   Agent Profile Repository Port & InMemory Repository Adapter
+-   Agent Profile Loader (`agent_profile_loader.py`) dengan validasi kapabilitas & mode eksekusi
+-   Agent Profile Service dengan query filter capability score
+-   Penyusunan 6 berkas contoh Agent Profile di direktori `agent_profiles/`
+-   Penyusunan dokumen formal RFC-007 & ADR-007 untuk Agent Profile System
+-   Unit Tests baru untuk memvalidasi skema, tipe, error parse, dan filter query
 
 ## Current Task
 
--   v1.2 DX & Mission System Hardening Sign-off
+-   v1.2 DX & Agent Profile System Sign-off
 
 ## Next Tasks
 

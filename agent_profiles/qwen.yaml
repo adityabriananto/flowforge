@@ -1,0 +1,22 @@
+version: "1"
+id: "qwen-2-5"
+display_name: "Alibaba Qwen 2.5 Coder Agent"
+provider: "alibaba"
+execution_mode: "api"
+capabilities:
+  coding: 82
+  refactoring: 80
+  reasoning: 75
+limitations:
+  - "weaker-non-coding-reasoning"
+preferred_output: "text"
+context_limit: 32000
+supported_languages:
+  - "python"
+  - "javascript"
+  - "c++"
+supported_frameworks:
+  - "vue"
+  - "fastapi"
+metadata:
+  model_id: "qwen2.5-coder-7b-instruct"

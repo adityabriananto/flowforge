@@ -1,0 +1,27 @@
+version: "1"
+id: "claude-3-5"
+display_name: "Claude 3.5 Sonnet Agent"
+provider: "anthropic"
+execution_mode: "api"
+capabilities:
+  coding: 95
+  refactoring: 90
+  reasoning: 95
+  review: 90
+limitations:
+  - "no-direct-internet-access"
+preferred_output: "text"
+context_limit: 200000
+supported_languages:
+  - "python"
+  - "javascript"
+  - "typescript"
+  - "rust"
+  - "java"
+supported_frameworks:
+  - "react"
+  - "vue"
+  - "fastapi"
+  - "django"
+metadata:
+  model_id: "claude-3-5-sonnet-20241022"

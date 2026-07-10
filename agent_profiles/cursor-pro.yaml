@@ -1,0 +1,24 @@
+version: "1"
+id: "cursor-pro"
+display_name: "Cursor Pro Edition Agent"
+provider: "cursor"
+execution_mode: "agentic"
+capabilities:
+  coding: 90
+  refactoring: 85
+  reasoning: 80
+limitations:
+  - "requires-paid-subscription"
+preferred_output: "diff"
+context_limit: 8000
+supported_languages:
+  - "python"
+  - "javascript"
+  - "typescript"
+  - "go"
+supported_frameworks:
+  - "react"
+  - "nextjs"
+  - "fastapi"
+metadata:
+  tier: "pro"

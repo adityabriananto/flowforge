@@ -1,0 +1,25 @@
+version: "1"
+id: "codex-gpt4"
+display_name: "OpenAI GPT-4o Codex Agent"
+provider: "openai"
+execution_mode: "api"
+capabilities:
+  coding: 88
+  refactoring: 85
+  reasoning: 90
+  review: 85
+limitations:
+  - "rate-limited-per-minute"
+preferred_output: "text"
+context_limit: 128000
+supported_languages:
+  - "python"
+  - "javascript"
+  - "typescript"
+  - "csharp"
+supported_frameworks:
+  - "react"
+  - "fastapi"
+  - "dotnet"
+metadata:
+  model_id: "gpt-4o"

@@ -1,0 +1,25 @@
+version: "1"
+id: "gemini-1-5"
+display_name: "Google Gemini 1.5 Pro Agent"
+provider: "google"
+execution_mode: "api"
+capabilities:
+  coding: 85
+  refactoring: 80
+  reasoning: 92
+  review: 88
+limitations:
+  - "high-latency-for-large-context"
+preferred_output: "text"
+context_limit: 1000000
+supported_languages:
+  - "python"
+  - "javascript"
+  - "java"
+  - "go"
+supported_frameworks:
+  - "angular"
+  - "fastapi"
+  - "spring-boot"
+metadata:
+  model_id: "gemini-1.5-pro"

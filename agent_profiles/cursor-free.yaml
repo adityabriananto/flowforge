@@ -1,0 +1,21 @@
+version: "1"
+id: "cursor-free"
+display_name: "Cursor Free Edition Agent"
+provider: "cursor"
+execution_mode: "interactive"
+capabilities:
+  coding: 65
+  refactoring: 60
+  reasoning: 50
+limitations:
+  - "rate-limits-on-free-tier"
+  - "no-long-context-support"
+preferred_output: "diff"
+context_limit: 2000
+supported_languages:
+  - "python"
+  - "javascript"
+supported_frameworks:
+  - "react"
+metadata:
+  tier: "free"
