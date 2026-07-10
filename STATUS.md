@@ -133,10 +133,17 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Penyusunan dokumen formal RFC-013 & ADR-013 untuk AI Runtime Architecture
 -   Penyempurnaan arsitektur AI Runtime Refinement (FF-018.0) (Mission Package as Contract, Engineering Session, Engineering State, Deterministic Capabilities)
 -   Pembaruan dokumen RFC-013 & ADR-013 versi Refined
+-   Implementasi domain model agregat EngineeringState
+-   Pembuatan port interface EngineeringStateRepository
+-   Implementasi adapter YAMLEngineeringStateRepository
+-   Pembuatan loader & serializer EngineeringStateLoader
+-   Pembuatan logika transisi bisnis di EngineeringStateService
+-   Unit Tests baru untuk memvalidasi parser skema, repository, dan transisi state bisnis
+-   Penyusunan dokumen formal RFC-014 & ADR-014 untuk Engineering State
 
 ## Current Task
 
--   v1.4 AI Runtime Architecture Refinement Sign-off
+-   v1.4.1 Engineering State Sign-off
 
 ## Next Tasks
 
