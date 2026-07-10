@@ -90,10 +90,15 @@ Sprint 12 -- Resiliency, Scheduling & Policy Engine (v1.2)
 -   Auto-Discovery Plugins via pip entrypoints (`importlib.metadata`)
 -   Workflow Timeline & Execution Metrics di React Dashboard
 -   v1.1 Refactor unit testing suite (`pytest`) di `tests/test_v1_1_refactor.py`
+-   Mission Domain Model (`mission.py`) & Lifecycle States
+-   Mission Loader (`mission_loader.py`) untuk validasi file YAML Misi
+-   MissionRepository Port & InMemoryMissionRepository Adapter
+-   Mission Lifecycle Management Service (`mission_service.py`)
+-   Penyusunan dokumen formal RFC-006 & ADR-006 untuk Mission System
 
 ## Current Task
 
--   v1.2 DX Sign-off
+-   v1.2 DX & Mission System Sign-off
 
 ## Next Tasks
 
