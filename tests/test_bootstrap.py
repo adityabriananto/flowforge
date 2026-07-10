@@ -86,7 +86,7 @@ def test_smart_bootstrap_execution(tmp_path):
     assert os.path.exists(init_mission_path)
     with open(init_mission_path, "r") as f:
         m_data = yaml.safe_load(f)
-    assert m_data["id"] == "VUE-000"
+    assert m_data["code"] == "VUE-000"
     assert m_data["title"] == "Repository Discovery"
 
 def test_bootstrap_idempotency(tmp_path):

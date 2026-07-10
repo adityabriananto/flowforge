@@ -77,12 +77,26 @@ class MissionLifecycleManager:
         # Ensure workspace folders exist
         EngineeringWorkspace.initialize_workspace(base_path)
         
-        m_code = mission_id or f"PROJECT-{len(cls.list_missions(base_path)['backlog']) + 1:03d}"
+        # Determine if input mission_id is a valid UUID
+        m_id_is_uuid = False
+        if mission_id:
+            try:
+                uuid.UUID(str(mission_id))
+                m_id_is_uuid = True
+            except ValueError:
+                pass
+
+        if m_id_is_uuid:
+            m_uuid = str(mission_id)
+            m_code = str(mission_id)
+        else:
+            m_uuid = str(uuid.uuid4())
+            m_code = mission_id or f"PROJECT-{len(cls.list_missions(base_path)['backlog']) + 1:03d}"
         
         # Verify duplicate ID/Code
         state_found, _ = cls._find_mission_file(m_code, base_path)
         if state_found:
-            raise ValueError(f"Duplicate Mission Code/ID: A mission with Code or ID '{m_code}' already exists.")
+            raise ValueError(f"Duplicate Mission ID/Code: A mission with ID or Code '{m_code}' already exists.")
 
         template_path = os.path.join(base_path, "engineering", "missions", "templates", "mission.yaml")
         if not os.path.exists(template_path):
@@ -92,7 +106,7 @@ class MissionLifecycleManager:
             template_data = yaml.safe_load(f)
 
         # Update metadata
-        template_data["id"] = str(uuid.uuid4())
+        template_data["id"] = m_uuid
         template_data["code"] = m_code
         template_data["title"] = title
         template_data["description"] = description
