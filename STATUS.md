@@ -129,14 +129,16 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Friendly console error outputs specification
 -   Penyusunan dokumen formal RFC-012 & ADR-012 untuk CLI Hardening
 -   Unit Tests baru untuk memvalidasi pencarian Mission Code, compiler, dan console errors
+-   Desain AI Runtime Architecture formal, spesifikasi domain & interfaces publik
+-   Penyusunan dokumen formal RFC-013 & ADR-013 untuk AI Runtime Architecture
 
 ## Current Task
 
--   v1.3 CLI UX Hardening Sign-off
+-   v1.4 AI Runtime Architecture Sign-off
 
 ## Next Tasks
 
--   Sprint 14 -- Distributed Worker & Broker (v1.4) (Redis, Docker, Kubernetes)
+-   Sprint 14 — Distributed Worker & Broker (v1.4.1) (Redis, Docker, Kubernetes)
 
 ## Blockers
 
