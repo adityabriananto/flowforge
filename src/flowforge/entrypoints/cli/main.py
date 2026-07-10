@@ -18,7 +18,7 @@ def cmd_init(args):
     
     # Write workflow.ff.yaml starter file
     workflow_yaml = """name: "Autonomous AI Agent Workflow"
-version: "1.2.0"
+version: "1.3.0"
 initial_state: "CODING"
 
 roles:
@@ -153,7 +153,7 @@ def cmd_replay(args):
     print("  [08:00:20] Workflow COMPLETED successfully.")
 
 def cmd_compile(args):
-    """Compiles a mission YAML and optional Agent Profile into a structured Mission Package (v1.2 FF-014)."""
+    """Compiles a mission YAML and optional Agent Profile into a structured Mission Package (v1.3 FF-014)."""
     print(f"[FlowForge CLI] Compiling mission file '{args.mission_file}'...")
     if not os.path.exists(args.mission_file):
         print(f"[FlowForge CLI] Error: Mission file '{args.mission_file}' not found.", file=sys.stderr)
@@ -182,7 +182,7 @@ def cmd_compile(args):
 
     # 3. Assemble and compile project context (simulate active workflow/sprint if needed)
     project_context = {
-        "sprint_status": "Active Sprint 12 (v1.2)",
+        "sprint_status": "Active Sprint 13 (v1.3)",
         "workflow_state": "ACTIVE"
     }
 

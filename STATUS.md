@@ -6,15 +6,15 @@ FlowForge
 
 ## Version
 
-v0.1.0
+v1.3.0
 
 ## Current Sprint
 
-Sprint 12 -- Resiliency, Scheduling & Policy Engine (v1.2)
+Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 
 ## Overall Progress
 
-100% (v1.2 DX & Decoupling Complete)
+100% (v1.3 Mission System & Compiler Complete)
 
 ## Completed
 
@@ -107,11 +107,11 @@ Sprint 12 -- Resiliency, Scheduling & Policy Engine (v1.2)
 
 ## Current Task
 
--   v1.2 DX & Mission Package Compiler Sign-off
+-   v1.3 Mission System & Compiler Sign-off
 
 ## Next Tasks
 
--   Sprint 13 -- Distributed Worker & Broker (v1.3) (Redis, Docker, Kubernetes)
+-   Sprint 14 -- Distributed Worker & Broker (v1.4) (Redis, Docker, Kubernetes)
 
 ## Blockers
 

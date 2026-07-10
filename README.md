@@ -39,7 +39,7 @@ Vendor-specific implementations (Claude, Codex, Bedrock, etc.) live exclusively 
 
 ---
 
-## ✨ Key Features (v1.2)
+## ✨ Key Features (v1.3)
 
 - 📝 **FlowForge Workflow Language (FFWL)**: Define state configurations, transitions, and roles declaratively using strict `.ff.yaml` specifications.
 - 🎯 **Mission-Driven Engineering (New)**: Define targets using strict Mission YAML (Skema v1). Manage lifecycle through strongly typed `MissionState` Enum: `BACKLOG`, `READY`, `ACTIVE`, `REVIEW`, `DONE`, `ARCHIVED`.
@@ -293,7 +293,9 @@ pytest tests/
 |---------|-----------|--------|
 | v1.0 | Core Engine, Database, API, Dashboard, Git Integration, Plugin SDK | ✅ Complete |
 | v1.1 | FFWL DSL, Prompt Pipeline, Memory Engine, Execution Providers, Workspace Sandbox | ✅ Complete |
-| v1.2 | Policy Engine, Provider Registry, CLI Tools, Zero-Config Discovery, Vendor-Agnostic Core, Mission System, Agent Profile, Mission Package Compiler | ✅ Complete |
+| v1.2 | Policy Engine, Provider Registry, CLI Tools, Zero-Config Discovery, Vendor-Agnostic Core | ✅ Complete |
+| v1.3 | Mission System, Agent Profile, Mission Package Compiler | ✅ Complete |
+| v1.4 | Distributed Worker & Broker (Redis, Docker, Kubernetes) | 🔜 Planned |
 
 ---
 
