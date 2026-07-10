@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Optional, List
-from flowforge.domain.mission import Mission, VALID_STATES
+from typing import Optional, List, Union
+from flowforge.domain.mission import Mission, MissionState, VALID_STATES
 from flowforge.ports.mission_repository import MissionRepository
 
 class MissionService:
@@ -13,15 +13,17 @@ class MissionService:
         title: str, 
         description: str, 
         goals: Optional[List[str]] = None, 
-        metadata: Optional[dict] = None
+        metadata: Optional[dict] = None,
+        priority: str = "medium"
     ) -> Mission:
         mission = Mission(
             id=uuid.uuid4(),
             title=title,
             description=description,
-            status="BACKLOG",
+            status=MissionState.BACKLOG,
             goals=goals or [],
             metadata=metadata or {},
+            priority=priority,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc)
         )
@@ -31,15 +33,18 @@ class MissionService:
     async def get_mission(self, mission_id: uuid.UUID) -> Optional[Mission]:
         return await self.repository.get(mission_id)
 
-    async def update_status(self, mission_id: uuid.UUID, new_status: str) -> Mission:
-        if new_status not in VALID_STATES:
-            raise ValueError(f"Invalid status '{new_status}'. Must be one of {VALID_STATES}")
+    async def update_status(self, mission_id: uuid.UUID, new_status: Union[str, MissionState]) -> Mission:
+        # Convert string to Enum if needed
+        status_str = new_status.value if isinstance(new_status, MissionState) else new_status
+        
+        if status_str not in VALID_STATES:
+            raise ValueError(f"Invalid status '{status_str}'. Must be one of {VALID_STATES}")
         
         mission = await self.repository.get(mission_id)
         if not mission:
             raise ValueError(f"Mission with ID {mission_id} not found")
         
-        mission.status = new_status
+        mission.status = MissionState(status_str)
         mission.updated_at = datetime.now(timezone.utc)
         
         await self.repository.save(mission)
