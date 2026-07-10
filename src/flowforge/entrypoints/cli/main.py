@@ -204,6 +204,74 @@ def cmd_compile(args):
 
     print(f"[FlowForge CLI] Compilation success! Mission Package generated: {output_filename}")
 
+def cmd_mission(args):
+    """Handles all 'flowforge mission' subcommands (v1.3.0 FF-016)."""
+    from flowforge.services.workspace.mission_lifecycle_manager import MissionLifecycleManager
+
+    if args.mission_command == "new":
+        try:
+            path = MissionLifecycleManager.create_mission(
+                title=args.title,
+                description=args.desc or "",
+                mission_id=args.id,
+                base_path="."
+            )
+            print(f"[FlowForge CLI] Created new mission successfully in backlog: {path}")
+        except Exception as e:
+            print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
+            sys.exit(1)
+
+    elif args.mission_command == "list":
+        try:
+            grouped = MissionLifecycleManager.list_missions(base_path=".")
+            print("[FlowForge CLI] Missions List:")
+            print("\n  [BACKLOG]")
+            for m in grouped["backlog"]:
+                print(f"    - [{m['id']}] {m['title']} (Status: {m['status']})")
+            print("\n  [ACTIVE]")
+            for m in grouped["active"]:
+                print(f"    - [{m['id']}] {m['title']} (Status: {m['status']})")
+            print("\n  [COMPLETED]")
+            for m in grouped["completed"]:
+                print(f"    - [{m['id']}] {m['title']} (Status: {m['status']})")
+        except Exception as e:
+            print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
+            sys.exit(1)
+
+    elif args.mission_command == "show":
+        try:
+            mission = MissionLifecycleManager.show_mission(args.mission_id, base_path=".")
+            print(f"[FlowForge CLI] Mission [{mission.id}] Details:")
+            print(f"  Title: {mission.title}")
+            print(f"  Description: {mission.description}")
+            print(f"  Status: {mission.status}")
+            print(f"  Priority: {mission.priority}")
+            print(f"  Deliverables: {', '.join(mission.deliverables)}")
+            print(f"  Definition of Done: {', '.join(mission.definition_of_done)}")
+        except Exception as e:
+            print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
+            sys.exit(1)
+
+    elif args.mission_command == "start":
+        try:
+            path = MissionLifecycleManager.start_mission(args.mission_id, base_path=".")
+            print(f"[FlowForge CLI] Mission '{args.mission_id}' started successfully!")
+            print(f"  File moved to: {path}")
+            print("  PROJECT_STATE.yaml synchronized.")
+        except Exception as e:
+            print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
+            sys.exit(1)
+
+    elif args.mission_command == "complete":
+        try:
+            path = MissionLifecycleManager.complete_mission(args.mission_id, base_path=".")
+            print(f"[FlowForge CLI] Mission '{args.mission_id}' completed successfully!")
+            print(f"  File moved to: {path}")
+            print("  PROJECT_STATE.yaml synchronized.")
+        except Exception as e:
+            print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
+            sys.exit(1)
+
 def main():
     parser = argparse.ArgumentParser(description="FlowForge CLI - Developer Experience Tool")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -226,6 +294,31 @@ def main():
     parser_compile = subparsers.add_parser("compile", help="Compile a mission into a vendor-agnostic Mission Package")
     parser_compile.add_argument("mission_file", help="Path to mission YAML file")
     parser_compile.add_argument("--profile", help="Path to agent profile YAML file", required=False)
+
+    # Mission
+    parser_mission = subparsers.add_parser("mission", help="Manage mission lifecycle in the Engineering Workspace")
+    mission_subparsers = parser_mission.add_subparsers(dest="mission_command", required=True)
+
+    # Mission New
+    parser_m_new = mission_subparsers.add_parser("new", help="Create a new mission in backlog")
+    parser_m_new.add_argument("title", help="Title of the new mission")
+    parser_m_new.add_argument("--desc", help="Optional description of the mission", required=False)
+    parser_m_new.add_argument("--id", help="Optional custom UUID for the mission", required=False)
+
+    # Mission List
+    mission_subparsers.add_parser("list", help="List all missions grouped by state")
+
+    # Mission Show
+    parser_m_show = mission_subparsers.add_parser("show", help="Show details of a specific mission")
+    parser_m_show.add_argument("mission_id", help="UUID of the mission to display")
+
+    # Mission Start
+    parser_m_start = mission_subparsers.add_parser("start", help="Start a mission (move backlog -> active)")
+    parser_m_start.add_argument("mission_id", help="UUID of the mission to start")
+
+    # Mission Complete
+    parser_m_complete = mission_subparsers.add_parser("complete", help="Complete a mission (move active -> completed)")
+    parser_m_complete.add_argument("mission_id", help="UUID of the mission to complete")
     
     args = parser.parse_args()
     
@@ -239,6 +332,8 @@ def main():
         cmd_replay(args)
     elif args.command == "compile":
         cmd_compile(args)
+    elif args.command == "mission":
+        cmd_mission(args)
 
 if __name__ == "__main__":
     main()

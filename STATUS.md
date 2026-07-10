@@ -110,10 +110,15 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Integrasi kompiler default path ke Engineering Workspace
 -   Penyusunan dokumen formal RFC-009 & ADR-009 untuk Workspace
 -   Unit Tests baru untuk memvalidasi inisialisasi struktur dan transisi file
+-   MissionLifecycleManager & lifecycle transitions logic
+-   Integrasi CLI subcommand `flowforge mission` (`new`, `list`, `show`, `start`, `complete`)
+-   Otomatisasi sinkronisasi PROJECT_STATE.yaml status proyek
+-   Penyusunan dokumen formal RFC-010 & ADR-010 untuk Mission CLI
+-   Unit Tests baru untuk memvalidasi perintah CLI, routing subcommands, dan integrasi output file
 
 ## Current Task
 
--   v1.3 Mission System, Compiler & Engineering Workspace Sign-off
+-   v1.3 Mission Management CLI Sign-off
 
 ## Next Tasks
 
