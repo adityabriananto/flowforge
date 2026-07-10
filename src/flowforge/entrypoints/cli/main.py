@@ -152,6 +152,58 @@ def cmd_replay(args):
     print("  [08:00:18] State TESTING: pytest suite passed.")
     print("  [08:00:20] Workflow COMPLETED successfully.")
 
+def cmd_compile(args):
+    """Compiles a mission YAML and optional Agent Profile into a structured Mission Package (v1.2 FF-014)."""
+    print(f"[FlowForge CLI] Compiling mission file '{args.mission_file}'...")
+    if not os.path.exists(args.mission_file):
+        print(f"[FlowForge CLI] Error: Mission file '{args.mission_file}' not found.", file=sys.stderr)
+        sys.exit(1)
+
+    # 1. Load Mission using loader
+    from flowforge.services.mission_loader import MissionLoader
+    try:
+        mission = MissionLoader.load_from_file(args.mission_file)
+    except Exception as e:
+        print(f"[FlowForge CLI] Error loading mission: {str(e)}", file=sys.stderr)
+        sys.exit(1)
+
+    # 2. Load optional Agent Profile
+    agent_profile = None
+    if args.profile:
+        if not os.path.exists(args.profile):
+            print(f"[FlowForge CLI] Error: Agent profile file '{args.profile}' not found.", file=sys.stderr)
+            sys.exit(1)
+        from flowforge.services.agent_profile_loader import AgentProfileLoader
+        try:
+            agent_profile = AgentProfileLoader.load_from_file(args.profile)
+        except Exception as e:
+            print(f"[FlowForge CLI] Error loading agent profile: {str(e)}", file=sys.stderr)
+            sys.exit(1)
+
+    # 3. Assemble and compile project context (simulate active workflow/sprint if needed)
+    project_context = {
+        "sprint_status": "Active Sprint 12 (v1.2)",
+        "workflow_state": "ACTIVE"
+    }
+
+    # 4. Invoke compiler
+    from flowforge.services.compiler.compiler import MissionPackageCompiler
+    from flowforge.services.compiler.renderer import MissionPackageRenderer
+
+    compiler = MissionPackageCompiler()
+    package = compiler.compile(
+        mission=mission, 
+        agent_profile=agent_profile, 
+        project_context=project_context
+    )
+    rendered = MissionPackageRenderer.render_to_yaml(package)
+
+    output_filename = f"mission_package_{mission.id}.yaml"
+    with open(output_filename, "w", encoding="utf-8") as f:
+        f.write(rendered)
+
+    print(f"[FlowForge CLI] Compilation success! Mission Package generated: {output_filename}")
+
 def main():
     parser = argparse.ArgumentParser(description="FlowForge CLI - Developer Experience Tool")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -169,6 +221,11 @@ def main():
     # Replay
     parser_replay = subparsers.add_parser("replay", help="Replay logs for a specific workflow run")
     parser_replay.add_argument("instance_id", help="UUID of the workflow instance")
+
+    # Compile
+    parser_compile = subparsers.add_parser("compile", help="Compile a mission into a vendor-agnostic Mission Package")
+    parser_compile.add_argument("mission_file", help="Path to mission YAML file")
+    parser_compile.add_argument("--profile", help="Path to agent profile YAML file", required=False)
     
     args = parser.parse_args()
     
@@ -180,6 +237,8 @@ def main():
         cmd_doctor(args)
     elif args.command == "replay":
         cmd_replay(args)
+    elif args.command == "compile":
+        cmd_compile(args)
 
 if __name__ == "__main__":
     main()

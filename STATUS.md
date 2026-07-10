@@ -98,11 +98,16 @@ Sprint 12 -- Resiliency, Scheduling & Policy Engine (v1.2)
 -   Agent Profile Service dengan query filter capability score
 -   Penyusunan 6 berkas contoh Agent Profile di direktori `agent_profiles/`
 -   Penyusunan dokumen formal RFC-007 & ADR-007 untuk Agent Profile System
--   Unit Tests baru untuk memvalidasi skema, tipe, error parse, dan filter query
+-   Mission Package Domain Model (`mission_package.py`)
+-   ContextSelector, RuleSelector, dan ReferenceCollector pipeline services
+-   MissionPackageCompiler & MissionPackageRenderer terstandarisasi YAML
+-   Integrasi CLI subcommand `flowforge compile` di `main.py`
+-   Penyusunan dokumen formal RFC-008 & ADR-008 untuk compiler
+-   Unit Tests baru untuk memvalidasi seleksi context, rules, dan CLI compile
 
 ## Current Task
 
--   v1.2 DX & Agent Profile System Sign-off
+-   v1.2 DX & Mission Package Compiler Sign-off
 
 ## Next Tasks
 
