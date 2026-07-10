@@ -104,10 +104,16 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Integrasi CLI subcommand `flowforge compile` di `main.py`
 -   Penyusunan dokumen formal RFC-008 & ADR-008 untuk compiler
 -   Unit Tests baru untuk memvalidasi seleksi context, rules, dan CLI compile
+-   EngineeringWorkspace Initializer & Directory standardisation
+-   Mission transition state filesystem utility (`backlog` -> `active` -> `completed`)
+-   Penyusunan 5 berkas templates terstandardisasi (Mission, RFC, ADR, Sprint, Review)
+-   Integrasi kompiler default path ke Engineering Workspace
+-   Penyusunan dokumen formal RFC-009 & ADR-009 untuk Workspace
+-   Unit Tests baru untuk memvalidasi inisialisasi struktur dan transisi file
 
 ## Current Task
 
--   v1.3 Mission System & Compiler Sign-off
+-   v1.3 Mission System, Compiler & Engineering Workspace Sign-off
 
 ## Next Tasks
 

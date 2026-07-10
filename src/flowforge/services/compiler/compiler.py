@@ -9,8 +9,8 @@ from flowforge.services.compiler.reference_collector import ReferenceCollector
 class MissionPackageCompiler:
     def __init__(
         self, 
-        rules_file_path: str = "AGENTS.md", 
-        references_dir: str = "docs/references"
+        rules_file_path: str = "engineering/decisions/AGENTS.md", 
+        references_dir: str = "engineering/architecture"
     ):
         self.rules_file_path = rules_file_path
         self.references_dir = references_dir

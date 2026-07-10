@@ -1,0 +1,21 @@
+# FlowForge Mission Template (v1.0.0)
+version: "1"
+id: "FF-000"
+title: "Mission Title"
+description: "High-level goal description of what needs to be solved."
+status: "BACKLOG"
+priority: "medium" # low, medium, high, critical
+owner: "owner-role"
+reviewer: "reviewer-role"
+phase: "development"
+goal: "Define the specific technical objective"
+deliverables:
+  - "Deliverable item 1"
+constraints:
+  - "Constraint item 1"
+definition_of_done:
+  - "Unit tests pass with > 80% coverage"
+references:
+  - "rfc-000"
+metadata:
+  additional_key: "value"
