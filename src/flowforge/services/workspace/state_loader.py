@@ -1,18 +1,23 @@
 import yaml
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional, List
 from flowforge.domain.engineering_state import (
     EngineeringState,
     ProjectState,
     WorkspaceState,
-    MissionStateInfo,
-    ProviderStateInfo,
-    SessionStateInfo,
+    MissionState,
+    ProviderUsage,
+    ProviderState,
+    SessionState,
     KnowledgeEntry,
+    KnowledgeState,
     DecisionEntry,
+    DecisionState,
+    EngineeringEvent,
+    TimelineState,
+    OpenQuestion,
     BlockerEntry,
-    RecommendationEntry,
-    MilestoneEntry
+    RecommendationEntry
 )
 
 class EngineeringStateLoader:
@@ -48,24 +53,10 @@ class EngineeringStateLoader:
 
         # 4. Parse Mission State
         m_data = data.get("mission", {})
-        mission = MissionStateInfo(
+        mission = MissionState(
             current_mission=m_data.get("current_mission"),
             completed_missions=list(m_data.get("completed_missions", [])),
             mission_history=list(m_data.get("mission_history", []))
-        )
-
-        # 5. Parse Provider State
-        p_data = data.get("provider", {})
-        provider = ProviderStateInfo(
-            current_provider=p_data.get("current_provider"),
-            provider_history=list(p_data.get("provider_history", []))
-        )
-
-        # 6. Parse Session State
-        s_data = data.get("session", {})
-        session = SessionStateInfo(
-            current_session_id=s_data.get("current_session_id"),
-            latest_session_id=s_data.get("latest_session_id")
         )
 
         # Helper to parse datetime safely
@@ -77,30 +68,90 @@ class EngineeringStateLoader:
             except ValueError:
                 return datetime.utcnow()
 
-        # 7. Parse Knowledge
+        # Helper to parse optional datetime safely
+        def parse_optional_dt(dt_str: Any) -> Optional[datetime]:
+            if not dt_str:
+                return None
+            try:
+                return datetime.fromisoformat(str(dt_str))
+            except ValueError:
+                return None
+
+        # 5. Parse Provider State (ProviderUsage)
+        p_data = data.get("provider", {})
+        provider_history = []
+        for usage in p_data.get("provider_history", []) or []:
+            provider_history.append(ProviderUsage(
+                provider=str(usage.get("provider", "")),
+                mission=usage.get("mission"),
+                started_at=parse_dt(usage.get("started_at")),
+                finished_at=parse_optional_dt(usage.get("finished_at"))
+            ))
+        provider = ProviderState(
+            current_provider=p_data.get("current_provider"),
+            provider_history=provider_history
+        )
+
+        # 6. Parse Session State
+        s_data = data.get("session", {})
+        session = SessionState(
+            current_session_id=s_data.get("current_session_id"),
+            latest_session_id=s_data.get("latest_session_id")
+        )
+
+        # 7. Parse Knowledge State
+        k_data = data.get("knowledge_state", {})
         knowledge = []
-        for k in data.get("knowledge", []) or []:
+        for k in k_data.get("knowledge", []) or []:
             knowledge.append(KnowledgeEntry(
                 id=str(k.get("id", "")),
                 title=str(k.get("title", "")),
                 reference_path=str(k.get("reference_path", "")),
+                category=str(k.get("category", "repository")),
                 extracted_at=parse_dt(k.get("extracted_at"))
             ))
+        knowledge_state = KnowledgeState(knowledge=knowledge)
 
-        # 8. Parse Decisions
+        # 8. Parse Decisions State
+        d_data = data.get("decision_state", {})
         decisions = []
-        for d in data.get("decisions", []) or []:
+        for d in d_data.get("decisions", []) or []:
             decisions.append(DecisionEntry(
                 id=str(d.get("id", "")),
                 title=str(d.get("title", "")),
                 rationale=str(d.get("rationale", "")),
+                mission=d.get("mission"),
+                artifact_reference=d.get("artifact_reference"),
                 decided_at=parse_dt(d.get("decided_at"))
             ))
+        decision_state = DecisionState(decisions=decisions)
 
-        # 9. Parse Open Questions
-        open_questions = list(data.get("open_questions", []) or [])
+        # 9. Parse Timeline State (EngineeringEvent)
+        t_data = data.get("timeline_state", {})
+        event_log = []
+        for ev in t_data.get("event_log", []) or []:
+            event_log.append(EngineeringEvent(
+                id=str(ev.get("id", "")),
+                event_type=str(ev.get("event_type", "Engineering State Updated")),
+                description=str(ev.get("description", "")),
+                timestamp=parse_dt(ev.get("timestamp"))
+            ))
+        timeline_state = TimelineState(event_log=event_log)
 
-        # 10. Parse Blockers
+        # 10. Parse Open Questions
+        open_questions = []
+        for oq in data.get("open_questions", []) or []:
+            open_questions.append(OpenQuestion(
+                id=str(oq.get("id", "")),
+                title=str(oq.get("title", "")),
+                description=str(oq.get("description", "")),
+                mission=oq.get("mission"),
+                status=str(oq.get("status", "open")),
+                created_at=parse_dt(oq.get("created_at")),
+                resolved_at=parse_optional_dt(oq.get("resolved_at"))
+            ))
+
+        # 11. Parse Blockers
         blockers = []
         for b in data.get("blockers", []) or []:
             blockers.append(BlockerEntry(
@@ -109,7 +160,7 @@ class EngineeringStateLoader:
                 created_at=parse_dt(b.get("created_at"))
             ))
 
-        # 11. Parse Recommendations
+        # 12. Parse Recommendations
         recommendations = []
         for r in data.get("recommendations", []) or []:
             recommendations.append(RecommendationEntry(
@@ -118,27 +169,18 @@ class EngineeringStateLoader:
                 proposed_at=parse_dt(r.get("proposed_at"))
             ))
 
-        # 12. Parse Timeline
-        timeline = []
-        for t in data.get("timeline", []) or []:
-            timeline.append(MilestoneEntry(
-                id=str(t.get("id", "")),
-                title=str(t.get("title", "")),
-                target_date=t.get("target_date")
-            ))
-
         return EngineeringState(
             project=project,
             workspace=workspace,
             mission=mission,
             provider=provider,
             session=session,
-            knowledge=knowledge,
-            decisions=decisions,
+            knowledge_state=knowledge_state,
+            decision_state=decision_state,
+            timeline_state=timeline_state,
             open_questions=open_questions,
             blockers=blockers,
             recommendations=recommendations,
-            timeline=timeline,
             version=version
         )
 
@@ -162,29 +204,63 @@ class EngineeringStateLoader:
             },
             "provider": {
                 "current_provider": state.provider.current_provider,
-                "provider_history": state.provider.provider_history
+                "provider_history": [
+                    {
+                        "provider": p.provider,
+                        "mission": p.mission,
+                        "started_at": p.started_at.isoformat(),
+                        "finished_at": p.finished_at.isoformat() if p.finished_at else None
+                    } for p in state.provider.provider_history
+                ]
             },
             "session": {
                 "current_session_id": state.session.current_session_id,
                 "latest_session_id": state.session.latest_session_id
             },
-            "knowledge": [
+            "knowledge_state": {
+                "knowledge": [
+                    {
+                        "id": k.id,
+                        "title": k.title,
+                        "reference_path": k.reference_path,
+                        "category": k.category,
+                        "extracted_at": k.extracted_at.isoformat()
+                    } for k in state.knowledge_state.knowledge
+                ]
+            },
+            "decision_state": {
+                "decisions": [
+                    {
+                        "id": d.id,
+                        "title": d.title,
+                        "rationale": d.rationale,
+                        "mission": d.mission,
+                        "artifact_reference": d.artifact_reference,
+                        "decided_at": d.decided_at.isoformat()
+                    } for d in state.decision_state.decisions
+                ]
+            },
+            "timeline_state": {
+                "event_log": [
+                    {
+                        "id": ev.id,
+                        "event_type": ev.event_type,
+                        "description": ev.description,
+                        "timestamp": ev.timestamp.isoformat()
+                    } for ev in state.timeline_state.event_log
+                ]
+            },
+            "open_questions": [
                 {
-                    "id": k.id,
-                    "title": k.title,
-                    "reference_path": k.reference_path,
-                    "extracted_at": k.extracted_at.isoformat()
-                } for k in state.knowledge
+                    "id": oq.id,
+                    "title": oq.title,
+                    "description": oq.description,
+                    "mission": oq.mission,
+                    "status": oq.status,
+                    "created_at": oq.created_at.isoformat(),
+                    "resolved_at": oq.resolved_at.isoformat() if oq.resolved_at else None
+                } for oq in state.open_questions
             ],
-            "decisions": [
-                {
-                    "id": d.id,
-                    "title": d.title,
-                    "rationale": d.rationale,
-                    "decided_at": d.decided_at.isoformat()
-                } for d in state.decisions
-            ],
-            "open_questions": state.open_questions,
             "blockers": [
                 {
                     "id": b.id,
@@ -198,12 +274,5 @@ class EngineeringStateLoader:
                     "suggestion": r.suggestion,
                     "proposed_at": r.proposed_at.isoformat()
                 } for r in state.recommendations
-            ],
-            "timeline": [
-                {
-                    "id": t.id,
-                    "title": t.title,
-                    "target_date": t.target_date
-                } for t in state.timeline
             ]
         }

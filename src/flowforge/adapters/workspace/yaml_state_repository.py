@@ -5,7 +5,7 @@ from flowforge.domain.engineering_state import EngineeringState
 from flowforge.services.workspace.state_loader import EngineeringStateLoader
 
 class YAMLEngineeringStateRepository(EngineeringStateRepository):
-    def __init__(self, filename: str = "PROJECT_STATE.yaml"):
+    def __init__(self, filename: str = "ENGINEERING_STATE.yaml"):
         self.filename = filename
 
     def _get_path(self, base_path: str) -> str:
@@ -14,7 +14,7 @@ class YAMLEngineeringStateRepository(EngineeringStateRepository):
     def load(self, base_path: str = ".") -> EngineeringState:
         path = self._get_path(base_path)
         if not os.path.exists(path):
-            raise FileNotFoundError(f"PROJECT_STATE.yaml not found at: {path}")
+            raise FileNotFoundError(f"ENGINEERING_STATE.yaml not found at: {path}")
             
         with open(path, "r", encoding="utf-8") as f:
             content = f.read()
