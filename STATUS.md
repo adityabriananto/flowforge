@@ -147,10 +147,15 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Pembuatan logika imutabilitas dan handover di EngineeringSessionService
 -   Unit Tests baru untuk memvalidasi asersi imutabilitas, status state machine, dan state integration
 -   Penyusunan dokumen formal RFC-015 & ADR-015 untuk Engineering Session
+-   Pembuatan port interface AIProvider (mission_package-centric)
+-   Implementasi registry AIRuntimeProviderRegistry
+-   Pembuatan loader konfigurasi YAML ProviderConfigLoader & generic CLI adapter
+-   Unit Tests baru untuk memvalidasi registry lifecycle, config schema loading, dan dynamic cli injection
+-   Penyusunan dokumen formal RFC-016 & ADR-016 untuk Provider Interface & Registry
 
 ## Current Task
 
--   v1.4.2 Engineering Session Sign-off
+-   v1.5 Provider Interface & Registry Sign-off
 
 ## Next Tasks
 
