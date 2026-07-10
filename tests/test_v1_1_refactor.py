@@ -420,6 +420,8 @@ def test_cli_subcommands(tmp_path):
             pass
             
         args_init = Args()
+        args_init.force = True
+        args_init.prefix = "PROJECT"
         cmd_init(args_init)
         
         assert os.path.exists("workflow.ff.yaml")
