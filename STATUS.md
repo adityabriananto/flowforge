@@ -131,10 +131,12 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Unit Tests baru untuk memvalidasi pencarian Mission Code, compiler, dan console errors
 -   Desain AI Runtime Architecture formal, spesifikasi domain & interfaces publik
 -   Penyusunan dokumen formal RFC-013 & ADR-013 untuk AI Runtime Architecture
+-   Penyempurnaan arsitektur AI Runtime Refinement (FF-018.0) (Mission Package as Contract, Engineering Session, Engineering State, Deterministic Capabilities)
+-   Pembaruan dokumen RFC-013 & ADR-013 versi Refined
 
 ## Current Task
 
--   v1.4 AI Runtime Architecture Sign-off
+-   v1.4 AI Runtime Architecture Refinement Sign-off
 
 ## Next Tasks
 
