@@ -9,15 +9,26 @@ from flowforge.domain.engine import StateMachine
 from flowforge.domain.models import WorkflowInstance
 
 def cmd_init(args):
-    """Initializes a new FlowForge project directory (Challenge #18 & v1.3 DX)."""
-    print("[FlowForge CLI] Initializing new agentic workflow project...")
+    """Initializes a new FlowForge project directory (FF-017 Smart Project Bootstrap)."""
+    print("[FlowForge CLI] Initializing project workspace...")
     
-    # Create directories
-    os.makedirs("providers", exist_ok=True)
-    os.makedirs("agents", exist_ok=True)
+    from flowforge.services.workspace.bootstrapper import SmartBootstrapper
     
-    # Write workflow.ff.yaml starter file
-    workflow_yaml = """name: "Autonomous AI Agent Workflow"
+    try:
+        # Detect project, setup folder structures, generate metadata, and install templates
+        prefix = args.prefix if hasattr(args, "prefix") and args.prefix else "PROJECT"
+        force = args.force if hasattr(args, "force") else False
+        
+        print("✓ Detecting project")
+        details = SmartBootstrapper.bootstrap(base_path=".", force=force, prefix=prefix)
+        
+        # Write additional workflow and provider configs if not present
+        os.makedirs("providers", exist_ok=True)
+        os.makedirs("agents", exist_ok=True)
+        
+        workflow_yaml_path = "workflow.ff.yaml"
+        if not os.path.exists(workflow_yaml_path):
+            workflow_yaml = f"""name: "Autonomous AI Agent Workflow"
 version: "1.3.0"
 initial_state: "CODING"
 
@@ -43,15 +54,17 @@ states:
     is_final: true
 
 transitions:
-  - { from: "CODING", event: "SUCCESS", to: "TESTING" }
-  - { from: "TESTING", event: "SUCCESS", to: "COMPLETED" }
-  - { from: "TESTING", event: "FAILURE", to: "CODING" }
+  - {{ from: "CODING", event: "SUCCESS", to: "TESTING" }}
+  - {{ from: "TESTING", event: "SUCCESS", to: "COMPLETED" }}
+  - {{ from: "TESTING", event: "FAILURE", to: "CODING" }}
 """
-    with open("workflow.ff.yaml", "w", encoding="utf-8") as f:
-        f.write(workflow_yaml)
-        
-    # Write Claude provider profile yaml
-    claude_yaml = """name: "claude"
+            with open(workflow_yaml_path, "w", encoding="utf-8") as f:
+                f.write(workflow_yaml)
+
+        # Write Claude provider profile yaml if missing
+        claude_yaml_path = "providers/claude.yaml"
+        if not os.path.exists(claude_yaml_path):
+            claude_yaml = """name: "claude"
 capabilities:
   reasoning: 95
   coding: 85
@@ -60,11 +73,13 @@ cost: "high"
 speed: "medium"
 context_length: 200000
 """
-    with open("providers/claude.yaml", "w", encoding="utf-8") as f:
-        f.write(claude_yaml)
+            with open(claude_yaml_path, "w", encoding="utf-8") as f:
+                f.write(claude_yaml)
 
-    # Write Gemini provider profile yaml
-    gemini_yaml = """name: "gemini"
+        # Write Gemini provider profile yaml if missing
+        gemini_yaml_path = "providers/gemini.yaml"
+        if not os.path.exists(gemini_yaml_path):
+            gemini_yaml = """name: "gemini"
 capabilities:
   reasoning: 90
   coding: 80
@@ -73,11 +88,19 @@ cost: "low"
 speed: "fast"
 context_length: 1000000
 """
-    with open("providers/gemini.yaml", "w", encoding="utf-8") as f:
-        f.write(gemini_yaml)
+            with open(gemini_yaml_path, "w", encoding="utf-8") as f:
+                f.write(gemini_yaml)
 
-    print("[FlowForge CLI] Starter project directories and templates generated successfully.")
-    print("Files created: workflow.ff.yaml, providers/claude.yaml, providers/gemini.yaml")
+        print("✓ Creating Engineering Workspace")
+        print("✓ Installing templates")
+        print("✓ Creating PROJECT_STATE")
+        print("✓ Creating initial Mission")
+        print("\nInitialization complete.")
+        print(f"Project Type: {details['project_type']} (Framework: {details['framework']}, Language: {details['language']})")
+        
+    except Exception as e:
+        print(f"[FlowForge CLI] Error during initialization: {str(e)}", file=sys.stderr)
+        sys.exit(1)
 
 def cmd_run(args):
     """Runs a local .ff.yaml workflow definition otonomously (DX)."""
@@ -277,7 +300,9 @@ def main():
     subparsers = parser.add_subparsers(dest="command", required=True)
     
     # Init
-    subparsers.add_parser("init", help="Initialize a new FlowForge project")
+    parser_init = subparsers.add_parser("init", help="Initialize a new FlowForge project")
+    parser_init.add_argument("--force", action="store_true", help="Bypass Git repository safety check")
+    parser_init.add_argument("--prefix", default="PROJECT", help="Custom project prefix for initial mission")
     
     # Run
     parser_run = subparsers.add_parser("run", help="Run a workflow .ff.yaml definition locally")

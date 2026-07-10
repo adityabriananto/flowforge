@@ -13,7 +13,7 @@ class MissionLifecycleManager:
     
     @staticmethod
     def _get_project_state_path(base_path: str) -> str:
-        return os.path.join(base_path, "PROJECT_STATE.yaml")
+        return os.path.join(base_path, "engineering", "PROJECT_STATE.yaml")
 
     @classmethod
     def get_project_state(cls, base_path: str = ".") -> Dict[str, Any]:

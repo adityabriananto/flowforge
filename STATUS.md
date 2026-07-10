@@ -115,10 +115,16 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Otomatisasi sinkronisasi PROJECT_STATE.yaml status proyek
 -   Penyusunan dokumen formal RFC-010 & ADR-010 untuk Mission CLI
 -   Unit Tests baru untuk memvalidasi perintah CLI, routing subcommands, dan integrasi output file
+-   ProjectDetectorService & framework detection adapters (Laravel, Django, React, Vue, SpringBoot, Node)
+-   SmartBootstrapper dynamic workspace & metadata generation
+-   Inisiasi otomatis meta-informasi WORKSPACE.yaml dan PROJECT_STATE.yaml
+-   Otomatisasi install misi backlog perdana PROJECT-000 Repository Discovery
+-   Penyusunan dokumen formal RFC-011 & ADR-011 untuk Smart Bootstrap
+-   Unit Tests baru untuk memvalidasi deteksi signature framework, git safety, dan idempotency
 
 ## Current Task
 
--   v1.3 Mission Management CLI Sign-off
+-   v1.3 Smart Project Bootstrap Sign-off
 
 ## Next Tasks
 
