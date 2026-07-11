@@ -168,10 +168,16 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Penyusunan rekomendasi otonom Next Action setelah pemicuan perintah CLI init, compile, dan run
 -   Peningkatan penanganan level diagnosis doctor agar bersahabat sebelum inisiasi workspace
 -   Unit Tests baru untuk memvalidasi dynamic templates rendering dan bootstrapping data
+-   Penambahan field warnings dan metadata pada domain model MissionPackage (FF-021)
+-   Refaktor ContextSelector untuk memuat deskripsi properti WORKSPACE.yaml dan PROJECT_STATE.yaml otonom
+-   Refaktor ReferenceCollector untuk mengidentifikasi standard repository configurations otonom
+-   Peningkatan asersi warnings RuleSelector saat data rules kosong
+-   Pemetaan deliverables dinamis ke Acceptance Criteria otonom pada compiler
+-   Unit Tests baru untuk memvalidasi pemaket kompilasi rekayasa kaya (Mission Package Enrichment)
 
 ## Current Task
 
--   v1.5.4 Intelligent Project Bootstrap Sign-off
+-   v1.5.5 Mission Package Enrichment Sign-off
 
 ## Next Tasks
 

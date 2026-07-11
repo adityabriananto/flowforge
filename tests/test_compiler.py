@@ -98,8 +98,8 @@ def test_mission_package_compiler_success(tmp_path):
     assert "unused_var" not in package.relevant_context # Not matching database optimizer keywords
     assert any("limited-concurrency" in constraint for constraint in package.constraints)
     assert any("database is indexed" in rule for rule in package.relevant_rules)
-    assert len(package.relevant_references) == 1
-    assert "Database indexing is key" in package.relevant_references[0]
+    assert any("performance_guide" in ref for ref in package.relevant_references)
+    assert any("Database indexing is key" in ref for ref in package.relevant_references)
 
 def test_renderer_serialization():
     package = MissionPackage(

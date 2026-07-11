@@ -15,7 +15,9 @@ class MissionPackageRenderer:
             "relevant_context": package.relevant_context,
             "relevant_references": package.relevant_references,
             "acceptance_criteria": package.acceptance_criteria,
-            "definition_of_done": package.definition_of_done
+            "definition_of_done": package.definition_of_done,
+            "warnings": package.warnings,
+            "metadata": package.metadata
         }
 
     @staticmethod
