@@ -71,7 +71,11 @@ class MissionLifecycleManager:
         title: str, 
         description: str, 
         mission_id: Optional[str] = None, 
-        base_path: str = "."
+        base_path: str = ".",
+        goal: Optional[str] = None,
+        deliverables: Optional[List[str]] = None,
+        definition_of_done: Optional[List[str]] = None,
+        constraints: Optional[List[str]] = None
     ) -> str:
         """Creates a new mission in backlog using the template with UUID id and custom code."""
         # Ensure workspace folders exist
@@ -111,6 +115,15 @@ class MissionLifecycleManager:
         template_data["title"] = title
         template_data["description"] = description
         template_data["status"] = "BACKLOG"
+        
+        if goal:
+            template_data["goal"] = goal
+        if deliverables is not None:
+            template_data["deliverables"] = deliverables
+        if definition_of_done is not None:
+            template_data["definition_of_done"] = definition_of_done
+        if constraints is not None:
+            template_data["constraints"] = constraints
 
         dest_file = os.path.join(base_path, "engineering", "missions", "backlog", f"{m_code}.yaml")
         with open(dest_file, "w", encoding="utf-8") as f:

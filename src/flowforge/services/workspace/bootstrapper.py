@@ -57,9 +57,23 @@ class SmartBootstrapper:
                 yaml.dump(workspace_data, f, sort_keys=False, default_flow_style=False)
 
         # 6. Generate engineering/PROJECT_STATE.yaml (idempotent)
+        import uuid
+        from datetime import datetime
         project_state_yaml = os.path.join(base_path, "engineering", "PROJECT_STATE.yaml")
         if not os.path.exists(project_state_yaml):
+            repo_name = os.path.basename(os.path.abspath(base_path)) or "unknown-project"
             project_state_data = {
+                "version": "1",
+                "project": {
+                    "id": str(uuid.uuid4()),
+                    "name": repo_name,
+                    "framework": project_details.get("framework") or "Unknown",
+                    "language": project_details.get("language") or "Unknown",
+                    "project_type": project_details.get("project_type") or "Generic",
+                    "workspace_version": "1.0.0",
+                    "current_phase": "discovery",
+                    "created_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+                },
                 "active_missions": [],
                 "completed_missions": []
             }
@@ -67,14 +81,24 @@ class SmartBootstrapper:
                 yaml.dump(project_state_data, f, sort_keys=False, default_flow_style=False)
 
         # 7. Generate Initial Mission: PROJECT-000 Repository Discovery (idempotent)
+        from flowforge.services.workspace.templates import render_mission_data
         mission_id = f"{prefix}-000"
         m_state, _ = MissionLifecycleManager._find_mission_file(mission_id, base_path)
         if not m_state:
+            m_data = render_mission_data(
+                mission_type="Repository Discovery",
+                project_details=project_details,
+                custom_desc=f"Scan the {project_details.get('framework', 'project')} directory structure, dependencies, and requirements to index base knowledge."
+            )
             MissionLifecycleManager.create_mission(
-                title="Repository Discovery",
-                description="Scan project directory structure, dependencies, and requirements to index base knowledge.",
+                title=m_data["title"],
+                description=m_data["description"],
                 mission_id=mission_id,
-                base_path=base_path
+                base_path=base_path,
+                goal=m_data["goal"],
+                deliverables=m_data["deliverables"],
+                definition_of_done=m_data["definition_of_done"],
+                constraints=m_data["constraints"]
             )
 
         return project_details

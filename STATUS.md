@@ -163,10 +163,15 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Pembuatan version helper dinamis (DX-001) pembaca metadata pyproject.toml
 -   Pendaftaran subcommand `version` dan flag global `--version` pada argparse CLI
 -   Unit Tests baru untuk memverifikasi CLI output flag & command version
+-   Pembuatan database templates terstruktur untuk Mission Type (DX-002)
+-   Refaktor generator inisiasi SmartBootstrapper untuk mempopulasi metadata riwayat deteksi proyek pada PROJECT_STATE.yaml
+-   Penyusunan rekomendasi otonom Next Action setelah pemicuan perintah CLI init, compile, dan run
+-   Peningkatan penanganan level diagnosis doctor agar bersahabat sebelum inisiasi workspace
+-   Unit Tests baru untuk memvalidasi dynamic templates rendering dan bootstrapping data
 
 ## Current Task
 
--   v1.5.3 CLI Version Support Sign-off
+-   v1.5.4 Intelligent Project Bootstrap Sign-off
 
 ## Next Tasks
 

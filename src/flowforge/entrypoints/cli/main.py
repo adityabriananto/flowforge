@@ -97,6 +97,9 @@ context_length: 1000000
         print("✓ Creating initial Mission")
         print("\nInitialization complete.")
         print(f"Project Type: {details['project_type']} (Framework: {details['framework']}, Language: {details['language']})")
+        print("\nNext Recommended Action:")
+        print(f"  Review the initial mission:")
+        print(f"  flowforge mission show {prefix}-000")
         
     except Exception as e:
         print(f"[FlowForge CLI] Error during initialization: {str(e)}", file=sys.stderr)
@@ -192,6 +195,9 @@ def run_mission_orchestration(mission_code):
         print(f"✓ Session ID: {result['session_id']}")
         print(f"✓ Duration: {result['duration_seconds']:.2f}s")
         print("\n" + result["summary_report"])
+        print("\nNext Recommended Action:")
+        print("  Check execution status or active missions list:")
+        print("  flowforge mission list")
     except Exception as e:
         print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
@@ -208,19 +214,32 @@ def cmd_doctor(args):
     else:
         print("  [ERROR] Git is not installed or not in PATH.", file=sys.stderr)
         
-    # 2. Check Database repository
+    # 2. Check Engineering Workspace status
+    workspace_initialized = os.path.exists("engineering")
+    if workspace_initialized:
+        print("  [OK] Engineering Workspace is initialized.")
+    else:
+        print("  [INFO] Engineering Workspace has not been initialized.")
+        print("         Run:")
+        print("         flowforge init")
+        
+    # 3. Check Database repository
     sqlite_db_exists = os.path.exists("flowforge.db")
     if sqlite_db_exists:
         print("  [OK] Local database flowforge.db detected.")
     else:
-        print("  [WARNING] No local SQLite database file detected (Will auto-init on server start).")
+        # Expected before server start or setup
+        print("  [INFO] No local SQLite database detected (Will auto-init on server start).")
         
-    # 3. Check Providers directory
-    providers_dir_exists = os.path.exists("providers")
-    if providers_dir_exists:
-        print(f"  [OK] Providers profile registry found with {len(os.listdir('providers'))} profile(s).")
+    # 4. Check Providers directory
+    if workspace_initialized:
+        providers_dir_exists = os.path.exists("providers")
+        if providers_dir_exists:
+            print(f"  [OK] Providers profile registry found with {len(os.listdir('providers'))} profile(s).")
+        else:
+            print("  [WARNING] No 'providers/' profile directory found.")
     else:
-        print("  [WARNING] No 'providers/' profile directory found.")
+        print("  [INFO] Ready for project workspace bootstrap.")
         
     print("[FlowForge CLI] Diagnostic complete.")
 
@@ -296,6 +315,9 @@ def cmd_compile(args):
         f.write(rendered)
 
     print(f"[FlowForge CLI] Compilation success! Mission Package generated: {output_filename}")
+    print("\nNext Recommended Action:")
+    print(f"  Execute the mission:")
+    print(f"  flowforge run {mission.code}")
 
 def cmd_mission(args):
     """Handles all 'flowforge mission' subcommands (v1.3.0 FF-016)."""
