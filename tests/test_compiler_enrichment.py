@@ -96,5 +96,6 @@ def test_compiler_enrichment_pipeline(enriched_workspace):
     
     # 5. Assert Metadata details
     assert package.package["workspace"] is not None
-    assert package.package["compiler_version"] == "1.3.0"  # Read from pyproject.toml version helper fallback
+    from flowforge.utils.version import get_version
+    assert package.package["compiler_version"] == get_version()  # Read from pyproject.toml version helper fallback
     assert package.package["generated_at"] is not None
