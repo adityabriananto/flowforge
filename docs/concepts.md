@@ -28,3 +28,9 @@ The single source of truth for the project's long-term memory (`PROJECT_STATE.ya
 
 ### Engineering Artifact
 The tangible output produced by a Mission. This includes code changes, tests, updated documentation, or a new architecture decision record (ADR).
+
+### Engineering Identity
+The human-facing canonical identifier (e.g., `PROJECT-004`). Used exclusively in CLI outputs, communication, documentation, and file names (like Mission Packages) to ensure usability.
+
+### System Identity
+The internal identifier (e.g., UUID). Used strictly for persistence, caching, and repository integrity under the hood. Developers should rarely need to interact with UUIDs.

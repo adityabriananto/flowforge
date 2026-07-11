@@ -310,7 +310,8 @@ def cmd_compile(args):
     )
     rendered = MissionPackageRenderer.render_to_yaml(package)
 
-    output_filename = f"mission_package_{mission.id}.yaml"
+    output_filename = os.path.join(".flowforge", "packages", f"{mission.code}.package.yaml")
+    os.makedirs(os.path.dirname(output_filename), exist_ok=True)
     with open(output_filename, "w", encoding="utf-8") as f:
         f.write(rendered)
 

@@ -126,6 +126,7 @@ def test_cli_compile_command(tmp_path):
     mission_file.write_text("""
 version: "1"
 id: "550e8400-e29b-41d4-a716-446655442222"
+code: "PROJECT-999"
 title: "CLI Compile Test"
 status: "READY"
 priority: "low"
@@ -153,7 +154,7 @@ capabilities:
     os.chdir(str(tmp_path))
     try:
         cmd_compile(args)
-        output_pkg = f"mission_package_550e8400-e29b-41d4-a716-446655442222.yaml"
+        output_pkg = os.path.join(".flowforge", "packages", "PROJECT-999.package.yaml")
         assert os.path.exists(output_pkg)
         with open(output_pkg, "r") as f:
             data = yaml.safe_load(f.read())

@@ -93,13 +93,22 @@ class MissionPackageCompiler:
             else:
                 acceptance_criteria.append(f"{d} verified")
 
-        metadata = {
-            "workspace": os.path.basename(os.path.abspath(base_path)) or "unknown-workspace",
+        package_metadata = {
+            "id": str(mission.id), # Using mission ID as package ID for now
             "compiler_version": get_version(),
-            "generated_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            "generated_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "workspace": os.path.basename(os.path.abspath(base_path)) or "unknown-workspace"
+        }
+        
+        mission_metadata = {
+            "id": str(mission.id),
+            "code": mission.code,
+            "title": mission.title
         }
 
         return MissionPackage(
+            package=package_metadata,
+            mission=mission_metadata,
             mission_summary=summary,
             objective=objective,
             deliverables=list(mission.deliverables),
@@ -109,6 +118,5 @@ class MissionPackageCompiler:
             relevant_references=selected_references,
             acceptance_criteria=acceptance_criteria,
             definition_of_done=list(mission.definition_of_done),
-            warnings=warnings,
-            metadata=metadata
+            warnings=warnings
         )

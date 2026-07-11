@@ -7,6 +7,8 @@ class MissionPackageRenderer:
     def to_dict(package: MissionPackage) -> Dict[str, Any]:
         """Converts a MissionPackage dataclass to a dictionary representation."""
         return {
+            "package": package.package,
+            "mission": package.mission,
             "mission_summary": package.mission_summary,
             "objective": package.objective,
             "deliverables": package.deliverables,
@@ -16,8 +18,7 @@ class MissionPackageRenderer:
             "relevant_references": package.relevant_references,
             "acceptance_criteria": package.acceptance_criteria,
             "definition_of_done": package.definition_of_done,
-            "warnings": package.warnings,
-            "metadata": package.metadata
+            "warnings": package.warnings
         }
 
     @staticmethod
