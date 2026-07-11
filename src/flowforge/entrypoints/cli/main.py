@@ -103,8 +103,18 @@ context_length: 1000000
         sys.exit(1)
 
 def cmd_run(args):
-    """Runs a local .ff.yaml workflow definition otonomously (DX)."""
-    file_path = args.file
+    """Runs a local .ff.yaml workflow or executes a mission via AI Runtime (DX)."""
+    input_val = args.file
+    
+    import re
+    is_mission_code = bool(re.match(r'^[A-Za-z0-9_-]+-\d+$', input_val))
+    
+    if is_mission_code and not os.path.exists(input_val):
+        run_mission_orchestration(input_val)
+    else:
+        run_legacy_workflow(input_val)
+
+def run_legacy_workflow(file_path):
     if not os.path.exists(file_path):
         print(f"[FlowForge CLI] Error: File '{file_path}' not found.", file=sys.stderr)
         sys.exit(1)
@@ -134,6 +144,56 @@ def cmd_run(args):
         print(f"[FlowForge CLI] Execution finished. Final state: {instance.current_state}")
     except Exception as e:
         print(f"[FlowForge CLI] Error executing workflow: {str(e)}", file=sys.stderr)
+        sys.exit(1)
+
+def run_mission_orchestration(mission_code):
+    print(f"[FlowForge CLI] Initiating runtime engine for mission: {mission_code}")
+    from flowforge.services.compiler.compiler import MissionPackageCompiler
+    from flowforge.services.workspace.state_service import EngineeringStateService
+    from flowforge.services.workspace.session_service import EngineeringSessionService
+    from flowforge.services.runtime.provider_registry import AIRuntimeProviderRegistry
+    from flowforge.services.runtime.provider_config_loader import ProviderConfigLoader
+    from flowforge.services.runtime.engine import AIRuntimeEngine
+    from flowforge.adapters.workspace.yaml_state_repository import YAMLEngineeringStateRepository
+    from flowforge.adapters.workspace.yaml_session_repository import YAMLEngineeringSessionRepository
+    
+    compiler = MissionPackageCompiler()
+    state_repo = YAMLEngineeringStateRepository()
+    state_service = EngineeringStateService(state_repo)
+    
+    session_repo = YAMLEngineeringSessionRepository()
+    session_service = EngineeringSessionService(session_repo)
+    
+    registry = AIRuntimeProviderRegistry()
+    
+    # Load providers config if providers.yaml exists
+    providers_config_path = os.path.join(".", "providers.yaml")
+    if os.path.exists(providers_config_path):
+        try:
+            with open(providers_config_path, "r", encoding="utf-8") as f:
+                ProviderConfigLoader.load_from_yaml(f.read(), registry)
+        except Exception as e:
+            print(f"[FlowForge CLI] Warning: Failed to load providers.yaml: {str(e)}")
+            
+    if not registry.list():
+        # Load a default mock provider to ensure execution works even without config
+        from flowforge.services.runtime.provider_config_loader import GenericCLIProviderAdapter
+        default_mock = GenericCLIProviderAdapter(
+            name_str="MockProvider",
+            command="echo 'mock execution'"
+        )
+        registry.register("MockProvider", default_mock, is_default=True)
+
+    engine = AIRuntimeEngine(compiler, state_service, session_service, registry)
+    
+    try:
+        result = engine.execute_mission(mission_code, base_path=".")
+        print(f"\n✓ Mission execution status: {result['status']}")
+        print(f"✓ Session ID: {result['session_id']}")
+        print(f"✓ Duration: {result['duration_seconds']:.2f}s")
+        print("\n" + result["summary_report"])
+    except Exception as e:
+        print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
 def cmd_doctor(args):

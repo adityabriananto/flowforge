@@ -152,14 +152,20 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Pembuatan loader konfigurasi YAML ProviderConfigLoader & generic CLI adapter
 -   Unit Tests baru untuk memvalidasi registry lifecycle, config schema loading, dan dynamic cli injection
 -   Penyusunan dokumen formal RFC-016 & ADR-016 untuk Provider Interface & Registry
+-   Membuat domain model ExecutionResult
+-   Implementasi orkestrator runtime AIRuntimeEngine
+-   Refaktor sub-command CLI run untuk native mission execution
+-   Dokumentasi final di README.md, ROADMAP.md, dan STATUS.md
+-   Unit Tests baru untuk memvalidasi pipa integrasi eksekusi misi end-to-end secara stateless
+-   Penyusunan dokumen formal RFC-017 & ADR-017 untuk Runtime Integration
 
 ## Current Task
 
--   v1.5 Provider Interface & Registry Sign-off
+-   v1.5 Core Feature Complete Sign-off
 
 ## Next Tasks
 
--   Sprint 14 — Distributed Worker & Broker (v1.4.1) (Redis, Docker, Kubernetes)
+-   Sprint 16 — Distributed Worker & Broker (v1.6) (Redis, Docker, Kubernetes)
 
 ## Blockers
 

@@ -295,7 +295,8 @@ pytest tests/
 | v1.1 | FFWL DSL, Prompt Pipeline, Memory Engine, Execution Providers, Workspace Sandbox | ✅ Complete |
 | v1.2 | Policy Engine, Provider Registry, CLI Tools, Zero-Config Discovery, Vendor-Agnostic Core | ✅ Complete |
 | v1.3 | Mission System, Agent Profile, Mission Package Compiler | ✅ Complete |
-| v1.4 | Distributed Worker & Broker (Redis, Docker, Kubernetes) | 🔜 Planned |
+| v1.5 | AI Runtime (Engineering Session, Engineering State, Provider abstraction), Core Completion | ✅ Complete |
+| v1.6 | Distributed Worker & Broker (Redis, Docker, Kubernetes) | 🔜 Planned |
 
 ---
 
