@@ -21,8 +21,8 @@ Focus was on solidifying the internal State Machine architecture, unifying AI in
 
 Focus is on polishing the platform for public adoption, validating documentation, packaging, and certifying the Core platform. **No new engineering capabilities will be introduced in this phase.**
 - **FF-026 Documentation & Developer Onboarding**: (Completed) Rebuilding the installation guide, onboarding workflow, and concepts.
-- **FF-027 Public Distribution**: (Current) Preparing for PyPI package release.
-- **FF-028 Release Preparation**: Final adjustments for stability.
+- **FF-027 Public Distribution**: (Completed) Prepared PyPI package metadata and standard release workflows.
+- **FF-028 Release Preparation**: (Current) First public beta release transition and strategy validation.
 - **FF-029 Core Audit & Beta Certification**: Deep audit of Clean Architecture boundaries and testing coverage.
 
 ### FlowForge v1.0.0-beta

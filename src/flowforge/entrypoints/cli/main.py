@@ -29,7 +29,7 @@ def cmd_init(args):
         workflow_yaml_path = "workflow.ff.yaml"
         if not os.path.exists(workflow_yaml_path):
             workflow_yaml = f"""name: "Autonomous AI Agent Workflow"
-version: "1.3.0"
+version: "1.0.0-beta"
 initial_state: "CODING"
 
 roles:
@@ -321,7 +321,7 @@ def cmd_compile(args):
     print(f"  flowforge run {mission.code}")
 
 def cmd_mission(args):
-    """Handles all 'flowforge mission' subcommands (v1.3.0 FF-016)."""
+    """Handles all 'flowforge mission' subcommands (v1.0.0-beta FF-016)."""
     from flowforge.services.workspace.mission_lifecycle_manager import MissionLifecycleManager
 
     if args.mission_command == "new":
