@@ -20,8 +20,8 @@ Focus was on solidifying the internal State Machine architecture, unifying AI in
 **Missions: FF-026 ~ FF-029**
 
 Focus is on polishing the platform for public adoption, validating documentation, packaging, and certifying the Core platform. **No new engineering capabilities will be introduced in this phase.**
-- **FF-026 Documentation & Developer Onboarding**: (Current) Rebuilding the installation guide, onboarding workflow, and concepts.
-- **FF-027 Public Distribution**: Preparing for PyPI package release.
+- **FF-026 Documentation & Developer Onboarding**: (Completed) Rebuilding the installation guide, onboarding workflow, and concepts.
+- **FF-027 Public Distribution**: (Current) Preparing for PyPI package release.
 - **FF-028 Release Preparation**: Final adjustments for stability.
 - **FF-029 Core Audit & Beta Certification**: Deep audit of Clean Architecture boundaries and testing coverage.
 

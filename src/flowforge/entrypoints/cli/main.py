@@ -19,7 +19,7 @@ def cmd_init(args):
         prefix = args.prefix if hasattr(args, "prefix") and args.prefix else "PROJECT"
         force = args.force if hasattr(args, "force") else False
         
-        print("✓ Detecting project")
+        print("[OK] Detecting project")
         details = SmartBootstrapper.bootstrap(base_path=".", force=force, prefix=prefix)
         
         # Write additional workflow and provider configs if not present
@@ -91,10 +91,10 @@ context_length: 1000000
             with open(gemini_yaml_path, "w", encoding="utf-8") as f:
                 f.write(gemini_yaml)
 
-        print("✓ Creating Engineering Workspace")
-        print("✓ Installing templates")
-        print("✓ Creating PROJECT_STATE")
-        print("✓ Creating initial Mission")
+        print("[OK] Creating Engineering Workspace")
+        print("[OK] Installing templates")
+        print("[OK] Creating PROJECT_STATE")
+        print("[OK] Creating initial Mission")
         print("\nInitialization complete.")
         print(f"Project Type: {details['project_type']} (Framework: {details['framework']}, Language: {details['language']})")
         print("\nNext Recommended Action:")
@@ -191,9 +191,9 @@ def run_mission_orchestration(mission_code):
     
     try:
         result = engine.execute_mission(mission_code, base_path=".")
-        print(f"\n✓ Mission execution status: {result['status']}")
-        print(f"✓ Session ID: {result['session_id']}")
-        print(f"✓ Duration: {result['duration_seconds']:.2f}s")
+        print(f"\n[OK] Mission execution status: {result['status']}")
+        print(f"[OK] Session ID: {result['session_id']}")
+        print(f"[OK] Duration: {result['duration_seconds']:.2f}s")
         print("\n" + result["summary_report"])
         print("\nNext Recommended Action:")
         print("  Check execution status or active missions list:")

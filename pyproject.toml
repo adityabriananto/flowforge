@@ -9,6 +9,11 @@ description = "A framework for orchestrating human, AI, and system workers using
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
+authors = [
+    { name = "FlowForge Team", email = "hello@flowforge.dev" }
+]
+keywords = ["ai", "agent", "workflow", "engineering", "orchestration"]
+
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -22,6 +27,18 @@ dependencies = [
     "pydantic>=2.0.0",
     "websockets>=11.0.0",
     "pyyaml>=6.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/adityabriananto/flowforge"
+Repository = "https://github.com/adityabriananto/flowforge.git"
+"Bug Tracker" = "https://github.com/adityabriananto/flowforge/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "httpx>=0.24.0",
 ]
 
 [project.scripts]
