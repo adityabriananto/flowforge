@@ -8,41 +8,41 @@
 
 ## 1. What is FlowForge?
 
-FlowForge adalah **Engineering Operating System (EOS)** yang mengorkestrasi seluruh siklus hidup rekayasa perangkat lunak dalam kolaborasi dengan agen kecerdasan buatan (AI). FlowForge memindahkan kendali konteks rekayasa dari riwayat percakapan (*chat history*) model AI ke repositori kode Anda sendiri. 
+FlowForge is an **Engineering Operating System (EOS)** designed to orchestrate the entire software engineering lifecycle in collaboration with Artificial Intelligence (AI). FlowForge shifts the engineering context ownership from the transient chat histories of AI models directly into your code repository.
 
-Dalam arsitektur FlowForge, AI bertindak sebagai *execution worker* pelaksana tugas rekayasa, sementara FlowForge mengelola kelangsungan status proyek (*engineering continuity*), persetujuan keputusan arsitektural (*human-in-the-loop*), dan penyimpanan riwayat rekayasa jangka panjang yang permanen.
+Under the FlowForge architecture, AI operates purely as an *execution worker* performing targeted engineering tasks, while FlowForge manages the engineering continuity, architectural decisions approval (via *human-in-the-loop* interactions), and persists long-term engineering memory.
 
 ---
 
 ## 2. Why FlowForge?
 
-Alat bantu AI koding tradisional (seperti chat assistants atau autocomplete plugins) memiliki kelemahan mendasar: mereka bertumpu pada riwayat obrolan instan yang mudah hilang, bias, dan terbatas dalam kapasitas context window. 
+Traditional AI coding assistants (such as chat assistants or autocomplete extensions) have a fundamental flaw: they rely on conversation history which is volatile, prone to drift, and constrained by context windows.
 
-FlowForge menyelesaikan masalah ini dengan memperkenalkan **Engineering State** dan **Engineering Session** sebagai fondasi kebenaran proyek.
+FlowForge solves this by introducing **Engineering State** and **Engineering Session** as the persistent foundation of project truth.
 
-| Karakteristik | Traditional AI Coding Assistants | FlowForge (Engineering OS) |
+| Characteristic | Traditional AI Coding Assistants | FlowForge (Engineering OS) |
 |---|---|---|
-| **Sumber Kebenaran** | Riwayat Chat / Conversation History | Engineering State (`ENGINEERING_STATE.yaml`) |
-| **Keterikatan Vendor** | Terikat pada LLM/UI tertentu | Independen (Plug-and-play AI Provider) |
-| **Jejak Audit** | Tersebar di obrolan chat | Immutable Sesi Log (`session_<id>.yaml`) |
-| **Penyimpanan State** | Volatile (hilang saat restart chat) | Persisten langsung di dalam Git repository |
-| **Kolaborasi Multi-AI**| Mustahil tanpa input manual ulang | Mulus menggunakan context serah terima (*handover*) |
+| **Source of Truth** | Volatile Conversation/Chat History | Declarative Engineering State (`ENGINEERING_STATE.yaml`) |
+| **Vendor Lock-in** | Bound to a specific LLM or provider UI | Decoupled (Plug-and-play AI Provider) |
+| **Audit Trail** | Scattered across individual chat transcripts | Immutable Session Logs (`session_<id>.yaml`) |
+| **State Persistence** | Transient (lost when the chat resets) | Persistent directly within the Git repository |
+| **Multi-AI Collaboration** | Impractical without manual context-pasting | Seamless via standardized handover context |
 
 ---
 
 ## 3. Core Principles
 
-*   **Mission-Driven Engineering**: Rekayasa perangkat lunak dibagi menjadi unit kerja diskrit bernama **Mission**.
-*   **Engineering State as the Source of Truth**: Akumulasi memori rekayasa jangka panjang proyek disimpan dalam repositori sebagai data deklaratif yang provider-independent.
-*   **Provider Independence**: AI Provider diposisikan sebagai plugin yang dapat ditukar kapan saja (Claude, Gemini, Ollama lokal, dsb.) tanpa merusak engine orkestrasi inti.
-*   **Vendor-Neutral Mission Packages**: Seluruh instruksi rekayasa dikompilasi menjadi paket tugas mandiri yang bebas dari bias instruksi prompt vendor LLM.
-*   **Clean Architecture**: Kode inti FlowForge dipisahkan secara tegas dengan pola Ports & Adapters untuk menjamin modularitas sistem.
+*   **Mission-Driven Engineering**: Software engineering is decomposed into discrete, manageable units of work called **Missions**.
+*   **Engineering State as the Source of Truth**: Long-term engineering memory is accumulated and stored in the repository as provider-independent declarative data.
+*   **Provider Independence**: AI Providers are treated as swapable plugins (Claude, Gemini, local Ollama, etc.) without altering the core orchestration engine.
+*   **Vendor-Neutral Mission Packages**: All engineering tasks and context inputs are compiled into standalone mission packages free from LLM-specific prompt biases.
+*   **Clean Architecture**: The core codebase is strictly separated using the Ports & Adapters pattern to guarantee high modularity and extendability.
 
 ---
 
 ## 4. Core Architecture
 
-Alur eksekusi kanonikal di dalam FlowForge Core berjalan secara stateless sebagai berikut:
+The canonical end-to-end execution pipeline of FlowForge Core runs statelessly as illustrated below:
 
 ```mermaid
 graph TD
@@ -59,27 +59,27 @@ graph TD
 
 ## 5. Core Components
 
-FlowForge Core terdiri dari 6 komponen stabil berikut:
+FlowForge Core is composed of 6 stable, architectural domains:
 
-1.  **Mission**: Unit deklaratif siklus hidup rekayasa (terbagi atas status: `BACKLOG`, `ACTIVE`, `COMPLETED`).
-2.  **Mission Package**: Paket instruksi vendor-neutral hasil kompilasi Misi lengkap dengan referensi keputusan (ADR) dan arsitektur proyek.
-3.  **Engineering State**: Memori rekayasa jangka panjang yang merekam riwayat misi, blocker, keputusan arsitektur, dan timeline kronologis proyek di dalam file `engineering/ENGINEERING_STATE.yaml`.
-4.  **Engineering Session**: Log jejak audit detail instan dari satu eksekusi AI Provider yang dikunci secara permanen (*immutable*) setelah selesai.
-5.  **Provider**: Lapisan abstraksi driver/adapter AI yang bertugas murni mengeksekusi rekayasa.
-6.  **Runtime**: Engine orkestrasi stateless yang mengoordinasikan pipa eksekusi secara end-to-end.
+1.  **Mission**: The lifecycle unit of engineering work (states: `BACKLOG`, `ACTIVE`, `COMPLETED`).
+2.  **Mission Package**: A compiled, vendor-neutral bundle of instructions containing the mission details, relevant architectural decisions (ADRs), and project references.
+3.  **Engineering State**: The long-term engineering memory tracking completed missions, active blockers, design decisions, and a chronological event log in `engineering/ENGINEERING_STATE.yaml`.
+4.  **Engineering Session**: An immutable, detailed execution log recording the outcomes, files changed, and decisions of a single AI run.
+5.  **Provider**: The abstraction layer representing the AI execution driver.
+6.  **Runtime**: The stateless coordinator engine orchestrating the end-to-end execution workflow.
 
 ---
 
 ## 6. Installation
 
-FlowForge membutuhkan manajemen dependensi Python modern menggunakan **`uv`**.
+FlowForge relies on **`uv`** for modern Python package management and virtual environment execution.
 
-1.  **Clone Repositori**:
+1.  **Clone the Repository**:
     ```bash
     git clone https://github.com/adityabriananto/flowforge.git
     cd flowforge
     ```
-2.  **Install Dependensi & Virtual Environment**:
+2.  **Sync Dependencies**:
     ```bash
     uv sync
     ```
@@ -88,19 +88,19 @@ FlowForge membutuhkan manajemen dependensi Python modern menggunakan **`uv`**.
 
 ## 7. Quick Start
 
-Jalankan pipa rekayasa perdana Anda dengan langkah-langkah CLI berikut:
+Execute your first automated engineering mission using the CLI:
 
 ```bash
-# 1. Inisialisasi Workspace (FlowForge mendeteksi framework Anda secara cerdas)
+# 1. Initialize the workspace (FlowForge auto-detects your project framework)
 uv run flowforge init
 
-# 2. Buat Misi baru di backlog
+# 2. Define a new mission in backlog
 uv run flowforge mission new "Implement database connection pooling" --desc "Setup SQLAlchemy pool size"
 
-# 3. Compile Misi menjadi Mission Package
+# 3. Compile the mission into a Mission Package
 uv run flowforge compile PROJECT-001
 
-# 4. Eksekusi Misi menggunakan AI Runtime Provider
+# 4. Run the compiled mission package using the active AI Provider
 uv run flowforge run PROJECT-001
 ```
 
@@ -108,33 +108,33 @@ uv run flowforge run PROJECT-001
 
 ## 8. Engineering Workspace
 
-Setelah inisialisasi, FlowForge mengelola struktur direktori standar berikut secara otomatis:
+Once initialized, FlowForge enforces a standardized directory structure in your repository:
 
 ```
 engineering/
 ├── missions/
-│   ├── backlog/       # Misi yang sedang direncanakan
-│   ├── active/        # Misi yang sedang berjalan
-│   ├── completed/     # Misi yang telah selesai
-│   └── templates/     # Template dokumen (adr, rfc, sprint)
-├── rfcs/              # Dokumen RFC proyek
-├── adrs/              # Dokumen keputusan arsitektur (ADR)
-├── decisions/         # File panduan core AGENTS.md
-└── ENGINEERING_STATE.yaml  # Memori jangka panjang proyek (Source of Truth)
+│   ├── backlog/       # Planned missions
+│   ├── active/        # Active missions being executed
+│   ├── completed/     # Successfully completed missions
+│   └── templates/     # Document templates (adr, rfc, sprint)
+├── rfcs/              # Project RFCs
+├── adrs/              # Architecture Decision Records
+├── decisions/         # Core rules (AGENTS.md)
+└── ENGINEERING_STATE.yaml  # Long-term engineering memory (Source of Truth)
 ```
 
-Sesi eksekusi runtime disimpan secara terisolasi di bawah log rahasia:
+Execution logs are generated under a hidden directory to isolate transient runtime artifacts:
 ```
 .flowforge/
 └── logs/
-    └── session_<uuid>.yaml  # Log audit immutable per-eksekusi
+    └── session_<uuid>.yaml  # Immutable execution audit log
 ```
 
 ---
 
 ## 9. Provider Model
 
-Penyedia kecerdasan buatan dapat didaftarkan secara deklaratif di bawah file konfigurasi `providers.yaml` di root proyek:
+AI execution engines can be registered declaratively in the `providers.yaml` configuration file at the repository root:
 
 ```yaml
 providers:
@@ -153,36 +153,36 @@ providers:
 
 ## 10. CLI Reference
 
-*   `flowforge init`: Menginisialisasi Engineering Workspace standar, mendeteksi framework (Laravel, Django, React, Vue, SpringBoot, Node), dan menginstall template.
-*   `flowforge compile <MISSION_FILE_OR_CODE>`: Mengompilasi file misi menjadi Mission Package vendor-agnostic.
-*   `flowforge run <MISSION_CODE>`: Mengeksekusi satu langkah misi rekayasa secara otonom menggunakan provider default yang aktif.
-*   `flowforge mission new <TITLE>`: Membuat berkas misi baru di folder backlog.
-*   `flowforge mission list`: Menampilkan seluruh daftar misi terdaftar dikelompokkan berdasarkan state.
-*   `flowforge doctor`: Mendiagnosis status kesehatan dependensi sistem dan workspace Anda.
+*   `flowforge init`: Scans the codebase to detect frameworks (Laravel, Django, React, Vue, SpringBoot, Node), initializes folders, and installs templates.
+*   `flowforge compile <MISSION_FILE_OR_CODE>`: Compiles a raw mission into a vendor-agnostic Mission Package.
+*   `flowforge run <MISSION_CODE>`: Executes an engineering mission package using the default active AI provider.
+*   `flowforge mission new <TITLE>`: Creates a new mission template in the backlog.
+*   `flowforge mission list`: Lists all workspace missions grouped by status.
+*   `flowforge doctor`: Diagnoses the system requirements and verify workspace health.
 
 ---
 
 ## 11. Product Roadmap
 
-Fokus pengembangan FlowForge ke depan berorientasi pada ekosistem DX dan kegunaan praktis:
+The development roadmap focuses on DX, developer tooling, and analytical interfaces:
 
-*   **Developer Experience (DX)**: Visual editor dan VSCode Extension untuk memantau status instansi langsung dari editor.
-*   **CLI Improvements**: CLI interaktif dan prompt completion.
-*   **Dashboard & Monitoring**: UI dashboard real-time yang memvisualisasikan data Engineering State dan timeline log sesi.
-*   **Provider Packs**: Bundle adapter default siap pakai untuk Claude, OpenAI, dan Ollama lokal.
-*   **Analytics**: Analisis durasi, biaya token, dan efisiensi eksekusi antar provider.
+*   **Developer Experience (DX)**: Visual flow designer and VSCode Extension to monitor runtimes directly from your editor.
+*   **CLI Improvements**: Interactive prompts and shell completions.
+*   **Dashboard & Monitoring**: Real-time dashboard to visualize Engineering State timeline and audit execution sessions.
+*   **Provider Packs**: Standardized, out-of-the-box CLI providers for Claude, OpenAI, and Ollama.
+*   **Analytics**: Monitor token consumption, execution costs, and provider efficiency.
 
 ---
 
 ## 12. Contributing
 
-Kontribusi sangat terbuka! Harap pastikan setiap Pull Request yang dikirimkan mematuhi:
-1.  **Clean Architecture**: Isolasi port dan adapter.
-2.  **SOLID**: Desain kelas terfokus dengan tanggung jawab tunggal.
-3.  **Provider Independence**: Kode core tidak boleh berasumsi atau mengimpor pustaka vendor AI secara langsung.
+We welcome contributions! Please ensure your Pull Requests strictly adhere to:
+1.  **Clean Architecture**: Ports and adapters must remain decoupled.
+2.  **SOLID**: Classes must have a single, focused responsibility.
+3.  **Provider Independence**: The core engine must never directly import or depend on specific AI provider packages.
 
 ---
 
 ## 13. License
 
-FlowForge didistribusikan di bawah lisensi MIT. Lihat file [LICENSE](LICENSE) untuk detail lengkap.
+FlowForge is open-source software licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
