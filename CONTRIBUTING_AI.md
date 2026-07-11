@@ -2,52 +2,61 @@
 
 ## Objective
 
-Semua AI harus mengikuti aturan yang sama agar hasil konsisten.
+All AI agents must adhere to the same rules to ensure consistent outcomes.
 
 ## Startup Checklist
 
--   Baca README.md
--   Baca STATUS.md
--   Baca ROADMAP.md
--   Baca seluruh dokumen sprint aktif
--   Jangan mulai coding jika sprint belum mengizinkan.
+- Read `README.md`
+- Read `STATUS.md`
+- Read `ROADMAP.md`
+- Read all active sprint/mission documents.
+- Do not begin coding if the mission scope does not explicitly authorize it.
+
+## Product Core Phase Restrictions
+
+FlowForge is currently in the **Product Core** phase.
+During this phase:
+- **No new engineering capabilities** may be introduced.
+- **No architecture redesigns** are permitted.
+- The sole focus is on Documentation, Packaging, Distribution, Quality, Testing, and Developer Experience.
+- Respect the frozen nature of the Engineering Core. Do not modify the Runtime, Mission Planning Engine, or Mission Lifecycle.
 
 ## Roles
 
 ### Architect
-
--   Mendesain solusi
--   Membuat ADR
--   Tidak mengimplementasikan kode
+- Designs the solution.
+- Authors Architecture Decision Records (ADR).
+- Does not implement code.
 
 ### Engineer
-
--   Mengimplementasikan task
--   Menambah test
--   Tidak mengubah arsitektur
+- Implements the tasks.
+- Writes tests.
+- Does not modify system architecture.
 
 ### Reviewer
-
--   Review kualitas kode
--   Review security
--   Review performance
+- Reviews code quality.
+- Reviews security.
+- Reviews performance.
 
 ## Rules
 
--   Jangan menambah dependency tanpa approval.
--   Jangan mengubah stack tanpa approval.
--   Semua keputusan arsitektur harus menjadi ADR.
--   Semua perubahan harus mengacu pada sprint aktif.
--   Update dokumen yang relevan setelah pekerjaan selesai.
+- Do not add dependencies without approval.
+- Do not modify the technology stack without approval.
+- All architectural decisions must be documented as an ADR.
+- All changes must strictly map to an active mission.
+- Update relevant documentation upon task completion.
 
 ## Branch Strategy
 
-Sesuai dengan *Core Freeze Policy*, repositori ini mengadopsi strategi dua branch jangka panjang:
+In accordance with the *Core Freeze Policy*, this repository adopts a long-term dual-branch strategy:
 
--   **`main`**: Merepresentasikan *stable FlowForge Core*. Hanya bug fix kritis, perbaikan sekuritas, perbaikan dokumentasi, dan optimasi performa yang boleh di-*merge* ke sini. TIDAK menerima fitur eksperimental apa pun.
--   **`next`**: Merepresentasikan masa depan ekosistem FlowForge. Segala fitur baru yang bersifat opsional (Dashboard, VS Code Extension, Cloud, AI-assisted Planning, Marketplace, dll) dikembangkan dan divalidasi pada branch ini.
+- **`main`**: Represents *stable FlowForge Core*. Only critical bug fixes, security patches, documentation improvements, and performance optimizations may be merged here. Experimental features are STRICTLY FORBIDDEN.
+- **`next`**: Represents the future ecosystem of FlowForge. All new optional features (Dashboards, VS Code Extensions, Cloud Integrations, AI-assisted Planning, Marketplaces) are developed and validated exclusively on this branch.
 
 ## Tech Stack
 
-Backend: Python + FastAPI Frontend: React + TypeScript Database:
-PostgreSQL Queue: Redis ORM: SQLAlchemy
+Backend: Python + FastAPI
+Frontend: React + TypeScript
+Database: PostgreSQL
+Queue: Redis
+ORM: SQLAlchemy

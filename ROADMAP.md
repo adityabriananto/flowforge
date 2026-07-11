@@ -1,63 +1,52 @@
 # FlowForge Product Roadmap
 
-Peta jalan rilis versi pengembangan framework orkestrasi FlowForge.
+The development release roadmap for the FlowForge orchestration framework.
 
 ---
 
 ## Release Roadmap
 
-### v1.1 — Refactor & Foundation Enhancement
-Fokus pada penguatan arsitektur internal State Machine, standarisasi input/output AI, dan loader workflow deklaratif tanpa coding.
--   **Workflow Definition YAML**: Engine meload alur kerja langsung dari file `workflow.yaml`.
--   **Capability Resolver**: Pemetaan job/worker secara dinamis ke LLM Provider terbaik (Claude/Codex).
--   **Prompt Builder**: Modul sentral untuk templating prompt dan loading file context.
--   **Artifact Manager**: Pelacakan hasil output AI formal sebagai Artifact versi terkontrol.
+### Engineering Core (Completed)
+**Missions: FF-012 ~ FF-025**
 
-### v1.2 — Policy Engine & CLI Tools
-Fokus pada keandalan resolusi worker secara aman dan peningkatan UX command line interface.
--   **Capability Policy Engine**: Resolusi provider dengan prioritas biaya, kecepatan, dan aturan capability matching dinamis.
--   **CLI Tools**: flowforge run, compile, replay, doctor.
+Focus was on solidifying the internal State Machine architecture, unifying AI input/output standards, and introducing deterministic engineering workflows.
+- **Platform Validation**: The Engine Layer has been validated via pilot projects (BroDev Cashier & Meeting Intelligence).
+- **Engineering Workspace**: Standardized directory structure for persistent engineering memory.
+- **Mission Planning Engine**: Deterministic engineering planning without relying directly on AI execution.
+- **Mission Lifecycle**: Structured flow of engineering units from Backlog to Active to Completed.
+- **Artifact Identity Service**: Engineering identifier management across repositories.
 
-### v1.3 — Mission System, Agent Profile, & Compiler
-Membawa konsep AI Worker sebagai agen rekayasa modular.
--   **Mission Lifecycle**: backlog ➔ active ➔ completed.
--   **Agent Profile System**: Penentuan kapabilitas runtime agen.
--   **Mission Package Compiler**: Compiler yang merender data rekayasa mentah (RFC, ADR, roadmap) menjadi paket vendor-agnostic.
+### Product Core (Current Phase)
+**Missions: FF-026 ~ FF-029**
 
-### v1.5 — AI Runtime & Core Completion (Current)
-Penyambungan seluruh domain modular rekayasa ke dalam satu orkestrasi runtime terpadu hingga stabil sebagai *FlowForge Core v1.0.0-beta*.
--   **✅ Platform Validation**: Engine Layer divalidasi melalui pilot project (BroDev Cashier & Meeting Intelligence).
--   **✅ FF-024 Engineering Artifact Identity Service**: Manajemen identifier rekayasa lintas repositori.
--   **⏳ FF-025 Mission Planning Engine**: Perencanaan *engineering* deterministik bawaan (tanpa eksekusi AI langsung).
--   **⏳ FF-026 README 2.0 & Developer Onboarding**: Perbaikan panduan instalasi dan dokumentasi orientasi.
--   **⏳ FF-027 Public Distribution (PyPI)**: Paket rilis siap pakai ke Python Package Index.
+Focus is on polishing the platform for public adoption, validating documentation, packaging, and certifying the Core platform. **No new engineering capabilities will be introduced in this phase.**
+- **FF-026 Documentation & Developer Onboarding**: (Current) Rebuilding the installation guide, onboarding workflow, and concepts.
+- **FF-027 Public Distribution**: Preparing for PyPI package release.
+- **FF-028 Release Preparation**: Final adjustments for stability.
+- **FF-029 Core Audit & Beta Certification**: Deep audit of Clean Architecture boundaries and testing coverage.
 
-### Core Freeze Policy (Post-FF-027)
-Setelah FF-027 selesai, platform *FlowForge Core* (cabang `main`) akan dibekukan (masuk fase *Core Freeze*).
--   **Core hanya menerima**: Critical bug fixes, Security fixes, Performance improvements, Documentation improvements, Small compatibility updates.
--   **Core TIDAK menerima**: Eksperimen fitur, dashboard UX, editor visual, integrasi cloud, AI-assisted planning, marketplace. Segala kapabilitas di atas merupakan peningkatan produktivitas yang harus diletakkan pada layer aplikasi di luar *Core*.
+### FlowForge v1.0.0-beta
+The culmination of the Product Core phase. The FlowForge framework will be officially published and enter a public beta period. 
 
-### v2.0 — Productivity & Ecosystem Enhancements (Next)
-Fokus pada infrastruktur terdistribusi, perluasan ekosistem developer, dan eksperimen UX yang dijalankan sepenuhnya di cabang `next`.
--   **Distributed Worker & K8s**: Kontainerisasi engine backend dan dashboard frontend untuk cluster terdistribusi.
--   **Cloud Integration & Marketplace**: Layanan SaaS managed FlowForge dan toko template plugin.
--   **VSCode Extension & Visual Workspace**: Ekstensi editor visual untuk mendesain workflow dan memantau status instansi.
--   **AI-assisted Planning (Plugin)**: Integrasi kecerdasan buatan dalam perencanaan (sebagai modul ekstensi).
+### Core Freeze Policy
+Once FlowForge reaches v1.0.0-beta, the core repository (`main` branch) enters the **Core Freeze** phase.
+- **The Core WILL accept**: Critical bug fixes, Security fixes, Performance improvements, Documentation improvements, Small compatibility updates.
+- **The Core WILL NOT accept**: Experimental features, UX dashboards, visual editors, cloud integrations, AI-assisted planning, or marketplaces. All advanced capabilities must be developed on application layers outside the Core.
 
-### v2.0 — Ecosystem & Cloud
-Fokus pada perluasan ekosistem developer dan integrasi awan.
--   **Marketplace**: Toko plugin dan worker templates kustom yang dapat di-share.
--   **Plugin Registry**: Registri pusat untuk mempublish dan mendownload FlowForge plugins.
--   **Cloud Integration**: Layanan SaaS managed FlowForge.
--   **Model Context Protocol (MCP)**: Dukungan penuh standard protokol MCP untuk integrasi tools AI.
--   **VSCode Extension**: Ekstensi editor visual untuk mendesain workflow dan memantau status instansi langsung dari editor.
+### FlowForge Labs (Future Evolution)
+Focus shifts to distributed infrastructure, expanding the developer ecosystem, and UX experiments (developed strictly outside the frozen Core).
+- **Marketplace**: Plugin stores and shareable custom worker templates.
+- **Cloud Integration**: SaaS-managed FlowForge instances.
+- **VSCode Extension**: Visual editor extension to design workflows and monitor instance statuses directly from the IDE.
+- **Model Context Protocol (MCP)**: Full standard support for MCP to integrate external AI tools.
+- **AI-assisted Planning (Plugin)**: Integrating artificial intelligence directly into the authoring process as an extension module.
 
 ---
 
 ## Definition of Done (DoD)
 
--   Semua unit & integration tests lulus 100%.
--   Dokumentasi API, README, dan STATUS diperbarui.
--   ADR dibuat/diperbarui untuk keputusan arsitektur baru.
--   Semua kode terkompilasi sukses tanpa warning/error.
--   Perubahan dipush ke remote origin repository.
+-   All unit & integration tests pass at 100%.
+-   API Documentation, README, and STATUS are updated in English.
+-   ADRs are created/updated for all new architectural decisions.
+-   All code compiles successfully without warnings or errors.
+-   Changes are pushed to the remote origin repository.
