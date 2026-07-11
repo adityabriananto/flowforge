@@ -3,46 +3,63 @@
 > **Engineering First. AI Second.**
 >
 > An Engineering Operating System for AI-assisted software development.
+>
+> **One Engineering State. Any AI.**
+>
+> *AI providers may change. Your engineering process should not.*
 
 ---
 
 ## 1. What is FlowForge?
 
-FlowForge is an **Engineering Operating System (EOS)** designed to orchestrate the entire software engineering lifecycle in collaboration with Artificial Intelligence (AI). FlowForge shifts the engineering context ownership from the transient chat histories of AI models directly into your code repository.
+FlowForge is an **Engineering Operating System (EOS)** designed to orchestrate the entire software engineering lifecycle in collaboration with Artificial Intelligence (AI). 
 
-Under the FlowForge architecture, AI operates purely as an *execution worker* performing targeted engineering tasks, while FlowForge manages the engineering continuity, architectural decisions approval (via *human-in-the-loop* interactions), and persists long-term engineering memory.
+Unlike traditional AI coding assistants that focus on continuous chat conversations, FlowForge manages the engineering lifecycle itself. It introduces a structured environment that abstracts LLMs into interchangeable *execution providers*, ensuring that your project's engineering memory, architecture, and history remain local, permanent, and independent of any single AI vendor.
+
+FlowForge exists to solve the problem of context fragmentation. It ensures that the engineering knowledge accumulated during a software project is owned by the repository itself, rather than being trapped inside transient AI conversation histories.
 
 ---
 
 ## 2. Why FlowForge?
 
-Traditional AI coding assistants (such as chat assistants or autocomplete extensions) have a fundamental flaw: they rely on conversation history which is volatile, prone to drift, and constrained by context windows.
+Traditional AI coding tools (such as chat assistants or autocomplete plugins) rely on volatile conversation history. This history is prone to context drift, vendor lock-in, and inevitably gets lost when starting a new session. 
 
-FlowForge solves this by introducing **Engineering State** and **Engineering Session** as the persistent foundation of project truth.
+FlowForge shifts the source of truth from transient chat windows to a persistent, repository-owned **Engineering State**.
 
-| Characteristic | Traditional AI Coding Assistants | FlowForge (Engineering OS) |
+| Dimension | Traditional AI Coding Assistants | FlowForge (Engineering OS) |
 |---|---|---|
 | **Source of Truth** | Volatile Conversation/Chat History | Declarative Engineering State (`ENGINEERING_STATE.yaml`) |
-| **Vendor Lock-in** | Bound to a specific LLM or provider UI | Decoupled (Plug-and-play AI Provider) |
-| **Audit Trail** | Scattered across individual chat transcripts | Immutable Session Logs (`session_<id>.yaml`) |
-| **State Persistence** | Transient (lost when the chat resets) | Persistent directly within the Git repository |
-| **Multi-AI Collaboration** | Impractical without manual context-pasting | Seamless via standardized handover context |
+| **Execution Context** | Prompt-centric (LLM-specific prompt hacks) | Mission-centric (Vendor-neutral Mission Packages) |
+| **Vendor Coupling** | Hard lock-in to specific model APIs/UIs | Decoupled (Plug-and-play AI Provider Registry) |
+| **Audit Trail** | Volatile, unstructured chat transcript | Permanent, immutable Session logs (`session_<id>.yaml`) |
+| **Knowledge Persistence** | Lost upon session restart | Persistent directly within the Git repository |
+| **AI Handover** | Requires manual context reconstruction | Seamless transfer of completed states to next worker |
 
 ---
 
-## 3. Core Principles
+## 3. Design Philosophy
 
-*   **Mission-Driven Engineering**: Software engineering is decomposed into discrete, manageable units of work called **Missions**.
-*   **Engineering State as the Source of Truth**: Long-term engineering memory is accumulated and stored in the repository as provider-independent declarative data.
-*   **Provider Independence**: AI Providers are treated as swapable plugins (Claude, Gemini, local Ollama, etc.) without altering the core orchestration engine.
-*   **Vendor-Neutral Mission Packages**: All engineering tasks and context inputs are compiled into standalone mission packages free from LLM-specific prompt biases.
-*   **Clean Architecture**: The core codebase is strictly separated using the Ports & Adapters pattern to guarantee high modularity and extendability.
+FlowForge is built upon the following core beliefs:
+
+*   **Engineering belongs to the repository, not the conversation.** Chat logs are transient; your code, tests, decisions, and history should live together.
+*   **Engineering knowledge should outlive AI sessions.** An engineer (human or AI) should be able to pick up where the last one left off without reading conversation transcripts.
+*   **AI providers are replaceable; engineering context is not.** The algorithms generating the code will change, but the engineering standards, dependencies, and requirements of your system are continuous.
 
 ---
 
-## 4. Core Architecture
+## 4. Core Principles
 
-The canonical end-to-end execution pipeline of FlowForge Core runs statelessly as illustrated below:
+*   **Mission-Driven Engineering**: Software development is decomposed into discrete, declarative units of work called **Missions**.
+*   **Engineering State as the Source of Truth**: The project's long-term memory is updated automatically as missions are started and completed.
+*   **Provider Independence**: The runtime engine communicates with AI adapters through a unified port interface.
+*   **Vendor-Neutral Mission Packages**: Tasks are compiled into abstract packages, separating raw requirements from vendor-specific prompt templates.
+*   **Clean Architecture**: Separation of concerns via Ports & Adapters allows FlowForge to remain resilient and easily testable.
+
+---
+
+## 5. Core Architecture
+
+The end-to-end execution pipeline of FlowForge Core runs statelessly as follows:
 
 ```mermaid
 graph TD
@@ -52,28 +69,33 @@ graph TD
     Runtime -->|4. Invokes| Provider[AI Provider Adapter]
     Provider -->|5. Executes tasks| Session[Engineering Session]
     Session -->|6. Updates memory| EngineeringState[(Engineering State)]
-    EngineeringState -->|7. Recommends| NextMission[Next Mission]
+    EngineeringState -->|7. Evaluates state| NextMission[Next Mission]
 ```
 
 ---
 
-## 5. Core Components
+## 6. Core Components
 
-FlowForge Core is composed of 6 stable, architectural domains:
+FlowForge Core consists of six stable domains:
 
 1.  **Mission**: The lifecycle unit of engineering work (states: `BACKLOG`, `ACTIVE`, `COMPLETED`).
-2.  **Mission Package**: A compiled, vendor-neutral bundle of instructions containing the mission details, relevant architectural decisions (ADRs), and project references.
-3.  **Engineering State**: The long-term engineering memory tracking completed missions, active blockers, design decisions, and a chronological event log in `engineering/ENGINEERING_STATE.yaml`.
-4.  **Engineering Session**: An immutable, detailed execution log recording the outcomes, files changed, and decisions of a single AI run.
+2.  **Mission Package**: A compiled, vendor-agnostic bundle of instructions containing the mission details, relevant architectural decisions (ADRs), and project references.
+3.  **Engineering State**: The long-term engineering memory tracking completed missions, active blockers, design decisions, and a chronological event log.
+4.  **Engineering Session**: An immutable, detailed execution log recording the outcomes, files changed, and decisions of a single AI execution.
 5.  **Provider**: The abstraction layer representing the AI execution driver.
 6.  **Runtime**: The stateless coordinator engine orchestrating the end-to-end execution workflow.
 
 ---
 
-## 6. Installation
+## 7. Installation
 
-FlowForge relies on **`uv`** for modern Python package management and virtual environment execution.
+FlowForge requires **`uv`** for modern Python package management and virtual environment execution.
 
+### Prerequisites
+- Python 3.10+
+- `uv` installed (Run `pip install uv` if missing)
+
+### Setup
 1.  **Clone the Repository**:
     ```bash
     git clone https://github.com/adityabriananto/flowforge.git
@@ -86,27 +108,30 @@ FlowForge relies on **`uv`** for modern Python package management and virtual en
 
 ---
 
-## 7. Quick Start
+## 8. Quick Start
 
-Execute your first automated engineering mission using the CLI:
+Verify and run your first automated engineering mission using the FlowForge CLI:
 
 ```bash
-# 1. Initialize the workspace (FlowForge auto-detects your project framework)
+# 1. Diagnose environment and check prerequisites
+uv run flowforge doctor
+
+# 2. Initialize the Engineering Workspace
 uv run flowforge init
 
-# 2. Define a new mission in backlog
+# 3. Define a new mission in the backlog
 uv run flowforge mission new "Implement database connection pooling" --desc "Setup SQLAlchemy pool size"
 
-# 3. Compile the mission into a Mission Package
+# 4. Compile the mission into a Mission Package
 uv run flowforge compile PROJECT-001
 
-# 4. Run the compiled mission package using the active AI Provider
+# 5. Run the compiled mission package using the active AI Provider
 uv run flowforge run PROJECT-001
 ```
 
 ---
 
-## 8. Engineering Workspace
+## 9. Engineering Workspace
 
 Once initialized, FlowForge enforces a standardized directory structure in your repository:
 
@@ -132,9 +157,9 @@ Execution logs are generated under a hidden directory to isolate transient runti
 
 ---
 
-## 9. Provider Model
+## 10. Provider Model
 
-AI execution engines can be registered declaratively in the `providers.yaml` configuration file at the repository root:
+FlowForge is strictly provider-independent. AI execution engines (such as Claude, Codex, Gemini, or local models running via Ollama) are configured declaratively in a `providers.yaml` file at the repository root:
 
 ```yaml
 providers:
@@ -149,32 +174,40 @@ providers:
     health_command: "curl -I http://localhost:11434"
 ```
 
+The Runtime Engine executes missions through these configurations without depending on any provider-specific SDK or library.
+
 ---
 
-## 10. CLI Reference
+## 11. CLI Reference
 
+*   `flowforge doctor`: Diagnoses system requirements and verifies workspace health.
 *   `flowforge init`: Scans the codebase to detect frameworks (Laravel, Django, React, Vue, SpringBoot, Node), initializes folders, and installs templates.
-*   `flowforge compile <MISSION_FILE_OR_CODE>`: Compiles a raw mission into a vendor-agnostic Mission Package.
-*   `flowforge run <MISSION_CODE>`: Executes an engineering mission package using the default active AI provider.
 *   `flowforge mission new <TITLE>`: Creates a new mission template in the backlog.
 *   `flowforge mission list`: Lists all workspace missions grouped by status.
-*   `flowforge doctor`: Diagnoses the system requirements and verify workspace health.
+*   `flowforge compile <MISSION_FILE_OR_CODE>`: Compiles a raw mission into a vendor-agnostic Mission Package.
+*   `flowforge run <MISSION_CODE>`: Executes an engineering mission package using the default active AI provider.
 
 ---
 
-## 11. Product Roadmap
+## 12. Roadmap
 
-The development roadmap focuses on DX, developer tooling, and analytical interfaces:
+FlowForge Core has reached architectural completion. 
 
-*   **Developer Experience (DX)**: Visual flow designer and VSCode Extension to monitor runtimes directly from your editor.
-*   **CLI Improvements**: Interactive prompts and shell completions.
-*   **Dashboard & Monitoring**: Real-time dashboard to visualize Engineering State timeline and audit execution sessions.
-*   **Provider Packs**: Standardized, out-of-the-box CLI providers for Claude, OpenAI, and Ollama.
-*   **Analytics**: Monitor token consumption, execution costs, and provider efficiency.
+### FlowForge v1
+*   [x] **Core Complete**: Mission, Package, State, Session, Provider Registry, and Runtime Engine.
+
+### Future Focus
+*   **Developer Experience (DX)**: Interactive command CLI prompts, visualization tools, and shell completions.
+*   **CLI Improvements**: Faster package compilation and smart bootstrapping enhancements.
+*   **Dashboard**: A local web interface to visualize the Engineering State timeline and audit session logs.
+*   **Provider Packs**: Pre-built adapter packages for major cloud and local LLMs.
+*   **Integrations**: IDE extensions and Model Context Protocol (MCP) integrations.
+*   **Analytics**: Metrics for tracking token costs, latency, and success rates across different providers.
+*   **Documentation**: Detailed API references and guides for custom provider development.
 
 ---
 
-## 12. Contributing
+## 13. Contributing
 
 We welcome contributions! Please ensure your Pull Requests strictly adhere to:
 1.  **Clean Architecture**: Ports and adapters must remain decoupled.
@@ -183,6 +216,6 @@ We welcome contributions! Please ensure your Pull Requests strictly adhere to:
 
 ---
 
-## 13. License
+## 14. License
 
-FlowForge is open-source software licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+FlowForge is open-source software licensed under the [MIT License](LICENSE).

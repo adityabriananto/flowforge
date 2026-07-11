@@ -159,10 +159,11 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Unit Tests baru untuk memvalidasi pipa integrasi eksekusi misi end-to-end secara stateless
 -   Penyusunan dokumen formal RFC-017 & ADR-017 untuk Runtime Integration
 -   Perombakan total produk README.md (FF-020.1) untuk meluruskan visi FlowForge sebagai Engineering Operating System
+-   Penyusunan README.md (Global Open Source Edition) (FF-020.2) dalam Bahasa Inggris profesional
 
 ## Current Task
 
--   v1.5.1 README Product Rewrite Sign-off
+-   v1.5.2 README Global Open Source Edition Sign-off
 
 ## Next Tasks
 
