@@ -95,6 +95,6 @@ def test_compiler_enrichment_pipeline(enriched_workspace):
     assert "Code Implementation integrated and verified" in package.acceptance_criteria
     
     # 5. Assert Metadata details
-    assert package.metadata["workspace"] is not None
-    assert package.metadata["compiler_version"] == "1.3.0"  # Read from pyproject.toml version helper fallback
-    assert package.metadata["generated_at"] is not None
+    assert package.package["workspace"] is not None
+    assert package.package["compiler_version"] == "1.3.0"  # Read from pyproject.toml version helper fallback
+    assert package.package["generated_at"] is not None

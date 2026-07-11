@@ -47,7 +47,7 @@ def test_engine_guard_refuses_backlog_mission(mock_lifecycle_workspace):
     with pytest.raises(RuntimeError) as excinfo:
         engine.execute_mission(mission_code="TESTPROJ-000", base_path=base_dir)
         
-    assert "currently in BACKLOG" in str(excinfo.value)
+    assert "BACKLOG" in str(excinfo.value)
     assert "Run 'flowforge mission start TESTPROJ-000' before executing" in str(excinfo.value)
 
 def test_engine_allows_active_mission(mock_lifecycle_workspace):

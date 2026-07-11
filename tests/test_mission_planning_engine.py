@@ -1,6 +1,7 @@
 import pytest
 from flowforge.services.planning_context_builder import PlanningContext
 from flowforge.services.mission_planning_engine import MissionPlanningEngine
+from flowforge.domain.mission_draft import DeveloperInput
 
 def test_generate_draft_deterministic_backend():
     engine = MissionPlanningEngine()
@@ -12,11 +13,15 @@ def test_generate_draft_deterministic_backend():
         recent_rfcs=[]
     )
     
+    dev_input = DeveloperInput(
+        title="Implement User Auth",
+        business_goal="Add JWT authentication",
+        priority="high"
+    )
+
     mission = engine.generate_draft(
         context=context,
-        title="Implement User Auth",
-        goal="Add JWT authentication",
-        priority="high",
+        developer_input=dev_input,
         code="PROJECT-001",
         notes="Use PyJWT"
     )
@@ -50,11 +55,15 @@ def test_generate_draft_deterministic_frontend():
         project_type="frontend"
     )
     
+    dev_input = DeveloperInput(
+        title="Build Login Page",
+        business_goal="Create responsive login UI",
+        priority="medium"
+    )
+
     mission = engine.generate_draft(
         context=context,
-        title="Build Login Page",
-        goal="Create responsive login UI",
-        priority="medium",
+        developer_input=dev_input,
         code="PROJECT-002"
     )
     

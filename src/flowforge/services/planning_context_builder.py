@@ -28,7 +28,13 @@ class PlanningContextBuilder:
 
     def build_context(self) -> PlanningContext:
         import json
-        import tomli # if available, else skip
+        try:
+            import tomllib as toml
+        except ImportError:
+            try:
+                import tomli as toml
+            except ImportError:
+                toml = None
         import yaml
         
         context = PlanningContext()
@@ -109,10 +115,9 @@ class PlanningContextBuilder:
             if context.project_name == "Unknown":
                 try:
                     pyproj_path = os.path.join(self.base_path, "pyproject.toml")
-                    if os.path.exists(pyproj_path):
-                        import tomli
+                    if os.path.exists(pyproj_path) and toml is not None:
                         with open(pyproj_path, "rb") as f:
-                            pyproj = tomli.load(f)
+                            pyproj = toml.load(f)
                             if pyproj.get("project", {}).get("name"): 
                                 context.project_name = pyproj["project"]["name"]
                             elif pyproj.get("tool", {}).get("poetry", {}).get("name"):

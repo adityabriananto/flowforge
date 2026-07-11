@@ -92,8 +92,6 @@ def test_cli_compile_by_mission_code(mock_hardened_workspace, monkeypatch):
         
     # Trigger compile
     cmd_compile(CompileArgs())
-    
-    # Expect compiled yaml exists in workspace root
-    files = os.listdir(mock_hardened_workspace)
-    compiled_files = [f for f in files if f.startswith("mission_package_")]
-    assert len(compiled_files) == 1
+    # Expect compiled yaml exists in packages dir
+    output_pkg = os.path.join(mock_hardened_workspace, ".flowforge", "packages", "PROJECT-101.package.yaml")
+    assert os.path.exists(output_pkg)
