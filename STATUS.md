@@ -183,11 +183,13 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 
 ## Current Task
 
--   v1.5.8 Artifact Identity Service Sign-off
+-   v1.0.0-beta Core Completion Planning & Documentation
 
 ## Next Tasks
 
--   Sprint 16 — Distributed Worker & Broker (v1.6) (Redis, Docker, Kubernetes)
+-   FF-025 — Mission Planning Engine (Deterministic, Provider-independent)
+-   FF-026 — README 2.0 & Developer Onboarding
+-   FF-027 — Distribution (PyPI release)
 
 ## Blockers
 

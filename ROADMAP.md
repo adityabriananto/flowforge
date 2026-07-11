@@ -25,19 +25,24 @@ Membawa konsep AI Worker sebagai agen rekayasa modular.
 -   **Mission Package Compiler**: Compiler yang merender data rekayasa mentah (RFC, ADR, roadmap) menjadi paket vendor-agnostic.
 
 ### v1.5 — AI Runtime & Core Completion (Current)
-Penyambungan seluruh domain modular rekayasa ke dalam satu orkestrasi runtime terpadu.
--   **Mission Package as Contract**: Kontrak pelaksanaan tugas terstandarisasi.
--   **Engineering Session**: Log detail audit eksekusi worker tunggal secara immutable pasca-penyelesaian.
--   **Engineering State**: Memori jangka panjang proyek ter-update otomatis di disk via `ENGINEERING_STATE.yaml` untuk context restoration.
--   **AI Runtime Engine & Registry**: Penyedia integrasi orkestrasi stateless end-to-end.
--   **Core Complete**: FlowForge Core v1.5 selesai sepenuhnya.
+Penyambungan seluruh domain modular rekayasa ke dalam satu orkestrasi runtime terpadu hingga stabil sebagai *FlowForge Core v1.0.0-beta*.
+-   **✅ Platform Validation**: Engine Layer divalidasi melalui pilot project (BroDev Cashier & Meeting Intelligence).
+-   **✅ FF-024 Engineering Artifact Identity Service**: Manajemen identifier rekayasa lintas repositori.
+-   **⏳ FF-025 Mission Planning Engine**: Perencanaan *engineering* deterministik bawaan (tanpa eksekusi AI langsung).
+-   **⏳ FF-026 README 2.0 & Developer Onboarding**: Perbaikan panduan instalasi dan dokumentasi orientasi.
+-   **⏳ FF-027 Public Distribution (PyPI)**: Paket rilis siap pakai ke Python Package Index.
 
-### v1.6 — Scale & Distribution (Next)
-Fokus pada infrastruktur terdistribusi dan kontainerisasi.
--   **Distributed Worker**: Eksekusi Worker di mesin server terpisah secara asinkron.
--   **Redis Integration**: Event broker & message queue berbasis Redis untuk sinkronisasi state.
--   **Dockerization**: Kontainerisasi engine backend dan dashboard frontend.
--   **Kubernetes (K8s)**: Manifest deployment untuk orkestrasi cluster terdistribusi.
+### Core Freeze Policy (Post-FF-027)
+Setelah FF-027 selesai, platform *FlowForge Core* (cabang `main`) akan dibekukan (masuk fase *Core Freeze*).
+-   **Core hanya menerima**: Critical bug fixes, Security fixes, Performance improvements, Documentation improvements, Small compatibility updates.
+-   **Core TIDAK menerima**: Eksperimen fitur, dashboard UX, editor visual, integrasi cloud, AI-assisted planning, marketplace. Segala kapabilitas di atas merupakan peningkatan produktivitas yang harus diletakkan pada layer aplikasi di luar *Core*.
+
+### v2.0 — Productivity & Ecosystem Enhancements (Next)
+Fokus pada infrastruktur terdistribusi, perluasan ekosistem developer, dan eksperimen UX yang dijalankan sepenuhnya di cabang `next`.
+-   **Distributed Worker & K8s**: Kontainerisasi engine backend dan dashboard frontend untuk cluster terdistribusi.
+-   **Cloud Integration & Marketplace**: Layanan SaaS managed FlowForge dan toko template plugin.
+-   **VSCode Extension & Visual Workspace**: Ekstensi editor visual untuk mendesain workflow dan memantau status instansi.
+-   **AI-assisted Planning (Plugin)**: Integrasi kecerdasan buatan dalam perencanaan (sebagai modul ekstensi).
 
 ### v2.0 — Ecosystem & Cloud
 Fokus pada perluasan ekosistem developer dan integrasi awan.
