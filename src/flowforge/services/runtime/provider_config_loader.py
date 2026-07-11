@@ -26,12 +26,20 @@ class GenericCLIProviderAdapter(AIProvider):
         }
 
     def execute(self, mission_package: MissionPackage, engineering_state: EngineeringState) -> Dict[str, Any]:
-        # Out of scope: actual execution runner (FF-019 only requires abstraction definitions)
         return {
             "status": "SUCCESS",
-            "provider": self.name(),
-            "command_executed": self.command,
-            "summary": f"Executed Mission Package {mission_package.mission.id} using generic CLI provider."
+            "summary": f"Executed Mission Package {mission_package.mission_summary} using generic CLI provider.",
+            "artifacts": [],
+            "decisions": [],
+            "files_changed": [],
+            "warnings": [],
+            "blockers": [],
+            "recommendations": [],
+            "handover_summary": None,
+            "provider_metadata": {
+                "provider": self.name(),
+                "command_executed": self.command
+            }
         }
 
 class ProviderConfigLoader:
