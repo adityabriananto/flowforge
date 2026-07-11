@@ -12,15 +12,21 @@ class MissionService:
         self, 
         title: str, 
         description: str, 
+        prefix: str = "PROJECT",
         goals: Optional[List[str]] = None, 
         metadata: Optional[dict] = None,
         priority: str = "medium"
     ) -> Mission:
+        from flowforge.services.artifact_identity_service import ArtifactIdentityService
+        existing_identifiers = await self.repository.list_identifiers()
+        mission_code = ArtifactIdentityService.generate_next_identity(prefix, existing_identifiers)
+
         mission = Mission(
             id=uuid.uuid4(),
             title=title,
             description=description,
             status=MissionState.BACKLOG,
+            code=mission_code,
             goals=goals or [],
             metadata=metadata or {},
             priority=priority,

@@ -95,7 +95,17 @@ class MissionLifecycleManager:
             m_code = str(mission_id)
         else:
             m_uuid = str(uuid.uuid4())
-            m_code = mission_id or f"PROJECT-{len(cls.list_missions(base_path)['backlog']) + 1:03d}"
+            # Gather all existing identifiers across all lifecycle states
+            existing_identifiers = []
+            grouped_missions = cls.list_missions(base_path)
+            for group in grouped_missions.values():
+                for m_data in group:
+                    if m_data.get("code"):
+                        existing_identifiers.append(m_data["code"])
+                        
+            from flowforge.services.artifact_identity_service import ArtifactIdentityService
+            prefix = "PROJECT" # Default engineering prefix for missions
+            m_code = mission_id or ArtifactIdentityService.generate_next_identity(prefix, existing_identifiers)
         
         # Verify duplicate ID/Code
         state_found, _ = cls._find_mission_file(m_code, base_path)

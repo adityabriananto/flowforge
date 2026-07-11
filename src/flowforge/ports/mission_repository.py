@@ -23,3 +23,8 @@ class MissionRepository(ABC):
     async def delete(self, mission_id: uuid.UUID) -> None:
         """Removes a mission from the persistent store by its ID."""
         pass
+
+    @abstractmethod
+    async def list_identifiers(self) -> List[str]:
+        """Lists all known mission string identifiers (e.g., codes like PROJECT-001)."""
+        pass

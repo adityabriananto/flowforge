@@ -19,3 +19,6 @@ class InMemoryMissionRepository(MissionRepository):
     async def delete(self, mission_id: uuid.UUID) -> None:
         if mission_id in self._missions:
             del self._missions[mission_id]
+
+    async def list_identifiers(self) -> List[str]:
+        return [m.code for m in self._missions.values() if m.code]

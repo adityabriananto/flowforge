@@ -177,10 +177,13 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Penerapan Runtime Guard di AIRuntimeEngine.execute_mission penolak eksekusi misi non-ACTIVE (FF-023)
 -   Perbaikan bug fallback state creation di engine runner
 -   Unit Tests baru untuk memverifikasi kebijakan penegakan guard status misi
+-   Implementasi ArtifactIdentityService untuk pembuatan identifier engineering yang deterministik (FF-024)
+-   Implementasi arsitektur MissionGenerator, MissionFactory, dan YamlMissionRepository
+-   Unit Tests baru untuk 7 skenario prefix identitas sekuensial dan pengenalan gap
 
 ## Current Task
 
--   v1.5.7 Mission Lifecycle Enforcement Sign-off
+-   v1.5.8 Artifact Identity Service Sign-off
 
 ## Next Tasks
 
