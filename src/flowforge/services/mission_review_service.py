@@ -49,7 +49,7 @@ class MissionReviewService:
         
         self.print_provider("\nExpected Engineering Outputs:")
         for d in draft.generated_mission.deliverables:
-            self.print_provider(f"✓ {d}")
+            self.print_provider(f"  - {d}")
             
         self.print_provider("\nConstraints:")
         for c in draft.generated_mission.constraints:
