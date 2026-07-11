@@ -115,10 +115,11 @@ def test_cli_command_routing(mock_workspace, monkeypatch):
 
     # CLI mission new
     m_id = str(uuid.uuid4())
-    args_new = Args("new", title="CLI Test", desc="CLI Desc", id="PROJECT-000")
+    args_new = Args("new", title="CLI Test", goal="CLI Desc", priority="high", id="PROJECT-000")
     
     # Mock review_mission to auto-accept the mission
-    monkeypatch.setattr('flowforge.services.mission_review_service.MissionReviewService.review_mission', lambda self, m: True)
+    monkeypatch.setattr('flowforge.services.mission_review_service.MissionReviewService.review_mission', 
+                        lambda self, m: __import__("flowforge.domain.mission_draft", fromlist=["MissionReviewAction"]).MissionReviewAction.ACCEPT)
     
     cmd_mission(args_new)
     

@@ -23,41 +23,104 @@ class MissionCreationService:
         self.planning_engine = MissionPlanningEngine()
         self.review_service = review_service or MissionReviewService()
 
+    def _prompt_input(self, prompt_text: str, current_val: Optional[str] = None) -> str:
+        # Helper to get user input from the console directly during the wizard.
+        # In a real CLI, we might use richer interactive prompts, but simple input() works.
+        prompt = f"{prompt_text} [{current_val}]: " if current_val else f"{prompt_text}: "
+        val = input(prompt).strip()
+        return val if val else (current_val or "")
+
+    def _validate_priority(self, p: str) -> str:
+        p = p.lower()
+        if p in ["low", "medium", "high"]:
+            return p
+        return ""
+
     async def create_mission(
         self,
-        title: str,
-        goal: str,
-        priority: str = "medium",
+        title: Optional[str] = None,
+        goal: Optional[str] = None,
+        priority: Optional[str] = None,
         prefix: str = "PROJECT",
         notes: Optional[str] = None
     ) -> Optional[Mission]:
-        """
-        Creates and saves a mission after planning and developer review.
-        Returns the Mission if accepted, None if rejected.
-        """
-        # 1. Identity
+        from flowforge.domain.mission_draft import DeveloperInput, MissionDraft, MissionReviewAction
+
         existing_identifiers = await self.repository.list_identifiers()
         next_code = ArtifactIdentityService.generate_next_identity(prefix, existing_identifiers)
-        
-        # 2. Context
         context = self.context_builder.build_context()
-        
-        # 3. Planning
-        mission = self.planning_engine.generate_draft(
-            context=context,
-            title=title,
-            goal=goal,
-            priority=priority,
-            code=next_code,
-            notes=notes
-        )
-        
-        # 4. Review
-        accepted = self.review_service.review_mission(mission)
-        
-        # 5. Persistence
-        if accepted:
-            await self.repository.save(mission)
-            return mission
-        
-        return None
+
+        # Wizard State
+        current_title = title or ""
+        current_goal = goal or ""
+        current_priority = (priority or "").lower()
+        if not self._validate_priority(current_priority):
+            current_priority = ""
+
+        # Non-interactive mode check
+        is_interactive = not (title and goal and self._validate_priority(priority or ""))
+
+        while True:
+            if is_interactive:
+                print("\n" + "-"*40)
+                print(" Mission Authoring Wizard")
+                print("-"*40)
+                while not current_title:
+                    current_title = self._prompt_input("Mission Title", current_title)
+                    if not current_title:
+                        print("Error: Title is required.")
+                
+                while not current_goal:
+                    current_goal = self._prompt_input("Business Goal", current_goal)
+                    if not current_goal:
+                        print("Error: Business Goal is required.")
+                
+                while not current_priority:
+                    p = self._prompt_input("Priority (Low/Medium/High)", current_priority)
+                    validated_p = self._validate_priority(p)
+                    if validated_p:
+                        current_priority = validated_p
+                    else:
+                        print("Error: Priority must be Low, Medium, or High.")
+                
+                print("-"*40 + "\n")
+
+            dev_input = DeveloperInput(title=current_title, business_goal=current_goal, priority=current_priority)
+            
+            generated_mission = self.planning_engine.generate_draft(
+                context=context,
+                developer_input=dev_input,
+                code=next_code,
+                notes=notes
+            )
+            
+            draft = MissionDraft(
+                developer_input=dev_input,
+                planning_context=context,
+                generated_mission=generated_mission
+            )
+            
+            action = self.review_service.review_mission(draft)
+            
+            if action == MissionReviewAction.ACCEPT:
+                await self.repository.save(generated_mission)
+                return generated_mission
+            elif action == MissionReviewAction.EDIT:
+                is_interactive = True
+                # Clear them out so the user can be prompted again, or leave them as defaults for the prompt
+                print("\n--- Editing Developer Input ---")
+                current_title = self._prompt_input("Mission Title", current_title)
+                current_goal = self._prompt_input("Business Goal", current_goal)
+                
+                new_p = ""
+                while not new_p:
+                    p = self._prompt_input("Priority (Low/Medium/High)", current_priority)
+                    validated_p = self._validate_priority(p)
+                    if validated_p:
+                        new_p = validated_p
+                    else:
+                        print("Error: Priority must be Low, Medium, or High.")
+                current_priority = new_p
+                continue
+            elif action == MissionReviewAction.CANCEL:
+                return None

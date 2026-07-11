@@ -13,15 +13,13 @@ class MissionPlanningEngine:
     def generate_draft(
         self,
         context: PlanningContext,
-        title: str,
-        goal: str,
-        priority: str,
+        developer_input: 'DeveloperInput',
         code: str,
         notes: Optional[str] = None
     ) -> Mission:
         
         # Deterministic Rules
-        deliverables = self._determine_deliverables(context, goal)
+        deliverables = self._determine_deliverables(context, developer_input.business_goal)
         constraints = self._determine_constraints(context)
         definition_of_done = self._determine_dod(context)
         
@@ -38,15 +36,15 @@ class MissionPlanningEngine:
             metadata["developer_notes"] = notes
             
         mission = MissionFactory.create(
-            title=title,
-            description=goal,
+            title=developer_input.title,
+            description=developer_input.business_goal,
             code=code,
-            goals=[goal],
+            goals=[developer_input.business_goal],
             metadata=metadata,
-            priority=priority
+            priority=developer_input.priority
         )
         
-        mission.goal = goal
+        mission.goal = developer_input.business_goal
         mission.deliverables = deliverables
         mission.constraints = constraints
         mission.definition_of_done = definition_of_done

@@ -333,9 +333,9 @@ def cmd_mission(args):
             service = MissionCreationService(repository=repo, base_path=".")
             
             mission = asyncio.run(service.create_mission(
-                title=args.title,
-                goal=args.desc or "Implement feature",
-                priority="medium",
+                title=getattr(args, 'title', None),
+                goal=getattr(args, 'goal', None),
+                priority=getattr(args, 'priority', None),
                 prefix="PROJECT"
             ))
             
@@ -457,9 +457,9 @@ def main():
 
     # Mission New
     parser_m_new = mission_subparsers.add_parser("new", help="Create a new mission in backlog")
-    parser_m_new.add_argument("title", help="Title of the new mission")
-    parser_m_new.add_argument("--desc", help="Optional description of the mission", required=False)
-    parser_m_new.add_argument("--id", help="Optional custom UUID for the mission", required=False)
+    parser_m_new.add_argument("--title", help="Optional title of the new mission (triggers non-interactive mode if all args provided)", required=False)
+    parser_m_new.add_argument("--goal", help="Optional business goal of the mission", required=False)
+    parser_m_new.add_argument("--priority", help="Optional priority (low/medium/high)", required=False)
 
     # Mission List
     mission_subparsers.add_parser("list", help="List all missions grouped by state")

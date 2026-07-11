@@ -1,5 +1,5 @@
 from typing import Callable, Any
-from flowforge.domain.mission import Mission
+from flowforge.domain.mission_draft import MissionDraft, MissionReviewAction
 import yaml
 
 class MissionReviewService:
@@ -11,46 +11,73 @@ class MissionReviewService:
         self.input_provider = input_provider
         self.print_provider = print_provider
 
-    def review_mission(self, mission: Mission) -> bool:
+    def review_mission(self, draft: MissionDraft) -> MissionReviewAction:
         """
-        Displays the mission and asks for approval.
-        Returns True if accepted, False if rejected or cancelled.
+        Displays the mission draft and asks for approval.
+        Returns the chosen MissionReviewAction.
         """
         self.print_provider("\n" + "="*40)
-        self.print_provider(" MISSION DRAFT REVIEW")
+        self.print_provider(" Mission Draft")
         self.print_provider("="*40)
         
-        self.print_provider(f"Code: {mission.code}")
-        self.print_provider(f"Title: {mission.title}")
-        self.print_provider(f"Goal: {mission.goal}")
-        self.print_provider(f"Priority: {mission.priority}")
-        self.print_provider("\nDeliverables:")
-        for d in mission.deliverables:
-            self.print_provider(f"  - {d}")
+        self.print_provider("\nDeveloper Input")
+        self.print_provider(f"- Mission Title: {draft.developer_input.title}")
+        self.print_provider(f"- Business Goal: {draft.developer_input.business_goal}")
+        self.print_provider(f"- Priority: {draft.developer_input.priority}")
+        
+        self.print_provider("\n" + "-"*40)
+        self.print_provider("Planning Context")
+        
+        self.print_provider(f"\nProject:\n{draft.planning_context.project_name}")
+        self.print_provider(f"\nFramework:\n{draft.planning_context.framework}")
+        self.print_provider(f"\nLanguage:\n{draft.planning_context.language}")
+        self.print_provider(f"\nProject Type:\n{draft.planning_context.project_type}")
+        self.print_provider(f"\nCurrent Phase:\n{draft.planning_context.current_phase}")
+        
+        self.print_provider("\nCompleted Missions:")
+        if draft.planning_context.completed_missions:
+            for m in draft.planning_context.completed_missions:
+                self.print_provider(m)
+        else:
+            self.print_provider("None")
+        
+        self.print_provider("\n" + "-"*40)
+        self.print_provider("Generated Mission")
+        
+        self.print_provider("\nObjective:")
+        self.print_provider(draft.generated_mission.goal)
+        
+        self.print_provider("\nExpected Engineering Outputs:")
+        for d in draft.generated_mission.deliverables:
+            self.print_provider(f"✓ {d}")
             
         self.print_provider("\nConstraints:")
-        for c in mission.constraints:
+        for c in draft.generated_mission.constraints:
             self.print_provider(f"  - {c}")
             
         self.print_provider("\nDefinition of Done:")
-        for dod in mission.definition_of_done:
+        for dod in draft.generated_mission.definition_of_done:
             self.print_provider(f"  - {dod}")
             
-        if mission.references:
+        if draft.generated_mission.references:
             self.print_provider("\nReferences:")
-            for ref in mission.references:
+            for ref in draft.generated_mission.references:
                 self.print_provider(f"  - {ref}")
-                
-        self.print_provider("\nMetadata:")
-        self.print_provider(yaml.dump(mission.metadata, default_flow_style=False).strip())
         
+        self.print_provider("\n" + "="*40)
+        self.print_provider("Actions")
+        self.print_provider("[A] Accept")
+        self.print_provider("[E] Edit")
+        self.print_provider("[C] Cancel")
         self.print_provider("="*40)
         
         while True:
-            choice = self.input_provider("Accept this mission? [y/N]: ").strip().lower()
-            if choice in ['y', 'yes']:
-                return True
-            elif choice in ['n', 'no', '']:
-                return False
+            choice = self.input_provider("Select an action [A/E/C]: ").strip().lower()
+            if choice == 'a':
+                return MissionReviewAction.ACCEPT
+            elif choice == 'e':
+                return MissionReviewAction.EDIT
+            elif choice == 'c':
+                return MissionReviewAction.CANCEL
             else:
-                self.print_provider("Please enter 'y' or 'n'.")
+                self.print_provider("Please enter 'A', 'E', or 'C'.")
