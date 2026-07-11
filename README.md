@@ -113,10 +113,13 @@ FlowForge requires **`uv`** for modern Python package management and virtual env
 Verify and run your first automated engineering mission using the FlowForge CLI:
 
 ```bash
-# 1. Diagnose environment and check prerequisites
+# 1. Verify the installed version
+uv run flowforge --version
+
+# 2. Diagnose environment and check prerequisites
 uv run flowforge doctor
 
-# 2. Initialize the Engineering Workspace
+# 3. Initialize the Engineering Workspace
 uv run flowforge init
 
 # 3. Define a new mission in the backlog

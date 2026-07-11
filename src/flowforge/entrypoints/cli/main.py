@@ -380,9 +380,22 @@ def cmd_mission(args):
             sys.exit(1)
 
 def main():
+    from flowforge.utils.version import get_version
+    version_str = f"FlowForge CLI\nVersion: {get_version()}"
+
     parser = argparse.ArgumentParser(description="FlowForge CLI - Developer Experience Tool")
+    parser.add_argument(
+        "-v", "--version",
+        action="version",
+        version=version_str,
+        help="Show FlowForge CLI version information"
+    )
+    
     subparsers = parser.add_subparsers(dest="command", required=True)
     
+    # Version Subcommand
+    parser_version = subparsers.add_parser("version", help="Show FlowForge CLI version information")
+
     # Init
     parser_init = subparsers.add_parser("init", help="Initialize a new FlowForge project")
     parser_init.add_argument("--force", action="store_true", help="Bypass Git repository safety check")
@@ -431,7 +444,9 @@ def main():
     
     args = parser.parse_args()
     
-    if args.command == "init":
+    if args.command == "version":
+        print(version_str)
+    elif args.command == "init":
         cmd_init(args)
     elif args.command == "run":
         cmd_run(args)

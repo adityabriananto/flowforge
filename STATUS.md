@@ -160,10 +160,13 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Penyusunan dokumen formal RFC-017 & ADR-017 untuk Runtime Integration
 -   Perombakan total produk README.md (FF-020.1) untuk meluruskan visi FlowForge sebagai Engineering Operating System
 -   Penyusunan README.md (Global Open Source Edition) (FF-020.2) dalam Bahasa Inggris profesional
+-   Pembuatan version helper dinamis (DX-001) pembaca metadata pyproject.toml
+-   Pendaftaran subcommand `version` dan flag global `--version` pada argparse CLI
+-   Unit Tests baru untuk memverifikasi CLI output flag & command version
 
 ## Current Task
 
--   v1.5.2 README Global Open Source Edition Sign-off
+-   v1.5.3 CLI Version Support Sign-off
 
 ## Next Tasks
 
