@@ -415,8 +415,8 @@ def cmd_mission(args):
             sys.exit(1)
 
 def main():
-    from flowforge.utils.version import get_version
-    version_str = f"FlowForge CLI\nVersion: {get_version()}"
+    from flowforge.utils.version import get_display_version
+    version_str = f"FlowForge CLI Version: {get_display_version()}"
 
     parser = argparse.ArgumentParser(description="FlowForge CLI - Developer Experience Tool")
     parser.add_argument(
