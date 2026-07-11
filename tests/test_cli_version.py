@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import patch
 from io import StringIO
 from flowforge.entrypoints.cli.main import main
-from flowforge.utils.version import get_version
+from flowforge.utils.version import get_version, get_display_version
 
 def test_get_version_matches_pyproject():
     version = get_version()
@@ -17,7 +17,7 @@ def test_cli_version_subcommand(capsys):
         
     captured = capsys.readouterr()
     assert "FlowForge CLI" in captured.out
-    assert get_version() in captured.out
+    assert get_display_version() in captured.out
 
 def test_cli_version_flag(capsys):
     testargs = ["flowforge", "--version"]
@@ -29,4 +29,4 @@ def test_cli_version_flag(capsys):
         
     captured = capsys.readouterr()
     assert "FlowForge CLI" in captured.out
-    assert get_version() in captured.out
+    assert get_display_version() in captured.out
