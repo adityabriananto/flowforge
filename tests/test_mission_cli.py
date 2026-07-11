@@ -115,13 +115,30 @@ def test_cli_command_routing(mock_workspace, monkeypatch):
 
     # CLI mission new
     m_id = str(uuid.uuid4())
-    args_new = Args("new", title="CLI Test", desc="CLI Desc", id=m_id)
+    args_new = Args("new", title="CLI Test", desc="CLI Desc", id="PROJECT-000")
+    
+    # Mock review_mission to auto-accept the mission
+    monkeypatch.setattr('flowforge.services.mission_review_service.MissionReviewService.review_mission', lambda self, m: True)
+    
     cmd_mission(args_new)
     
-    backlog_path = os.path.join(mock_workspace, "engineering", "missions", "backlog", f"{m_id}.yaml")
+    backlog_path = os.path.join(mock_workspace, "engineering", "missions", "backlog", "PROJECT-000.yaml")
     assert os.path.exists(backlog_path)
     
     # CLI mission start
-    args_start = Args("start", mission_id=m_id)
+    args_start = Args("start", mission_id="PROJECT-000")
     cmd_mission(args_start)
-    assert os.path.exists(os.path.join(mock_workspace, "engineering", "missions", "active", f"{m_id}.yaml"))
+    
+    active_path = os.path.join(mock_workspace, "engineering", "missions", "active", "PROJECT-000.yaml")
+    assert os.path.exists(active_path)
+    
+    # CLI mission complete
+    args_complete = Args("complete", mission_id="PROJECT-000")
+    cmd_mission(args_complete)
+    
+    completed_path = os.path.join(mock_workspace, "engineering", "missions", "completed", "PROJECT-000.yaml")
+    assert os.path.exists(completed_path)
+    
+    # CLI mission show
+    args_show = Args("show", mission_id="PROJECT-000")
+    cmd_mission(args_show)

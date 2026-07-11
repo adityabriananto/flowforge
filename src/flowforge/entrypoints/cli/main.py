@@ -324,14 +324,26 @@ def cmd_mission(args):
     from flowforge.services.workspace.mission_lifecycle_manager import MissionLifecycleManager
 
     if args.mission_command == "new":
+        import asyncio
+        from flowforge.services.mission_creation_service import MissionCreationService
+        from flowforge.adapters.mission.yaml_mission_repository import YamlMissionRepository
+        
         try:
-            path = MissionLifecycleManager.create_mission(
+            repo = YamlMissionRepository(".")
+            service = MissionCreationService(repository=repo, base_path=".")
+            
+            mission = asyncio.run(service.create_mission(
                 title=args.title,
-                description=args.desc or "",
-                mission_id=args.id,
-                base_path="."
-            )
-            print(f"[FlowForge CLI] Created new mission successfully in backlog: {path}")
+                goal=args.desc or "Implement feature",
+                priority="medium",
+                prefix="PROJECT"
+            ))
+            
+            if mission:
+                print(f"\n[FlowForge CLI] Created new mission successfully: {mission.code}")
+            else:
+                print(f"\n[FlowForge CLI] Mission creation cancelled.")
+                
         except Exception as e:
             print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
             sys.exit(1)

@@ -40,7 +40,7 @@ class YamlMissionRepository(MissionRepository):
         folder = "backlog"
         if mission.status == MissionState.ACTIVE:
             folder = "active"
-        elif mission.status == MissionState.COMPLETED or mission.status == MissionState.DONE:
+        elif mission.status == MissionState.DONE or mission.status.value == "COMPLETED":
             folder = "completed"
             
         dest_dir = os.path.join(self.base_path, "engineering", "missions", folder)
