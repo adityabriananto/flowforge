@@ -42,6 +42,13 @@ class AIRuntimeEngine:
         except Exception as e:
             raise RuntimeError(f"Runtime failed to load mission file '{resolved_path}': {str(e)}")
 
+        # Runtime Guard: Refuse execution if mission is not ACTIVE
+        if mission.status != "ACTIVE":
+            raise RuntimeError(
+                f"Mission '{mission_code}' is currently in {mission.status}. "
+                f"Run 'flowforge mission start {mission_code}' before executing this Mission."
+            )
+
         # Configure compiler paths relative to base_path
         self.compiler.rules_file_path = os.path.join(base_path, "engineering/decisions/AGENTS.md")
         self.compiler.references_dir = os.path.join(base_path, "engineering/architecture")
@@ -64,7 +71,7 @@ class AIRuntimeEngine:
         except Exception:
             # Fallback if state doesn't exist yet (Zero-config init fallback)
             from flowforge.domain.engineering_state import EngineeringState, ProjectState
-            state = EngineeringState(project=ProjectState(id=str(uuid.uuid4()), name=mission_package.mission.title))
+            state = EngineeringState(project=ProjectState(id=str(uuid.uuid4()), name=mission.title))
             self.state_service.save_state(state, base_path)
 
         # 4. Create and start engineering session

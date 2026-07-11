@@ -168,19 +168,19 @@ Sprint 13 -- Agent Profile & Mission Package Compiler (v1.3)
 -   Penyusunan rekomendasi otonom Next Action setelah pemicuan perintah CLI init, compile, dan run
 -   Peningkatan penanganan level diagnosis doctor agar bersahabat sebelum inisiasi workspace
 -   Unit Tests baru untuk memvalidasi dynamic templates rendering dan bootstrapping data
--   Penambahan field warnings dan metadata pada domain model MissionPackage (FF-021)
--   Refaktor ContextSelector untuk memuat deskripsi properti WORKSPACE.yaml dan PROJECT_STATE.yaml otonom
--   Refaktor ReferenceCollector untuk mengidentifikasi standard repository configurations otonom
--   Peningkatan asersi warnings RuleSelector saat data rules kosong
+-   Penyusunan asersi warnings RuleSelector saat data rules kosong
 -   Pemetaan deliverables dinamis ke Acceptance Criteria otonom pada compiler
 -   Unit Tests baru untuk memvalidasi pemaket kompilasi rekayasa kaya (Mission Package Enrichment)
 -   Penyusunan laporan evaluasi arsitektur runtime provider di provider_runtime_validation.md (FF-022)
 -   Peningkatan model GenericCLIProviderAdapter agar mematuhi schema ExecutionResult kanonikal
 -   Unit Tests baru untuk memverifikasi kepatuhan kontrak AIProvider interface
+-   Penerapan Runtime Guard di AIRuntimeEngine.execute_mission penolak eksekusi misi non-ACTIVE (FF-023)
+-   Perbaikan bug fallback state creation di engine runner
+-   Unit Tests baru untuk memverifikasi kebijakan penegakan guard status misi
 
 ## Current Task
 
--   v1.5.6 Provider Runtime Validation Sign-off
+-   v1.5.7 Mission Lifecycle Enforcement Sign-off
 
 ## Next Tasks
 
