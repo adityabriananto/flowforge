@@ -158,10 +158,14 @@ class MissionLifecycleManager:
                         with open(file_path, "r", encoding="utf-8") as f:
                             data = yaml.safe_load(f)
                         if data:
+                            code = data.get("code")
+                            if not code:
+                                code = file_name.replace(".yaml", "")
                             grouped[state].append({
                                 "id": data.get("id"),
                                 "title": data.get("title"),
                                 "status": data.get("status"),
+                                "code": code,
                                 "file_name": file_name
                             })
                     except Exception:
