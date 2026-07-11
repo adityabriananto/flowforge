@@ -35,7 +35,7 @@ def test_mission_review_accept():
     assert "Mission Draft" in output_text
     assert "Developer Input" in output_text
     assert "Unknown" in output_text
-    assert "✓ D1" in output_text
+    assert "  - D1" in output_text
     assert "Expected Engineering Outputs:" in output_text
 
 def test_mission_review_cancel():
