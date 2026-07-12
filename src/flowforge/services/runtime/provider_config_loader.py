@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Optional
 from flowforge.services.runtime.provider_registry import AIRuntimeProviderRegistry
 from flowforge.ports.ai_provider import AIProvider
 from flowforge.domain.mission_package import MissionPackage
-from flowforge.domain.engineering_state import EngineeringState
 
 class GenericCLIProviderAdapter(AIProvider):
     """A generic CLI-based AI provider adapter that loads configurations from YAML."""
@@ -25,7 +24,7 @@ class GenericCLIProviderAdapter(AIProvider):
             "health_command": self.health_command
         }
 
-    def execute(self, mission_package: MissionPackage, engineering_state: EngineeringState) -> Dict[str, Any]:
+    def execute(self, mission_package: MissionPackage, **kwargs) -> Dict[str, Any]:
         return {
             "status": "SUCCESS",
             "summary": f"Executed Mission Package {mission_package.mission_summary} using generic CLI provider.",

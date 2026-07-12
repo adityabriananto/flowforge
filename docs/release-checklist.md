@@ -46,6 +46,12 @@ Verify that an existing Engineering Workspace created using a previous FlowForge
 - [ ] `flowforge run` executes without migration errors.
 - [ ] `flowforge mission complete` increments mission numbering and state correctly.
 
+### Pre-Release Version Validation
+Verify that the intended version bump aligns with the newly recorded version impacts.
+- [ ] Review the `review.md` (or completed mission files) of all missions completed since the last release to tally their **Version Impact** (None, Patch, Minor, Major).
+- [ ] Determine the highest recorded Version Impact across all included missions.
+- [ ] Ensure the proposed version bump strictly adheres to Semantic Versioning based on that highest impact (e.g., if any mission is 'Major', the next release MUST bump the major version).
+
 ## 2. Testing & Lifecycle Verification
 
 ### Testing
@@ -67,11 +73,13 @@ Verify the core workflow operates without repository-specific artifacts, explici
 ## 3. Release Engineering
 
 ### Release Preparation
-- [ ] Versions synchronized across the project (`pyproject.toml` and CLI strings).
-- [ ] `CHANGELOG.md` updated with the new version and release notes.
+- [ ] Version Impact Assessment completed.
+- [ ] Versions synchronized across the project (`pyproject.toml` and CLI strings) based on the calculated Semantic Version bump.
+- [ ] `CHANGELOG.md` updated with the new version and categorized release history (Added, Changed, Fixed, Removed).
 - [ ] `ROADMAP.md` updated to reflect completed/current phases.
 - [ ] Release Notes drafted and finalized.
 - [ ] Commit changes: `git commit -m "chore(release): vX.Y.Z"`
+- [ ] Automated Tests & Local Validation run and passed.
 - [ ] Annotated Git tag created: `git tag -a vX.Y.Z -m "Release vX.Y.Z"`
 - [ ] Distribution artifacts generated (`uv build` produces `.whl` and `.tar.gz`).
 - [ ] Push to remote: `git push origin main --tags`

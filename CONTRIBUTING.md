@@ -46,6 +46,32 @@ During this phase:
 - All changes must strictly map to an active mission.
 - Update relevant documentation upon task completion.
 
+## Version Impact & Release Governance
+
+Every completed FlowForge mission must be explicitly evaluated for its **Version Impact** during the engineering review before being closed.
+
+### Version Impact Classification
+Missions must be classified into one of the following impacts:
+- **None**: No version change required.
+- **Patch**: Bug fixes, documentation improvements, CLI improvements, internal refactoring without behavioural changes, packaging improvements.
+- **Minor**: New capabilities, Planning Intelligence, Workspace Repair, new Mission Compiler features.
+- **Major**: Breaking API changes, Mission Package incompatibility, Workspace format incompatibility.
+
+### Engineering Workflow (Review Phase)
+Before a mission is marked as complete, the reviewer must add the following assessment to the review document:
+- **Version Impact**: (None / Patch / Minor / Major)
+- **Reason**: Justification for the selected impact.
+- **Recommended next version**: (Optional) e.g., `v1.0.1-beta`
+
+## Backward Compatibility Policy
+
+**Principle**: *The Engineering Workspace belongs to the project. FlowForge belongs to the toolchain.*
+
+Whenever reasonably possible:
+- Tool upgrades must not require Engineering Workspace recreation.
+- Deprecated artifacts should be ignored gracefully.
+- Workspace migration should remain optional.
+
 ## Branch Strategy
 
 In accordance with the *Core Freeze Policy*, this repository adopts a long-term dual-branch strategy:

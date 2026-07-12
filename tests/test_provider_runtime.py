@@ -2,7 +2,6 @@ import pytest
 from flowforge.ports.ai_provider import AIProvider
 from flowforge.services.runtime.provider_config_loader import GenericCLIProviderAdapter
 from flowforge.domain.mission_package import MissionPackage
-from flowforge.domain.engineering_state import EngineeringState, ProjectState
 
 def test_generic_cli_provider_adapter_compliance():
     adapter = GenericCLIProviderAdapter(
@@ -25,9 +24,7 @@ def test_generic_cli_provider_adapter_compliance():
         relevant_references=[]
     )
     
-    state = EngineeringState(project=ProjectState(id="1", name="Test"))
-    
-    res = adapter.execute(mission_package, state)
+    res = adapter.execute(mission_package)
     
     # Assert canonical ExecutionResult schema keys exist
     assert res["status"] == "SUCCESS"
@@ -49,7 +46,7 @@ def test_provider_interface_subclassing():
             return "Gemini"
         def health(self) -> dict:
             return {"healthy": True}
-        def execute(self, mission_package: MissionPackage, engineering_state: EngineeringState) -> dict:
+        def execute(self, mission_package: MissionPackage, **kwargs) -> dict:
             return {"status": "SUCCESS"}
             
     gemini = CustomGemini()

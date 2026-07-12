@@ -3,7 +3,6 @@ from flowforge.ports.ai_provider import AIProvider
 from flowforge.services.runtime.provider_registry import AIRuntimeProviderRegistry
 from flowforge.services.runtime.provider_config_loader import ProviderConfigLoader, GenericCLIProviderAdapter
 from flowforge.domain.mission_package import MissionPackage
-from flowforge.domain.engineering_state import EngineeringState
 from flowforge.domain.mission import Mission
 
 class DummyProvider(AIProvider):
@@ -16,7 +15,7 @@ class DummyProvider(AIProvider):
     def health(self) -> dict:
         return {"healthy": True}
 
-    def execute(self, mission_package: MissionPackage, engineering_state: EngineeringState) -> dict:
+    def execute(self, mission_package: MissionPackage, **kwargs) -> dict:
         return {"result": "success"}
 
 def test_registry_registration_and_retrieval():

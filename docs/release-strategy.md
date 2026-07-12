@@ -4,12 +4,16 @@ This document outlines the official strategy and flow for cutting and distributi
 
 ## The Standard Release Flow
 
-The release of a new FlowForge version follows a strictly sequential, standardized pipeline:
+The release of a new FlowForge version follows a strictly sequential, standardized pipeline built on Release Governance:
 
 ```text
-Development (main branch)
+Engineering Mission
        ↓
-Version Update (pyproject.toml, CLI internals)
+Review (Version Impact Assessment)
+       ↓
+Update Version (pyproject.toml, CLI internals based on highest impact)
+       ↓
+Update CHANGELOG (Added, Changed, Fixed, Removed)
        ↓
 Automated Tests & Local Validation
        ↓
@@ -22,9 +26,24 @@ Annotated Git Tag (vX.Y.Z)
 GitHub Release (Draft -> Published)
        ↓
 PyPI Publication (uv publish)
-       ↓
-Developer Installation (pip install / uv tool install)
 ```
+
+## Release Governance & Semantic Versioning
+
+FlowForge strictly adheres to [Semantic Versioning (SemVer 2.0.0)](https://semver.org/). 
+Version Impact Assessment is a mandatory part of every engineering mission review. The final version bump for a release is determined by the highest Version Impact of all missions included since the last release.
+
+### Version Formats
+**Format**: `MAJOR.MINOR.PATCH[-PRERELEASE]`
+
+- **Major** (`X.0.0`): Breaking API changes, Mission Package incompatibility, Workspace format incompatibility.
+- **Minor** (`0.X.0`): New capabilities, Planning Intelligence, Workspace Repair, new Mission Compiler features.
+- **Patch** (`0.0.X`): Bug fixes, documentation improvements, CLI improvements, internal refactoring without behavioural changes.
+
+### Prerelease Identifiers
+- **Alpha** (`-alpha`): Experimental phase, highly unstable, internal testing.
+- **Beta** (`-beta`): Feature complete, validation phase, real-world testing.
+- **RC** (`-rc`): Release candidate, no new features, only critical bug fixes before stable.
 
 ## Internal vs Public Versioning
 - **Internal Engineering History**: During the initial Dogfooding phases (Engineering Core and Product Core), FlowForge utilized internal version numbers (e.g., `1.1.x`, `1.2.x`, `1.3.x`). These strictly represent internal milestones and are not publicly documented outside of the Git history.

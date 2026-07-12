@@ -2,23 +2,19 @@ import uuid
 from datetime import datetime
 from typing import Dict, Any, Optional
 from flowforge.services.compiler.compiler import MissionPackageCompiler
-from flowforge.services.workspace.state_service import EngineeringStateService
 from flowforge.services.workspace.session_service import EngineeringSessionService
 from flowforge.services.runtime.provider_registry import AIRuntimeProviderRegistry
 from flowforge.domain.mission_package import MissionPackage
-from flowforge.domain.engineering_state import EngineeringState
 from flowforge.domain.engineering_session import EngineeringSession, SessionStatus
 
 class AIRuntimeEngine:
     def __init__(
         self,
         compiler: MissionPackageCompiler,
-        state_service: EngineeringStateService,
         session_service: EngineeringSessionService,
         provider_registry: AIRuntimeProviderRegistry
     ):
         self.compiler = compiler
-        self.state_service = state_service
         self.session_service = session_service
         self.provider_registry = provider_registry
 
@@ -65,16 +61,7 @@ class AIRuntimeEngine:
         else:
             provider = self.provider_registry.default()
 
-        # 3. Load active engineering state
-        try:
-            state = self.state_service.load_state(base_path)
-        except Exception:
-            # Fallback if state doesn't exist yet (Zero-config init fallback)
-            from flowforge.domain.engineering_state import EngineeringState, ProjectState
-            state = EngineeringState(project=ProjectState(id=str(uuid.uuid4()), name=mission.title))
-            self.state_service.save_state(state, base_path)
-
-        # 4. Create and start engineering session
+        # 3. Create and start engineering session
         session_id = str(uuid.uuid4())
         session = self.session_service.create_session(
             provider=provider.name(),
@@ -84,14 +71,11 @@ class AIRuntimeEngine:
         )
         self.session_service.start_session(session_id, base_path=base_path)
 
-        # Update current mission in engineering state
-        self.state_service.update_current_mission(mission_code, base_path=base_path)
-
-        # 5. Execute AI provider
+        # 4. Execute AI provider
         start_time = datetime.utcnow()
         try:
             # Delegate raw execution to provider
-            exec_res = provider.execute(mission_package, state)
+            exec_res = provider.execute(mission_package)
             status = exec_res.get("status", "SUCCESS")
         except Exception as e:
             # Handle failure transitions
@@ -101,7 +85,7 @@ class AIRuntimeEngine:
         finish_time = datetime.utcnow()
         duration = (finish_time - start_time).total_seconds()
 
-        # 6. Add results to session
+        # 5. Add results to session
         if status == "SUCCESS":
             # Add artifacts
             for art in exec_res.get("artifacts", []):
@@ -126,18 +110,17 @@ class AIRuntimeEngine:
             session_loaded.files_changed = list(exec_res.get("files_changed", []))
             self.session_service.save_session(session_loaded, base_path=base_path)
 
-            # 7. Complete Session & update state references (blockers, completed status, etc.)
+            # 6. Complete Session
             self.session_service.complete_session(
                 session_id=session_id,
                 summary=exec_res.get("summary", "Mission successfully completed."),
                 handover_summary=exec_res.get("handover_summary", "Handover to next mission."),
-                base_path=base_path,
-                state_service=self.state_service
+                base_path=base_path
             )
         else:
             self.session_service.fail_session(session_id, base_path=base_path)
 
-        # 8. Return formatted execution outcome
+        # 7. Return formatted execution outcome
         summary_str = self.session_service.export_session_summary(session_id, base_path=base_path)
         return {
             "session_id": session_id,

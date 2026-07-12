@@ -23,13 +23,10 @@ def test_engine_guard_refuses_backlog_mission(mock_lifecycle_workspace):
     
     # 1. Setup Services & Ports
     from flowforge.services.compiler.compiler import MissionPackageCompiler
-    from flowforge.services.workspace.state_service import EngineeringStateService
     from flowforge.services.workspace.session_service import EngineeringSessionService
-    from flowforge.adapters.workspace.yaml_state_repository import YAMLEngineeringStateRepository
     from flowforge.adapters.workspace.yaml_session_repository import YAMLEngineeringSessionRepository
 
     compiler = MissionPackageCompiler()
-    state_service = EngineeringStateService(YAMLEngineeringStateRepository())
     session_service = EngineeringSessionService(YAMLEngineeringSessionRepository())
     
     registry = AIRuntimeProviderRegistry()
@@ -38,7 +35,6 @@ def test_engine_guard_refuses_backlog_mission(mock_lifecycle_workspace):
     
     engine = AIRuntimeEngine(
         compiler=compiler,
-        state_service=state_service,
         session_service=session_service,
         provider_registry=registry
     )
@@ -55,13 +51,10 @@ def test_engine_allows_active_mission(mock_lifecycle_workspace):
     
     # 1. Setup Services & Ports
     from flowforge.services.compiler.compiler import MissionPackageCompiler
-    from flowforge.services.workspace.state_service import EngineeringStateService
     from flowforge.services.workspace.session_service import EngineeringSessionService
-    from flowforge.adapters.workspace.yaml_state_repository import YAMLEngineeringStateRepository
     from flowforge.adapters.workspace.yaml_session_repository import YAMLEngineeringSessionRepository
 
     compiler = MissionPackageCompiler()
-    state_service = EngineeringStateService(YAMLEngineeringStateRepository())
     session_service = EngineeringSessionService(YAMLEngineeringSessionRepository())
     
     registry = AIRuntimeProviderRegistry()
@@ -70,7 +63,6 @@ def test_engine_allows_active_mission(mock_lifecycle_workspace):
     
     engine = AIRuntimeEngine(
         compiler=compiler,
-        state_service=state_service,
         session_service=session_service,
         provider_registry=registry
     )

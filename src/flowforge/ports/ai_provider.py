@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 from flowforge.domain.mission_package import MissionPackage
-from flowforge.domain.engineering_state import EngineeringState
 
 class AIProvider(ABC):
     @abstractmethod
@@ -15,6 +14,6 @@ class AIProvider(ABC):
         pass
 
     @abstractmethod
-    def execute(self, mission_package: MissionPackage, engineering_state: EngineeringState) -> Dict[str, Any]:
+    def execute(self, mission_package: MissionPackage, **kwargs) -> Dict[str, Any]:
         """Executes the engineering tasks described in the MissionPackage."""
         pass

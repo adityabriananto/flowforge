@@ -9,3 +9,9 @@ Review accomplishments vs initial plans.
 
 ## Retrospective & Next Steps
 What worked well, what did not, and planning for the next sprint.
+
+## Version Impact Assessment
+Before closing the mission, explicitly state its impact on the FlowForge version.
+- **Version Impact**: (None | Patch | Minor | Major)
+- **Reason**: 
+- **Recommended next version**: (Optional)

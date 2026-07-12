@@ -1,8 +1,6 @@
 import os
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
-from flowforge.services.workspace.state_service import EngineeringStateService
-from flowforge.adapters.workspace.yaml_state_repository import YAMLEngineeringStateRepository
 from flowforge.services.workspace.mission_lifecycle_manager import MissionLifecycleManager
 
 @dataclass

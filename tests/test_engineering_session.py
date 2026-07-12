@@ -6,10 +6,7 @@ from flowforge.domain.engineering_session import EngineeringSession, SessionMeta
 from flowforge.services.workspace.session_loader import EngineeringSessionLoader
 from flowforge.adapters.workspace.yaml_session_repository import YAMLEngineeringSessionRepository
 from flowforge.services.workspace.session_service import EngineeringSessionService
-from flowforge.domain.engineering_state import EngineeringState
-from flowforge.services.workspace.state_loader import EngineeringStateLoader
-from flowforge.adapters.workspace.yaml_state_repository import YAMLEngineeringStateRepository
-from flowforge.services.workspace.state_service import EngineeringStateService
+
 
 @pytest.fixture
 def sample_session_yaml():
@@ -136,59 +133,4 @@ def test_session_service_lifecycle_and_immutability(tmp_path):
         service.add_blocker("sess-999", "New Blocker", base_path=base_dir)
     assert "Immutable Session" in str(exc.value)
 
-def test_session_state_integration(tmp_path, sample_session_yaml, sample_state_yaml):
-    base_dir = str(tmp_path)
-    os.makedirs(os.path.join(base_dir, ".flowforge", "logs"), exist_ok=True)
-    os.makedirs(os.path.join(base_dir, "engineering"), exist_ok=True)
-    
-    # Setup Repository & Services
-    session_repo = YAMLEngineeringSessionRepository()
-    session_service = EngineeringSessionService(session_repo)
-    
-    state_repo = YAMLEngineeringStateRepository()
-    state_service = EngineeringStateService(state_repo)
-    
-    # Save Initial State & Session
-    state = EngineeringStateLoader.load_from_yaml(sample_state_yaml)
-    state_repo.save(state, base_path=base_dir)
-    
-    session = EngineeringSessionLoader.load_from_yaml(sample_session_yaml)
-    session_repo.save(session, base_path=base_dir)
-    
-    # Add items to session before completing
-    session_service.add_blocker("session-uuid-12345", "GPU limit", base_path=base_dir)
-    session_service.add_recommendation("session-uuid-12345", "Upgrade hardware", base_path=base_dir)
-    
-    # Complete and sync state
-    session_service.complete_session(
-        session_id="session-uuid-12345",
-        summary="DB indices optimization done.",
-        handover_summary="Resume at PROJECT-003.",
-        base_path=base_dir,
-        state_service=state_service
-    )
-    
-    # Load state and verify integrated data
-    loaded_state = state_service.load_state(base_path=base_dir)
-    assert loaded_state.mission.current_mission is None
-    assert "PROJECT-002" in loaded_state.mission.completed_missions
-    assert loaded_state.provider.current_provider == "Claude"
-    assert len(loaded_state.knowledge_state.knowledge) == 1
-    assert loaded_state.knowledge_state.knowledge[0].reference_path == "docs/discovery.md"
-    assert len(loaded_state.decision_state.decisions) == 1
-    assert loaded_state.decision_state.decisions[0].title == "Use SQLite for metadata persistence"
-    assert len(loaded_state.blockers) == 1
-    assert loaded_state.blockers[0].description == "GPU limit"
-    assert len(loaded_state.recommendations) == 1
-    assert loaded_state.recommendations[0].suggestion == "Upgrade hardware"
-    
-    # Handover Generation
-    handover = session_service.generate_handover("session-uuid-12345", base_path=base_dir)
-    assert handover["session_id"] == "session-uuid-12345"
-    assert "GPU limit" in handover["active_blockers"]
-    assert handover["handover_summary"] == "Resume at PROJECT-003."
-    
-    # Export Summary
-    summary_str = session_service.export_session_summary("session-uuid-12345", base_path=base_dir)
-    assert "Status: COMPLETED" in summary_str
-    assert "Use SQLite for metadata persistence" in summary_str
+

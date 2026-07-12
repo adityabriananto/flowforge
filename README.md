@@ -9,22 +9,48 @@ FlowForge has been successfully validated through real-world engineering project
 
 ## What is FlowForge?
 
-FlowForge is a standalone Python CLI tool that orchestrates the software engineering lifecycle. It does not replace developers or AI; rather, it manages the **Engineering State**. Developers define goals and approve missions; AI providers execute the work; and FlowForge ensures the process is deterministic, isolated, and permanently recorded in your repository's Engineering Workspace.
+FlowForge is a standalone Python CLI tool that orchestrates the software engineering lifecycle. It does not replace developers or AI; rather, it manages the **Engineering Workspace**. Developers define goals and approve missions; AI providers execute the work; and FlowForge ensures the process is deterministic, isolated, and permanently recorded in your repository's Engineering Workspace.
+
+---
+
+## Distribution Status
+
+FlowForge is currently in **Public Beta**.
+During Public Beta, FlowForge is distributed as a wheel package (`.whl`). PyPI distribution is planned for a future public release.
+The installation instructions below reflect the current Public Beta distribution model.
 
 ---
 
 ## Installation Guide
 
-FlowForge can be installed globally as a standalone CLI tool. Both methods below install the exact same `flowforge` CLI.
+FlowForge can be installed globally as a standalone CLI tool.
 
 ### Recommended (uv)
-If you use [uv](https://github.com/astral-sh/uv), you can install FlowForge as an isolated tool:
+If you use [uv](https://github.com/astral-sh/uv), you can install FlowForge as an isolated tool using the wheel package:
 ```bash
-uv tool install flowforge
+uv tool install path/to/flowforge-<version>.whl
 ```
 
 ### Standard Python (pip)
 You can also install FlowForge via standard `pip`:
+```bash
+pip install path/to/flowforge-<version>.whl
+```
+
+---
+
+## Future PyPI Installation
+
+*Note: This installation method is **not yet available** during the current Public Beta.*
+
+Once FlowForge is officially published to PyPI in a future stable release, installation will become:
+
+**Using uv:**
+```bash
+uv tool install flowforge
+```
+
+**Using pip:**
 ```bash
 pip install flowforge
 ```
@@ -76,97 +102,23 @@ flowforge run PROJECT-000
 flowforge mission complete PROJECT-000
 ```
 
----
+> **Note**: The commands above demonstrate the complete [Mission Lifecycle](docs/engineering-workflow.md#mission-lifecycle). In real engineering projects, implementations are typically reviewed before executing `flowforge mission complete`. For more details, see our recommended [Engineering Workflow](docs/engineering-workflow.md).
 
-## Continue Existing Project
+## Documentation
 
-FlowForge is stateless, but your engineering projects are stateful. When joining an existing FlowForge project, no complex migration or setup is required. FlowForge automatically detects the Engineering Workspace and continues from the existing state.
+Before starting your first Engineering Workspace or contributing to FlowForge, we strongly encourage you to begin with the [Documentation Index](docs/README.md).
 
-```bash
-git clone <repository>
-cd repository
-flowforge doctor
-```
+The documentation serves as your gateway to understanding the engineering philosophy, workflow, release process, and contributor guidelines in greater detail.
 
 ---
 
-## Upgrade Guide
+## Versioning Policy
 
-To upgrade FlowForge to the latest version:
+FlowForge officially adopts [Semantic Versioning (SemVer 2.0.0)](https://semver.org/).
+For detailed rules on release governance, version impact, and bump rules, please see our [Release Strategy](docs/release-strategy.md).
 
-**Using uv:**
-```bash
-uv tool upgrade flowforge
-```
-
-**Using pip:**
-```bash
-pip install --upgrade flowforge
-```
-
-## Uninstall Guide
-
-To completely remove FlowForge:
-
-**Using uv:**
-```bash
-uv tool uninstall flowforge
-```
-
-**Using pip:**
-```bash
-pip uninstall flowforge
-```
-
----
-
-## Naming Convention
-
-To eliminate confusion, please adhere to the following naming conventions:
-
-- **Product Name**: FlowForge (Capitalized, used in documentation and conversation)
-- **Python Package**: `flowforge` (Lowercase, used in `pip install`)
-- **CLI Command**: `flowforge` (Lowercase, used in the terminal)
-
-**Important**: All terminal commands must use lowercase. 
-- `flowforge init`
-- `flowforge mission new`
-- `flowforge compile PROJECT-001`
-
----
-
-## Common Mistakes
-
-**Incorrect:** `uv flowforge install`
-**Correct:** `uv tool install flowforge`
-
-**Incorrect:** `FlowForge init`
-**Correct:** `flowforge init`
-
-**Incorrect:** `flowForge mission new`
-**Correct:** `flowforge mission new`
-
----
-
-## Core Concepts
-
-### 1. Philosophy & Human in the Loop
-FlowForge intentionally keeps developers in control at all times. It never makes engineering decisions autonomously. You define the goals, FlowForge orchestrates the state, and AI providers execute the labor. 
-
-### 2. Validated Engineering Workflow
-The workflow separates planning from execution, ensuring the architecture remains provider-agnostic. You can mix and match AI providers based on their strengths (e.g., using *ChatGPT* for Planning, *Codex* for Execution).
-
-### 3. Engineering Identity
-FlowForge utilizes a dual-identity model:
-- **Engineering Identity** (e.g., `PROJECT-005`): The canonical, human-facing identifier used by Developers and the CLI.
-- **System Identity** (e.g., `8b4b4b8d-...`): The internal UUID used strictly for Persistence and Integrity.
-
-### 4. Workspace Architecture
-- **Engineering Workspace (`engineering/`)**: The persistent, long-term memory of your project (Missions, Deliverables, `PROJECT_STATE.yaml`).
-- **Runtime Workspace (`.flowforge/`)**: Transient state managed entirely by FlowForge during execution (Mission Packages, Sessions).
-
-### 5. Mission Packages
-Mission Packages (`PROJECT-XXX.package.yaml`) are vendor-agnostic runtime artifacts generated by the Mission Compiler. They combine the declarative Mission intent with the project's Engineering Context to produce deterministic instructions for the AI Execution Provider.
+- **Current Release Channel**: Public Beta
+- **Current Version**: `1.0.0-beta`
 
 ---
 

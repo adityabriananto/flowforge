@@ -51,8 +51,8 @@ class EngineeringSessionService:
         self.save_session(session, base_path)
         return session
 
-    def complete_session(self, session_id: str, summary: str, handover_summary: str, base_path: str = ".", state_service: Optional[Any] = None) -> EngineeringSession:
-        """Transitions session status to COMPLETED and integrates results to Engineering State."""
+    def complete_session(self, session_id: str, summary: str, handover_summary: str, base_path: str = ".") -> EngineeringSession:
+        """Transitions session status to COMPLETED."""
         session = self.load_session(session_id, base_path)
         self._assert_mutable(session)
         
@@ -67,35 +67,6 @@ class EngineeringSessionService:
         
         self.save_session(session, base_path)
         
-        # 1. Integrate with Engineering State if state_service is provided
-        if state_service:
-            # Sync active mission to completed if matching
-            state_service.mark_mission_completed(session.metadata.mission, base_path=base_path)
-            # Log provider usage
-            state_service.update_provider(session.metadata.provider, base_path=base_path)
-            # Sync knowledge references
-            for art in session.artifacts:
-                state_service.add_knowledge_reference(
-                    title=f"Artifact generated during session {session_id}",
-                    reference_path=art,
-                    category="repository",
-                    base_path=base_path
-                )
-            # Sync decisions
-            for dec in session.decisions:
-                state_service.add_decision(
-                    title=dec.get("title", "Untitled Decision"),
-                    rationale=dec.get("rationale", "No rationale"),
-                    artifact_reference=dec.get("artifact_reference"),
-                    base_path=base_path
-                )
-            # Sync blockers
-            for blk in session.blockers:
-                state_service.add_blocker(blk, base_path=base_path)
-            # Sync recommendations
-            for rec in session.recommendations:
-                state_service.add_recommendation(rec, base_path=base_path)
-                
         return session
 
     def fail_session(self, session_id: str, base_path: str = ".") -> EngineeringSession:
