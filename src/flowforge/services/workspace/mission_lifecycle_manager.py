@@ -207,10 +207,17 @@ class MissionLifecycleManager:
 
         # Sync PROJECT_STATE.yaml
         project_state = cls.get_project_state(base_path)
+        
+        if project_state.get("active_missions") is None:
+            project_state["active_missions"] = []
+        if project_state.get("completed_missions") is None:
+            project_state["completed_missions"] = []
+            
         if resolved_code not in project_state["active_missions"]:
             project_state["active_missions"].append(resolved_code)
-        if resolved_code in project_state.get("completed_missions", []):
+        if resolved_code in project_state["completed_missions"]:
             project_state["completed_missions"].remove(resolved_code)
+            
         cls.write_project_state(project_state, base_path)
 
         return new_path
@@ -240,12 +247,17 @@ class MissionLifecycleManager:
 
         # Sync PROJECT_STATE.yaml
         project_state = cls.get_project_state(base_path)
+        
+        if project_state.get("active_missions") is None:
+            project_state["active_missions"] = []
+        if project_state.get("completed_missions") is None:
+            project_state["completed_missions"] = []
+            
         if resolved_code in project_state["active_missions"]:
             project_state["active_missions"].remove(resolved_code)
-        if "completed_missions" not in project_state:
-            project_state["completed_missions"] = []
         if resolved_code not in project_state["completed_missions"]:
             project_state["completed_missions"].append(resolved_code)
+            
         cls.write_project_state(project_state, base_path)
 
         return new_path
