@@ -13,13 +13,15 @@ FlowForge is designed strictly following **Clean Architecture** (Ports and Adapt
         ↓
   Mission Wizard
         ↓
-  Planning Engine
+  Planning Engine (Compiler)
         ↓
   Mission Package
         ↓
       Runtime
         ↓
-     Provider
+      Provider (Adapter)
+        ↓
+ XML Output Parsing
         ↓
 Engineering Artifact
 ```
@@ -28,41 +30,47 @@ Engineering Artifact
 
 The most critical architectural boundary in FlowForge is the absolute separation of **Planning** and **Execution (Runtime)**.
 
-### Planning Engine
-The Planning Engine is responsible for capturing human intent (the Business Goal) and translating it into a highly structured `MissionPackage`. The Planning Engine uses deterministic rules and workspace context to generate this package. **It does not execute code.**
+### Planning Engine (Compiler)
+The Planning Engine is responsible for capturing human intent (the Business Goal) via the Mission Wizard and translating it into a highly structured `.package.yaml`. The compiler uses deterministic rules and workspace context to generate this package. **It does not execute code.**
 
 ### Runtime Engine
 The Runtime Engine is completely stateless. It accepts a `MissionPackage` and orchestrates its execution. The Runtime does not know *what* it is building; it only knows *how* to delegate the instructions to an AI Provider.
 
-## 3. Provider Abstraction
+## 3. Provider Architecture
 
 FlowForge avoids vendor lock-in through the **Provider** abstraction.
-The Runtime communicates with execution drivers (e.g., Claude, Ollama, OpenAI) via a standardized Port interface. Providers are adapters that translate FlowForge's execution commands into vendor-specific API calls. 
+The Runtime communicates with execution drivers (e.g., Google Gemini, OpenAI, or a local Subprocess CLI) via a standardized Port interface. Providers are simply adapters that translate FlowForge's execution commands into vendor-specific API calls. 
 
-Because the `MissionPackage` is completely vendor-neutral, any AI provider can theoretically execute any mission, provided it has sufficient reasoning capability.
+FlowForge is **not an AI model catalog**. Instead, developers define API keys and driver types in `.flowforge/providers/`. Any AI provider can theoretically execute any mission as long as it respects the standard XML-wrapped output parsing mechanism.
 
-## 4. Engineering Workspace
+## 4. Profile Architecture
 
-The Engineering Workspace is the persistent storage layer (`engineering/` folder). It holds:
+Profiles map a specific role (e.g., "executor" or "architect") to a specific Provider and model (e.g., `gemini-main` using `gemini-3.1-flash-lite`). Profiles are stored in `.flowforge/profiles/`. This decouples the mission from the underlying hardware or service, allowing users to swap models at runtime (`--profile executor`).
+
+## 5. Engineering Workspace & Detection
+
+The Engineering Workspace is the persistent storage layer (`engineering/` folder and `.flowforge/` system folder). It holds:
 - **PROJECT_STATE.yaml**: The central, mutable Engineering State.
 - **Missions**: YAML files representing units of work.
+- **Mission Packages**: Compiled instructions in `.flowforge/packages/`.
+- **Reports**: AI-generated Implementation Reports in `engineering/reports/`.
 - **ADRs & RFCs**: Immutable records of architectural decisions.
 
-The workspace acts as the long-term memory of the project.
+FlowForge uses automatic Workspace Detection. Commands like `flowforge run` search upwards for the `.flowforge` directory to ensure they run in the correct context.
 
-## 5. Mission Lifecycle
+## 6. Mission Lifecycle
 
 Missions transition through three strict states:
-1. **BACKLOG**: The mission has been drafted but not executed.
-2. **ACTIVE**: The mission is currently assigned to a Provider via the Runtime.
-3. **COMPLETED**: The AI has delivered the artifact, the Developer has approved it, and the `PROJECT_STATE.yaml` has been updated with the mission's outcomes.
+1. **BACKLOG**: The mission has been drafted via the Mission Wizard but not compiled/executed.
+2. **ACTIVE**: The mission is compiled into a Mission Package and assigned to a Provider via the Runtime.
+3. **COMPLETED**: The AI has delivered the Implementation Report, the Developer has approved the XML-parsed file changes, and the mission is formally completed via `flowforge mission complete`.
 
-## 6. Execution Pipeline
+## 7. Execution Pipeline
 
 When `flowforge run` is triggered:
 1. The **Runtime** loads the compiled `MissionPackage`.
 2. The Runtime instantiates an **Engineering Session**.
 3. The Runtime invokes the configured **Provider**.
-4. The Provider modifies the codebase.
-5. The Runtime logs all changes, terminal outputs, and decisions into the Session log.
+4. The Provider generates the output (typically an XML-wrapped response).
+5. The Runtime parses the XML output and writes the physical file changes and Implementation Report to disk.
 6. The session concludes, awaiting developer review.

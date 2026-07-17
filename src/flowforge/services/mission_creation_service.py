@@ -53,6 +53,8 @@ class MissionCreationService:
         # Wizard State
         current_title = title or ""
         current_goal = goal or ""
+        current_context = ""
+        current_users = ""
         current_priority = (priority or "").lower()
         if not self._validate_priority(current_priority):
             current_priority = ""
@@ -71,9 +73,19 @@ class MissionCreationService:
                         print("Error: Title is required.")
                 
                 while not current_goal:
-                    current_goal = self._prompt_input("Business Goal", current_goal)
+                    current_goal = self._prompt_input("Project Goal", current_goal)
                     if not current_goal:
-                        print("Error: Business Goal is required.")
+                        print("Error: Project Goal is required.")
+                        
+                while not current_context:
+                    current_context = self._prompt_input("Business Context", current_context)
+                    if not current_context:
+                        print("Error: Business Context is required.")
+                        
+                while not current_users:
+                    current_users = self._prompt_input("Target Users", current_users)
+                    if not current_users:
+                        print("Error: Target Users is required.")
                 
                 while not current_priority:
                     p = self._prompt_input("Priority (Low/Medium/High)", current_priority)
@@ -85,7 +97,13 @@ class MissionCreationService:
                 
                 print("-"*40 + "\n")
 
-            dev_input = DeveloperInput(title=current_title, business_goal=current_goal, priority=current_priority)
+            dev_input = DeveloperInput(
+                title=current_title, 
+                project_goal=current_goal,
+                business_context=current_context,
+                target_users=current_users,
+                priority=current_priority
+            )
             
             generated_mission = self.planning_engine.generate_draft(
                 context=context,
@@ -110,7 +128,9 @@ class MissionCreationService:
                 # Clear them out so the user can be prompted again, or leave them as defaults for the prompt
                 print("\n--- Editing Developer Input ---")
                 current_title = self._prompt_input("Mission Title", current_title)
-                current_goal = self._prompt_input("Business Goal", current_goal)
+                current_goal = self._prompt_input("Project Goal", current_goal)
+                current_context = self._prompt_input("Business Context", current_context)
+                current_users = self._prompt_input("Target Users", current_users)
                 
                 new_p = ""
                 while not new_p:

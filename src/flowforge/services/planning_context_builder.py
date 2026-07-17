@@ -48,7 +48,7 @@ class PlanningContextBuilder:
                 context.project_name = ws_data.get("project_name") or "Unknown"
                 context.framework = ws_data.get("framework") or "Unknown"
                 context.language = ws_data.get("language") or "Unknown"
-                context.project_type = ws_data.get("project_type") or "Unknown"
+                context.project_type = ws_data.get("workspace_type") or ws_data.get("project_type") or "Unknown"
         except Exception:
             pass
 
@@ -58,8 +58,16 @@ class PlanningContextBuilder:
                 with open(project_state_path, "r", encoding="utf-8") as f:
                     state_data = yaml.safe_load(f) or {}
                     
-                if state_data.get("project_name"):
-                    context.project_name = state_data["project_name"]
+                project_info = state_data.get("project", {})
+                
+                if project_info.get("name"):
+                    context.project_name = project_info["name"]
+                if project_info.get("framework") and context.framework == "Unknown":
+                    context.framework = project_info["framework"]
+                if project_info.get("language") and context.language == "Unknown":
+                    context.language = project_info["language"]
+                if project_info.get("project_type") and context.project_type == "Unknown":
+                    context.project_type = project_info["project_type"]
                     
                 context.current_phase = state_data.get("current_phase") or "Unknown"
                 
@@ -132,7 +140,7 @@ class PlanningContextBuilder:
             "vue": "Frontend Application",
             "console": "CLI Application"
         }
-        if context.framework != "Unknown":
+        if context.framework != "Unknown" and context.project_type == "Unknown":
             fw_lower = context.framework.lower()
             for key, val in fw_map.items():
                 if key in fw_lower:

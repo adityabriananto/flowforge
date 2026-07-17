@@ -140,17 +140,53 @@ class ProjectDetectorService:
         self.detectors = self.DEFAULT_DETECTORS + (custom_detectors or [])
 
     def detect_project(self, base_path: str = ".") -> Dict[str, Any]:
-        """Scans the path and executes registered detectors. Returns result dict."""
+        """Scans the path and executes registered detectors. Returns result dict.
+        Supports multi-module projects by scanning subdirectories (depth 1) and aggregating results."""
+        results = []
+        
+        # 1. Scan base path first
         for detector in self.detectors:
-            result = detector.detect(base_path)
-            if result:
-                return result
+            res = detector.detect(base_path)
+            if res:
+                results.append(res)
+                break
                 
-        # Default unknown fallback
+        # 2. If no result or we want to find more, scan subdirectories (depth 1)
+        # Avoid scanning hidden directories or known build outputs
+        skip_dirs = {".git", ".flowforge", "node_modules", "vendor", "target", "build", "dist", "engineering", ".venv", "venv"}
+        
+        try:
+            for entry in os.listdir(base_path):
+                full_path = os.path.join(base_path, entry)
+                if os.path.isdir(full_path) and entry not in skip_dirs and not entry.startswith('.'):
+                    # Check each subdirectory
+                    for detector in self.detectors:
+                        res = detector.detect(full_path)
+                        if res:
+                            # Avoid duplicates from same detector type if identical result
+                            if not any(r["framework"] == res["framework"] for r in results):
+                                results.append(res)
+                            break
+        except Exception:
+            pass
+
+        if not results:
+            return {
+                "project_type": "Unknown",
+                "language": "Unknown",
+                "framework": "Unknown",
+                "package_manager": "Unknown",
+                "build_tool": "Unknown"
+            }
+            
+        if len(results) == 1:
+            return results[0]
+            
+        # Aggregate multiple results
         return {
-            "project_type": "Unknown",
-            "language": "Unknown",
-            "framework": "Unknown",
-            "package_manager": "Unknown",
-            "build_tool": "Unknown"
+            "project_type": " + ".join(sorted(set(r["project_type"] for r in results))),
+            "language": " + ".join(sorted(set(r["language"] for r in results))),
+            "framework": " + ".join(sorted(set(r["framework"] for r in results))),
+            "package_manager": " + ".join(sorted(set(r["package_manager"] for r in results))),
+            "build_tool": " + ".join(sorted(set(r["build_tool"] for r in results)))
         }

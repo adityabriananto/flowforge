@@ -6,7 +6,9 @@ from flowforge.services.planning_context_builder import PlanningContext
 @dataclass(frozen=True)
 class DeveloperInput:
     title: str
-    business_goal: str
+    project_goal: str
+    business_context: str
+    target_users: str
     priority: str
 
 class MissionReviewAction(str, Enum):

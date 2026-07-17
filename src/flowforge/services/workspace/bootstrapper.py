@@ -26,12 +26,10 @@ class SmartBootstrapper:
         Initializes an engineering project environment dynamically.
         Idempotent: will not overwrite existing assets.
         """
-        # 1. Validation: Prevent outside Git repositories unless force is True
-        if not cls.is_git_repository(base_path) and not force:
-            raise RuntimeError(
-                "Error: Not running inside a Git repository. "
-                "Use --force flag if you wish to bypass this safety check."
-            )
+        # 1. Validation: Check Git repository status
+        if not cls.is_git_repository(base_path):
+            print("[INFO] Git repository not found.\n       Continuing without Git integration.")
+
 
         # 2. Detect Project Properties
         detector = ProjectDetectorService()
@@ -43,9 +41,9 @@ class SmartBootstrapper:
         # 4. Generate/Install Templates (only if missing)
         cls._install_default_templates(base_path)
 
-        # 5. Generate engineering/WORKSPACE.yaml (idempotent)
+        # 5. Generate engineering/WORKSPACE.yaml
         workspace_yaml = os.path.join(base_path, "engineering", "WORKSPACE.yaml")
-        if not os.path.exists(workspace_yaml):
+        if force or not os.path.exists(workspace_yaml):
             workspace_data = {
                 "workspace_type": project_details["project_type"],
                 "language": project_details["language"],
@@ -56,11 +54,11 @@ class SmartBootstrapper:
             with open(workspace_yaml, "w", encoding="utf-8") as f:
                 yaml.dump(workspace_data, f, sort_keys=False, default_flow_style=False)
 
-        # 6. Generate engineering/PROJECT_STATE.yaml (idempotent)
+        # 6. Generate engineering/PROJECT_STATE.yaml
         import uuid
         from datetime import datetime
         project_state_yaml = os.path.join(base_path, "engineering", "PROJECT_STATE.yaml")
-        if not os.path.exists(project_state_yaml):
+        if force or not os.path.exists(project_state_yaml):
             repo_name = os.path.basename(os.path.abspath(base_path)) or "unknown-project"
             project_state_data = {
                 "version": "1",
@@ -148,6 +146,41 @@ A short abstract.
 Details of the specification.
 """
             with open(rfc, "w", encoding="utf-8") as f:
+                f.write(content)
+
+        # 3. implementation_report.md
+        report = os.path.join(templates_dir, "implementation_report.md")
+        if not os.path.exists(report):
+            content = """# Engineering Implementation Report
+
+## Executive Summary
+[Provide a summary of the implementation.]
+
+## Scope
+[Describe the approved scope.]
+
+## Files Created
+[List new files.]
+
+## Files Modified
+[List modified files.]
+
+## Technical Changes
+[Explain the technical modifications made.]
+
+## Validation Performed
+[Describe how the implementation was tested.]
+
+## Backward Compatibility
+[Note any impacts to backward compatibility.]
+
+## Known Limitations
+[List any known limitations.]
+
+## Completion Status
+[State whether the mission is completed.]
+"""
+            with open(report, "w", encoding="utf-8") as f:
                 f.write(content)
 
         # 3. adr.md

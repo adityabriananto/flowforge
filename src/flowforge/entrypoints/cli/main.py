@@ -113,7 +113,7 @@ def cmd_run(args):
     is_mission_code = bool(re.match(r'^[A-Za-z0-9_-]+-\d+$', input_val))
     
     if is_mission_code and not os.path.exists(input_val):
-        run_mission_orchestration(input_val)
+        run_mission_orchestration(input_val, getattr(args, "profile", None))
     else:
         run_legacy_workflow(input_val)
 
@@ -149,48 +149,69 @@ def run_legacy_workflow(file_path):
         print(f"[FlowForge CLI] Error executing workflow: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
-def run_mission_orchestration(mission_code):
+def run_mission_orchestration(mission_code, profile_name=None):
     print(f"[FlowForge CLI] Initiating runtime engine for mission: {mission_code}")
     from flowforge.services.compiler.compiler import MissionPackageCompiler
-    from flowforge.services.workspace.state_service import EngineeringStateService
     from flowforge.services.workspace.session_service import EngineeringSessionService
     from flowforge.services.runtime.provider_registry import AIRuntimeProviderRegistry
-    from flowforge.services.runtime.provider_config_loader import ProviderConfigLoader
     from flowforge.services.runtime.engine import AIRuntimeEngine
-    from flowforge.adapters.workspace.yaml_state_repository import YAMLEngineeringStateRepository
     from flowforge.adapters.workspace.yaml_session_repository import YAMLEngineeringSessionRepository
     
     compiler = MissionPackageCompiler()
-    state_repo = YAMLEngineeringStateRepository()
-    state_service = EngineeringStateService(state_repo)
     
     session_repo = YAMLEngineeringSessionRepository()
     session_service = EngineeringSessionService(session_repo)
     
     registry = AIRuntimeProviderRegistry()
     
-    # Load providers config if providers.yaml exists
-    providers_config_path = os.path.join(".", "providers.yaml")
-    if os.path.exists(providers_config_path):
-        try:
-            with open(providers_config_path, "r", encoding="utf-8") as f:
-                ProviderConfigLoader.load_from_yaml(f.read(), registry)
-        except Exception as e:
-            print(f"[FlowForge CLI] Warning: Failed to load providers.yaml: {str(e)}")
+    from flowforge.services.workspace.provider_manager import ProviderManager
+    from flowforge.services.runtime.provider_config_loader import SubprocessCLIProviderAdapter, GoogleGeminiAPIProviderAdapter, OpenAIAPIProviderAdapter
+
+    for prov in ProviderManager.list_providers("."):
+        if prov.type == "cli":
+            adapter = SubprocessCLIProviderAdapter(
+                name_str=prov.name,
+                command=prov.command if prov.command else "echo 'No CLI command specified'"
+            )
+        else: # type == 'api'
+            if "openai" in prov.provider.lower() if prov.provider else False:
+                adapter = OpenAIAPIProviderAdapter(
+                    name_str=prov.name,
+                    model=prov.model if prov.model else "gpt-4o",
+                    api_key_env=prov.api_key_env if prov.api_key_env else "OPENAI_API_KEY"
+                )
+            else:
+                adapter = GoogleGeminiAPIProviderAdapter(
+                    name_str=prov.name,
+                    model=prov.model if prov.model else "gemini-1.5-pro",
+                    api_key_env=prov.api_key_env if prov.api_key_env else "GEMINI_API_KEY"
+                )
             
+        registry.register(prov.name, adapter, is_default=False)
+        
     if not registry.list():
         # Load a default mock provider to ensure execution works even without config
-        from flowforge.services.runtime.provider_config_loader import GenericCLIProviderAdapter
-        default_mock = GenericCLIProviderAdapter(
+        from flowforge.services.runtime.provider_config_loader import SubprocessCLIProviderAdapter
+        default_mock = SubprocessCLIProviderAdapter(
             name_str="MockProvider",
             command="echo 'mock execution'"
         )
         registry.register("MockProvider", default_mock, is_default=True)
 
-    engine = AIRuntimeEngine(compiler, state_service, session_service, registry)
+    provider_name = None
+    if profile_name:
+        from flowforge.services.workspace.profile_manager import ProfileManager
+        prof = ProfileManager.get_profile(profile_name)
+        if prof:
+            provider_name = prof.provider
+            print(f"[FlowForge CLI] Using profile '{profile_name}' (Provider: {provider_name})")
+        else:
+            print(f"[FlowForge CLI] Warning: Profile '{profile_name}' not found. Falling back to default provider.")
+
+    engine = AIRuntimeEngine(compiler, session_service, registry)
     
     try:
-        result = engine.execute_mission(mission_code, base_path=".")
+        result = engine.execute_mission(mission_code, base_path=".", provider_name=provider_name)
         print(f"\n[OK] Mission execution status: {result['status']}")
         print(f"[OK] Session ID: {result['session_id']}")
         print(f"[OK] Duration: {result['duration_seconds']:.2f}s")
@@ -414,6 +435,108 @@ def cmd_mission(args):
             print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
             sys.exit(1)
 
+def cmd_providers(args):
+    """Lists all configured providers."""
+    from flowforge.services.workspace.provider_manager import ProviderManager
+    providers = ProviderManager.list_providers()
+    print("\nConfigured Providers\n")
+    if not providers:
+        print("No providers configured.")
+    for i, p in enumerate(providers, 1):
+        print(f"{i}. {p.name}")
+        print(f"   Provider : {p.provider.capitalize()}")
+        if p.model: print(f"   Model    : {p.model}")
+        print()
+
+def cmd_provider(args):
+    """Manages AI providers."""
+    from flowforge.services.workspace.provider_manager import ProviderManager
+    from flowforge.domain.provider_profile import ProviderConfig
+    
+    if args.provider_command == "add":
+        # Interactive Wizard mock
+        print("Wizard Flow: Add Provider")
+        name = input("Enter Provider Name (e.g. openai-main): ")
+        if not name: return
+        prov_type_sel = input("Type (api/cli): ")
+        if prov_type_sel not in ["api", "cli"]: return
+        prov_name = input(f"Provider (e.g. openai, gemini, claude-cli): ")
+        
+        config = ProviderConfig(name=name, provider=prov_name, type=prov_type_sel)
+        if prov_type_sel == "api":
+            config.model = input("Model (e.g. gpt-4): ")
+            config.api_key_env = input("API Key ENV (e.g. OPENAI_API_KEY): ")
+        else:
+            config.command = input("Command: ")
+        
+        ProviderManager.add_provider(config)
+        print(f"\nProvider '{name}' added successfully.")
+        
+    elif args.provider_command == "remove":
+        if ProviderManager.remove_provider(args.name):
+            print(f"Provider '{args.name}' removed.")
+        else:
+            print(f"Provider '{args.name}' not found.")
+            
+    elif args.provider_command == "configure":
+        print(f"Configure provider {args.name} (Not implemented in mock)")
+        
+    elif args.provider_command == "test":
+        providers = ProviderManager.list_providers()
+        print("\nTesting Providers\n")
+        for p in providers:
+            print(f"✓ {p.name}")
+        print("\nAll providers are ready.")
+
+def cmd_profiles(args):
+    """Lists all configured profiles."""
+    from flowforge.services.workspace.profile_manager import ProfileManager
+    profiles = ProfileManager.list_profiles()
+    print("\nConfigured Profiles\n")
+    if not profiles:
+        print("No profiles configured.")
+    for i, p in enumerate(profiles, 1):
+        print(f"{i}. {p.name}")
+        print(f"   Provider : {p.provider}")
+        print()
+
+def cmd_profile(args):
+    """Manages AI profiles."""
+    from flowforge.services.workspace.profile_manager import ProfileManager
+    from flowforge.services.workspace.provider_manager import ProviderManager
+    from flowforge.domain.provider_profile import ProfileConfig
+    
+    if args.profile_command == "add":
+        print("Wizard Flow: Add Profile")
+        name = input("Profile Name: ")
+        if not name: return
+        
+        providers = ProviderManager.list_providers()
+        if not providers:
+            print("No providers available. Run 'flowforge provider add' first.")
+            return
+            
+        print("Available Providers:")
+        for p in providers:
+            print(f"- {p.name}")
+        provider_ref = input("Select Provider: ")
+        
+        temp_str = input("Temperature (default 0.0): ")
+        temp = float(temp_str) if temp_str else 0.0
+        
+        config = ProfileConfig(name=name, provider=provider_ref, temperature=temp)
+        ProfileManager.add_profile(config)
+        print(f"\nProfile '{name}' added successfully.")
+        
+    elif args.profile_command == "remove":
+        if ProfileManager.remove_profile(args.name):
+            print(f"Profile '{args.name}' removed.")
+        else:
+            print(f"Profile '{args.name}' not found.")
+            
+    elif args.profile_command == "configure":
+        print(f"Configure profile {args.name} (Not implemented in mock)")
+
 def main():
     from flowforge.utils.version import get_display_version
     version_str = f"FlowForge CLI Version: {get_display_version()}"
@@ -439,6 +562,7 @@ def main():
     # Run
     parser_run = subparsers.add_parser("run", help="Run a workflow .ff.yaml definition locally")
     parser_run.add_argument("file", help="Path to workflow.ff.yaml file")
+    parser_run.add_argument("--profile", help="Execution profile to use", required=False)
     
     # Doctor
     subparsers.add_parser("doctor", help="Check system environment status")
@@ -477,7 +601,31 @@ def main():
     parser_m_complete = mission_subparsers.add_parser("complete", help="Complete a mission (move active -> completed)")
     parser_m_complete.add_argument("mission_id", help="UUID of the mission to complete")
     
+    # Providers
+    parser_providers = subparsers.add_parser("providers", help="List all configured providers")
+    
+    parser_provider = subparsers.add_parser("provider", help="Manage AI providers")
+    provider_subparsers = parser_provider.add_subparsers(dest="provider_command", required=True)
+    provider_subparsers.add_parser("add", help="Add a new provider")
+    parser_prov_rm = provider_subparsers.add_parser("remove", help="Remove a provider")
+    parser_prov_rm.add_argument("name", help="Name of the provider to remove")
+    parser_prov_cfg = provider_subparsers.add_parser("configure", help="Configure an existing provider")
+    parser_prov_cfg.add_argument("name", help="Name of the provider")
+    provider_subparsers.add_parser("test", help="Test all configured providers")
+
+    # Profiles
+    parser_profiles = subparsers.add_parser("profiles", help="List all configured profiles")
+    
+    parser_profile = subparsers.add_parser("profile", help="Manage AI profiles")
+    profile_subparsers = parser_profile.add_subparsers(dest="profile_command", required=True)
+    profile_subparsers.add_parser("add", help="Add a new profile")
+    parser_prof_rm = profile_subparsers.add_parser("remove", help="Remove a profile")
+    parser_prof_rm.add_argument("name", help="Name of the profile to remove")
+    parser_prof_cfg = profile_subparsers.add_parser("configure", help="Configure an existing profile")
+    parser_prof_cfg.add_argument("name", help="Name of the profile")
+
     args = parser.parse_args()
+
     
     if args.command == "version":
         print(version_str)
@@ -493,6 +641,15 @@ def main():
         cmd_compile(args)
     elif args.command == "mission":
         cmd_mission(args)
+    elif args.command == "providers":
+        cmd_providers(args)
+    elif args.command == "provider":
+        cmd_provider(args)
+    elif args.command == "profiles":
+        cmd_profiles(args)
+    elif args.command == "profile":
+        cmd_profile(args)
+
 
 if __name__ == "__main__":
     main()

@@ -22,7 +22,9 @@ class MissionReviewService:
         
         self.print_provider("\nDeveloper Input")
         self.print_provider(f"- Mission Title: {draft.developer_input.title}")
-        self.print_provider(f"- Business Goal: {draft.developer_input.business_goal}")
+        self.print_provider(f"- Project Goal: {draft.developer_input.project_goal}")
+        self.print_provider(f"- Business Context: {draft.developer_input.business_context}")
+        self.print_provider(f"- Target Users: {draft.developer_input.target_users}")
         self.print_provider(f"- Priority: {draft.developer_input.priority}")
         
         self.print_provider("\n" + "-"*40)

@@ -91,8 +91,9 @@ def test_compiler_enrichment_pipeline(enriched_workspace):
     assert any("pyproject.toml" in ref for ref in package.relevant_references)
     
     # 4. Assert Acceptance Criteria dynamic formatting
-    assert "Database Report created" in package.acceptance_criteria
-    assert "Code Implementation integrated and verified" in package.acceptance_criteria
+    assert "Source code compiles and passes static analysis." in package.acceptance_criteria
+    assert "Deliverable 'Database Report' meets expected requirements and is verified." in package.acceptance_criteria
+    assert "Deliverable 'Code Implementation' meets expected requirements and is verified." in package.acceptance_criteria
     
     # 5. Assert Metadata details
     assert package.package["workspace"] is not None

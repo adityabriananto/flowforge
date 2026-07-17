@@ -119,6 +119,9 @@ class AIRuntimeEngine:
             )
         else:
             self.session_service.fail_session(session_id, base_path=base_path)
+            session_loaded = self.session_service.load_session(session_id, base_path=base_path)
+            session_loaded.summary = exec_res.get("summary", "Mission failed during AI execution without providing a specific reason.")
+            self.session_service.save_session(session_loaded, base_path=base_path)
 
         # 7. Return formatted execution outcome
         summary_str = self.session_service.export_session_summary(session_id, base_path=base_path)

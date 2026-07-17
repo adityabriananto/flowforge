@@ -49,6 +49,11 @@ class MissionPackageCompiler:
             base_path=base_path
         )
         
+        # Override context with mission metadata if available (resolves Bug #1 metadata loss)
+        for key in ["framework", "language", "project_type"]:
+            if mission.metadata.get(key) and mission.metadata.get(key) != "Unknown":
+                selected_context[key] = mission.metadata[key]
+                
         # Always preserve active runtime state parameters in final context
         if workflow_state:
             selected_context["workflow_state"] = workflow_state
@@ -81,17 +86,81 @@ class MissionPackageCompiler:
         if agent_profile:
             constraints.extend([f"Agent limitation: {lim}" for lim in agent_profile.limitations])
 
-        # Map deliverables to acceptance criteria intelligently
-        acceptance_criteria = []
+        # Strengthen Deliverables
+        deliverables = list(mission.deliverables)
+        mandatory_deliverables = ["Source Code", "Unit Tests", "Documentation", "Execution Report", "Updated Project Status"]
+        for md in mandatory_deliverables:
+            if md not in deliverables:
+                deliverables.append(md)
+
+        # Strengthen Acceptance Criteria
+        acceptance_criteria = [
+            "Source code compiles and passes static analysis.",
+            "Unit tests cover all new logic and pass successfully.",
+            "Documentation reflects new changes accurately.",
+            "Execution report clearly documents design decisions and validation."
+        ]
+        # Append original mapped ACs if they make sense, but for now we replace/strengthen.
         for d in mission.deliverables:
-            if "Report" in d or "Brief" in d:
-                acceptance_criteria.append(f"{d} created")
-            elif "Analysis" in d or "Overview" in d or "Summary" in d:
-                acceptance_criteria.append(f"{d} completed")
-            elif "Implementation" in d or "Suite" in d or "Update" in d or "Patch" in d:
-                acceptance_criteria.append(f"{d} integrated and verified")
-            else:
-                acceptance_criteria.append(f"{d} verified")
+            acceptance_criteria.append(f"Deliverable '{d}' meets expected requirements and is verified.")
+
+        # Strengthen Definition of Done
+        definition_of_done = list(mission.definition_of_done)
+        mandatory_dod = ["Source code implemented", "Tests passing", "Documentation updated", "Execution report generated", "Mission status updated"]
+        for md in mandatory_dod:
+            if md not in definition_of_done:
+                definition_of_done.append(md)
+
+        # Define Engineering Execution Contract
+        execution_contract = {
+            "required_outputs": [
+                "source_code",
+                "unit_tests",
+                "documentation",
+                "execution_report",
+                "project_status_update"
+            ],
+            "reporting_instructions": [
+                "1. Load engineering/templates/implementation_report.md.",
+                "2. Complete every section defined in the template.",
+                "3. Preserve all section headings.",
+                "4. If a section is not applicable, write 'None' or 'Not Applicable'.",
+                "5. Save the completed report to the configured report output location.",
+                "6. Treat the report as a mandatory deliverable before marking the mission complete."
+            ]
+        }
+        
+        reporting = {
+            "required": True,
+            "purpose": "Provide implementation evidence.",
+            "template_path": "engineering/templates/implementation_report.md",
+            "required_sections": [
+                "Executive Summary",
+                "Scope",
+                "Files Created",
+                "Files Modified",
+                "Technical Changes",
+                "Validation Performed",
+                "Backward Compatibility",
+                "Known Limitations",
+                "Completion Status"
+            ],
+            "execution_guidance": [
+                "Every required section from the template must be present.",
+                "Sections may contain 'None' or 'Not Applicable' when appropriate.",
+                "Sections must never be omitted."
+            ],
+            "output_location": "engineering/reports/"
+        }
+        
+        post_execution = [
+            "update mission status",
+            "update documentation",
+            "load implementation report template",
+            "update every required report section",
+            "save engineering report",
+            "validate report completeness"
+        ]
 
         package_metadata = {
             "id": str(mission.id), # Using mission ID as package ID for now
@@ -111,12 +180,16 @@ class MissionPackageCompiler:
             mission=mission_metadata,
             mission_summary=summary,
             objective=objective,
-            deliverables=list(mission.deliverables),
+            deliverables=deliverables,
             constraints=constraints,
             relevant_rules=selected_rules,
             relevant_context=selected_context,
             relevant_references=selected_references,
             acceptance_criteria=acceptance_criteria,
-            definition_of_done=list(mission.definition_of_done),
+            definition_of_done=definition_of_done,
+            execution_contract=execution_contract,
+            reporting=reporting,
+            post_execution=post_execution,
             warnings=warnings
         )
+

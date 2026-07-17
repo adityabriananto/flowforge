@@ -48,12 +48,12 @@ def test_project_framework_detection(tmp_path):
     assert details["build_tool"] == "vite"
     os.remove(os.path.join(base_dir, "package.json"))
 
-def test_git_safety_error(tmp_path):
+def test_git_absence_no_error(tmp_path):
     base_dir = str(tmp_path)
-    # Running bootstrap on non-git dir should raise error
-    with pytest.raises(RuntimeError) as exc:
-        SmartBootstrapper.bootstrap(base_dir, force=False)
-    assert "Not running inside a Git repository" in str(exc.value)
+    # Running bootstrap on non-git dir should NO LONGER raise error
+    details = SmartBootstrapper.bootstrap(base_dir, force=False)
+    assert details is not None
+    assert os.path.exists(os.path.join(base_dir, ".flowforge"))
 
 def test_smart_bootstrap_execution(tmp_path):
     base_dir = str(tmp_path)

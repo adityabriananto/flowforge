@@ -7,10 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Feature #1: Provider & Profile Management CLI and architecture.
+
 ### Changed
 - Introduced Semantic Versioning governance.
 - Added Version Impact Assessment.
 - Improved Release Strategy documentation.
+- Refactored `MissionAuthoringWizard` to request Project Goal, Business Context, and Target Users.
+- Enforced automated scaffolding of `implementation_report.md` template via `SmartBootstrapper`.
+
+### Fixed
+- Bug Fix #1: Mission Package Engineering Contract (enforces execution reports in YAML).
+- Bug Fix #2: Workspace Detection (scans subdirectories for multi-module projects).
+- Bug Fix #3: Git Dependency During Initialization (removes requirement for `.git` during `flowforge init`).
+- Bug Fix #4: Wizard Field Synchronization (resolved `AttributeError` for obsolete `business_goal` property in `MissionReviewService`).
+- Bug Fix #5: Workspace Metadata Propagation (fixed `PlanningContextBuilder` to prevent valid metadata from being overwritten by `Unknown` defaults).
 
 ## [1.0.0-beta] - 2026-07-12
 

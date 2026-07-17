@@ -19,7 +19,7 @@ class MissionPlanningEngine:
     ) -> Mission:
         
         # Deterministic Rules
-        deliverables = self._determine_deliverables(context, developer_input.business_goal)
+        deliverables = self._determine_deliverables(context, developer_input.project_goal)
         constraints = self._determine_constraints(context)
         definition_of_done = self._determine_dod(context)
         
@@ -29,22 +29,25 @@ class MissionPlanningEngine:
             "project_type": context.project_type,
             "estimated_size": self._estimate_size(deliverables),
             "risk_level": "medium",
-            "dependencies": []
+            "dependencies": [],
+            "business_context": developer_input.business_context,
+            "target_users": developer_input.target_users
         }
         
         if notes:
             metadata["developer_notes"] = notes
             
+        desc = f"Goal: {developer_input.project_goal}\nContext: {developer_input.business_context}\nUsers: {developer_input.target_users}"
         mission = MissionFactory.create(
             title=developer_input.title,
-            description=developer_input.business_goal,
+            description=desc,
             code=code,
-            goals=[developer_input.business_goal],
+            goals=[developer_input.project_goal],
             metadata=metadata,
             priority=developer_input.priority
         )
         
-        mission.goal = developer_input.business_goal
+        mission.goal = developer_input.project_goal
         mission.deliverables = deliverables
         mission.constraints = constraints
         mission.definition_of_done = definition_of_done

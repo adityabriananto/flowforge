@@ -18,8 +18,12 @@ class MissionPackageRenderer:
             "relevant_references": package.relevant_references,
             "acceptance_criteria": package.acceptance_criteria,
             "definition_of_done": package.definition_of_done,
+            "execution_contract": package.execution_contract,
+            "reporting": package.reporting,
+            "post_execution": package.post_execution,
             "warnings": package.warnings
         }
+
 
     @staticmethod
     def render_to_yaml(package: MissionPackage) -> str:

@@ -14,4 +14,7 @@ class MissionPackage:
     relevant_references: List[str] = field(default_factory=list)
     acceptance_criteria: List[str] = field(default_factory=list)
     definition_of_done: List[str] = field(default_factory=list)
+    execution_contract: Dict[str, Any] = field(default_factory=dict)
+    reporting: Dict[str, Any] = field(default_factory=dict)
+    post_execution: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
