@@ -93,7 +93,7 @@ def test_bootstrap_idempotency(tmp_path):
     base_dir = str(tmp_path)
     
     # Run once
-    SmartBootstrapper.bootstrap(base_dir, force=True, prefix="TEST")
+    SmartBootstrapper.bootstrap(base_dir, force=False, prefix="TEST")
     
     # Pre-write custom content to check idempotency
     workspace_yaml_path = os.path.join(base_dir, "engineering", "WORKSPACE.yaml")
@@ -101,7 +101,7 @@ def test_bootstrap_idempotency(tmp_path):
         f.write("custom_key: custom_val")
         
     # Run twice
-    SmartBootstrapper.bootstrap(base_dir, force=True, prefix="TEST")
+    SmartBootstrapper.bootstrap(base_dir, force=False, prefix="TEST")
     
     # Verify it was NOT overwritten
     with open(workspace_yaml_path, "r") as f:

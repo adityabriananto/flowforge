@@ -15,8 +15,8 @@ def test_generate_draft_deterministic_backend():
     
     dev_input = DeveloperInput(
         title="Implement User Auth",
-        business_goal="Add JWT authentication",
-        priority="high"
+        project_goal="Add JWT authentication",
+        business_context="N/A", target_users="N/A", priority="high"
     )
 
     mission = engine.generate_draft(
@@ -57,8 +57,8 @@ def test_generate_draft_deterministic_frontend():
     
     dev_input = DeveloperInput(
         title="Build Login Page",
-        business_goal="Create responsive login UI",
-        priority="medium"
+        project_goal="Create responsive login UI",
+        business_context="N/A", target_users="N/A", priority="medium"
     )
 
     mission = engine.generate_draft(

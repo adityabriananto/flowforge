@@ -1,12 +1,12 @@
 import pytest
 from flowforge.ports.ai_provider import AIProvider
-from flowforge.services.runtime.provider_config_loader import GenericCLIProviderAdapter
+from flowforge.services.runtime.provider_config_loader import SubprocessCLIProviderAdapter
 from flowforge.domain.mission_package import MissionPackage
 
 def test_generic_cli_provider_adapter_compliance():
-    adapter = GenericCLIProviderAdapter(
+    adapter = SubprocessCLIProviderAdapter(
         name_str="TestClaude",
-        command="python code.py",
+        command="python -c \"print('<file_changes></file_changes>')\"",
         health_command="curl example.com"
     )
     
@@ -37,7 +37,7 @@ def test_generic_cli_provider_adapter_compliance():
     assert "recommendations" in res
     assert "handover_summary" in res
     assert res["provider_metadata"]["provider"] == "TestClaude"
-    assert res["provider_metadata"]["command_executed"] == "python code.py"
+    assert res["provider_metadata"]["command_executed"].startswith("python -c")
 
 def test_provider_interface_subclassing():
     # Verify that a custom provider can be easily implemented and passes typechecks

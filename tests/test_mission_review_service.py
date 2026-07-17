@@ -23,7 +23,7 @@ def test_mission_review_accept():
     mission.deliverables = ["D1"]
     
     draft = MissionDraft(
-        developer_input=DeveloperInput("Test Mission", "Goal", "High"),
+        developer_input=DeveloperInput("Test Mission", "Goal", "Ctx", "Usr", "High"),
         planning_context=PlanningContext(),
         generated_mission=mission
     )
@@ -51,7 +51,7 @@ def test_mission_review_cancel():
         code="PROJECT-001"
     )
     draft = MissionDraft(
-        developer_input=DeveloperInput("Test Mission", "Goal", "High"),
+        developer_input=DeveloperInput("Test Mission", "Goal", "Ctx", "Usr", "High"),
         planning_context=PlanningContext(),
         generated_mission=mission
     )
@@ -72,7 +72,7 @@ def test_mission_review_edit():
         code="PROJECT-001"
     )
     draft = MissionDraft(
-        developer_input=DeveloperInput("Test Mission", "Goal", "High"),
+        developer_input=DeveloperInput("Test Mission", "Goal", "Ctx", "Usr", "High"),
         planning_context=PlanningContext(),
         generated_mission=mission
     )
@@ -94,7 +94,7 @@ def test_mission_review_invalid_then_accept():
         code="PROJECT-001"
     )
     draft = MissionDraft(
-        developer_input=DeveloperInput("Test Mission", "Goal", "High"),
+        developer_input=DeveloperInput("Test Mission", "Goal", "Ctx", "Usr", "High"),
         planning_context=PlanningContext(),
         generated_mission=mission
     )

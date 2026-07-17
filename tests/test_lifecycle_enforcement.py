@@ -4,7 +4,7 @@ import pytest
 from flowforge.services.runtime.engine import AIRuntimeEngine
 from flowforge.services.workspace.bootstrapper import SmartBootstrapper
 from flowforge.services.runtime.provider_registry import AIRuntimeProviderRegistry
-from flowforge.services.runtime.provider_config_loader import GenericCLIProviderAdapter
+from flowforge.services.runtime.provider_config_loader import SubprocessCLIProviderAdapter
 
 @pytest.fixture
 def mock_lifecycle_workspace(tmp_path):
@@ -30,7 +30,7 @@ def test_engine_guard_refuses_backlog_mission(mock_lifecycle_workspace):
     session_service = EngineeringSessionService(YAMLEngineeringSessionRepository())
     
     registry = AIRuntimeProviderRegistry()
-    dummy_provider = GenericCLIProviderAdapter("mock-provider", "echo 1")
+    dummy_provider = SubprocessCLIProviderAdapter("mock-provider", "echo 1")
     registry.register("mock-provider", dummy_provider, is_default=True)
     
     engine = AIRuntimeEngine(
@@ -58,7 +58,7 @@ def test_engine_allows_active_mission(mock_lifecycle_workspace):
     session_service = EngineeringSessionService(YAMLEngineeringSessionRepository())
     
     registry = AIRuntimeProviderRegistry()
-    dummy_provider = GenericCLIProviderAdapter("mock-provider", "echo 1")
+    dummy_provider = SubprocessCLIProviderAdapter("mock-provider", "echo 1")
     registry.register("mock-provider", dummy_provider, is_default=True)
     
     engine = AIRuntimeEngine(
