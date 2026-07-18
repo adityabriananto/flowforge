@@ -470,9 +470,9 @@ def cmd_provider(args):
         else:
             prov_name = "custom-cli"
             config = ProviderConfig(name=name, provider=prov_name, type=prov_type_sel)
-            print("\n[NOTE] Tipe 'cli' HANYA digunakan jika Anda memiliki script agen AI lokal buatan sendiri.")
-            print("       Jika Anda ingin menggunakan OpenAI/Gemini, silakan batalkan dan pilih tipe 'api'.")
-            config.command = input("Command (e.g. python agen_saya.py): ")
+            print("\n[NOTE] The 'cli' type is ONLY for executing your own custom local AI script or agent.")
+            print("       If you want to use OpenAI/Gemini APIs directly, please cancel and choose 'api' instead.")
+            config.command = input("Command (e.g. to use a local agent: python my_agent.py): ")
         
         ProviderManager.add_provider(config)
         print(f"\nProvider '{name}' added successfully.")
@@ -661,7 +661,7 @@ def main():
     try:
         cli_main()
     except (KeyboardInterrupt, EOFError):
-        print("\n\n[FlowForge] Operasi dibatalkan (Ctrl+C).")
+        print("\n\n[FlowForge] Operation cancelled by user (Ctrl+C).")
         sys.exit(1)
 
 
