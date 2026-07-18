@@ -460,13 +460,14 @@ def cmd_provider(args):
         if not name: return
         prov_type_sel = input("Type (api/cli): ")
         if prov_type_sel not in ["api", "cli"]: return
-        prov_name = input(f"Provider (e.g. openai, gemini, claude-cli): ")
-        
-        config = ProviderConfig(name=name, provider=prov_name, type=prov_type_sel)
         if prov_type_sel == "api":
+            prov_name = input(f"Provider (e.g. openai, gemini): ")
+            config = ProviderConfig(name=name, provider=prov_name, type=prov_type_sel)
             config.model = input("Model (e.g. gpt-4): ")
             config.api_key_env = input("API Key ENV (e.g. OPENAI_API_KEY): ")
         else:
+            prov_name = "custom-cli"
+            config = ProviderConfig(name=name, provider=prov_name, type=prov_type_sel)
             print("\n[NOTE] Tipe 'cli' HANYA digunakan jika Anda memiliki script agen AI lokal buatan sendiri.")
             print("       Jika Anda ingin menggunakan OpenAI/Gemini, silakan batalkan dan pilih tipe 'api'.")
             config.command = input("Command (e.g. python agen_saya.py): ")
