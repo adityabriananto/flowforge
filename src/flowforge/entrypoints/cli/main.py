@@ -467,7 +467,9 @@ def cmd_provider(args):
             config.model = input("Model (e.g. gpt-4): ")
             config.api_key_env = input("API Key ENV (e.g. OPENAI_API_KEY): ")
         else:
-            config.command = input("Command: ")
+            print("\n[NOTE] Tipe 'cli' HANYA digunakan jika Anda memiliki script agen AI lokal buatan sendiri.")
+            print("       Jika Anda ingin menggunakan OpenAI/Gemini, silakan batalkan dan pilih tipe 'api'.")
+            config.command = input("Command (e.g. python agen_saya.py): ")
         
         ProviderManager.add_provider(config)
         print(f"\nProvider '{name}' added successfully.")
