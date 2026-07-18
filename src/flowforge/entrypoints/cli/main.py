@@ -366,10 +366,10 @@ def cmd_mission(args):
             else:
                 print(f"\n[FlowForge CLI] Mission creation cancelled.")
                 
-        except (KeyboardInterrupt, asyncio.exceptions.CancelledError):
+        except (KeyboardInterrupt, EOFError, asyncio.CancelledError):
             raise KeyboardInterrupt
         except Exception as e:
-            print(f"[FlowForge CLI] Error: {str(e)}", file=sys.stderr)
+            print(f"[FlowForge CLI] Error: {type(e).__name__} - {str(e)}", file=sys.stderr)
             sys.exit(1)
 
     elif args.mission_command == "list":
@@ -660,7 +660,7 @@ def main():
     import sys
     try:
         cli_main()
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, EOFError):
         print("\n\n[FlowForge] Operasi dibatalkan (Ctrl+C).")
         sys.exit(1)
 
