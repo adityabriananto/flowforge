@@ -540,7 +540,7 @@ def cmd_profile(args):
     elif args.profile_command == "configure":
         print(f"Configure profile {args.name} (Not implemented in mock)")
 
-def main():
+def cli_main():
     from flowforge.utils.version import get_display_version
     version_str = f"FlowForge CLI Version: {get_display_version()}"
 
@@ -652,6 +652,15 @@ def main():
         cmd_profiles(args)
     elif args.command == "profile":
         cmd_profile(args)
+
+
+def main():
+    import sys
+    try:
+        cli_main()
+    except KeyboardInterrupt:
+        print("\n\n[FlowForge] Operasi dibatalkan (Ctrl+C).")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
