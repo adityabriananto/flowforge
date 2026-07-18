@@ -174,17 +174,19 @@ def run_mission_orchestration(mission_code, profile_name=None):
                 command=prov.command if prov.command else "echo 'No CLI command specified'"
             )
         else: # type == 'api'
-            if "openai" in prov.provider.lower() if prov.provider else False:
+            if prov.provider == "openai":
                 adapter = OpenAIAPIProviderAdapter(
                     name_str=prov.name,
                     model=prov.model if prov.model else "gpt-4o",
-                    api_key_env=prov.api_key_env if prov.api_key_env else "OPENAI_API_KEY"
+                    api_key_env=prov.api_key_env if prov.api_key_env else "OPENAI_API_KEY",
+                    api_key=prov.api_key
                 )
             else:
                 adapter = GoogleGeminiAPIProviderAdapter(
                     name_str=prov.name,
                     model=prov.model if prov.model else "gemini-1.5-pro",
-                    api_key_env=prov.api_key_env if prov.api_key_env else "GEMINI_API_KEY"
+                    api_key_env=prov.api_key_env if prov.api_key_env else "GEMINI_API_KEY",
+                    api_key=prov.api_key
                 )
             
         registry.register(prov.name, adapter, is_default=False)
