@@ -177,8 +177,11 @@ Duration: {session.metadata.duration_seconds or 0.0:.2f} seconds
 Summary:
 {session.summary or 'No summary provided.'}
 
-Artifacts Produced:
+Artifacts Produced (Reports):
 {chr(10).join(f' - {art}' for art in session.artifacts) if session.artifacts else ' - None'}
+
+Files Changed (Code):
+{chr(10).join(f' - {f}' for f in session.files_changed) if session.files_changed else ' - None'}
 
 Decisions Approved:
 {chr(10).join(f" - {d['title']} ({d['rationale']})" for d in session.decisions) if session.decisions else ' - None'}
