@@ -543,6 +543,12 @@ def cmd_profile(args):
         print(f"Configure profile {args.name} (Not implemented in mock)")
 
 def cli_main():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+    
     from flowforge.utils.version import get_display_version
     version_str = f"FlowForge CLI Version: {get_display_version()}"
 
