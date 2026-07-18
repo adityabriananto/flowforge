@@ -63,9 +63,9 @@ flowforge run PROJECT-001 --profile executor
 
 ## Workspace Structure
 
-When you run `flowforge init`, it creates an `.flowforge/` system directory and an `engineering/` documentation directory.
+When you run `flowforge init`, it creates an `.flowforge/` system directory (which is automatically git-ignored) and an `engineering/` documentation directory.
 
-- **`.flowforge/`**: Internal system configuration, runtime logs, compiled packages, and profile setups.
+- **`.flowforge/`**: Ephemeral system configuration, runtime logs, compiled packages, and profile setups. Provider configs store your raw `api_key` locally.
 - **`engineering/`**: Human-readable engineering documentation.
   - `active/`: Ongoing missions.
   - `completed/`: Finished missions.

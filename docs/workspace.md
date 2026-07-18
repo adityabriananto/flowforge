@@ -8,6 +8,7 @@ Dokumentasi ini menjelaskan standar struktur direktori untuk memisahkan file rek
 Pusat seluruh aset rekayasa yang bersifat editable dan persisten:
 - `missions/`: Spesifikasi misi otonom (`backlog`, `active`, `completed`).
 - `missions/templates/`: Template yang di-version untuk Misi, RFC, ADR, Sprint, dan Review.
+- `reports/`: Laporan eksekusi misi dari agen AI.
 - `rfcs/`: Dokumen usulan fitur teknis.
 - `adrs/`: Catatan keputusan arsitektural.
 - `roadmap/`: Rencana sprint.
@@ -15,8 +16,9 @@ Pusat seluruh aset rekayasa yang bersifat editable dan persisten:
 - `decisions/`: Berkas `AGENTS.md` (Engineering Rules).
 
 ### 2. `.flowforge/`
-Berkas runtime otomatis hasil eksekusi agen/state machine:
-- `packages/`: Plugin terunduh.
+Berkas runtime ephemera otomatis (di-ignore oleh git secara default):
+- `packages/`: Plugin terunduh / compiled mission packages.
+- `providers/`: Konfigurasi provider dan raw `api_key`.
 - `cache/`: Cache eksekusi.
 - `workspace/`: Workspace sandbox isolasi.
 - `logs/`: Logs mentah.

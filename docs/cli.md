@@ -36,6 +36,7 @@ FlowForge separates the API connection (Provider) from the specific model execut
 
 ### `flowforge provider add`
 Launches the wizard to configure a new AI Provider (e.g., Gemini, OpenAI, Subprocess).
+- **What it does:** Creates a provider configuration YAML file in `.flowforge/providers/`. Starting in recent updates, you can safely store your raw `api_key` directly in this file since the `.flowforge/` directory is git-ignored, eliminating the need to set environment variables on every terminal session.
 - **Example:**
   ```bash
   $ flowforge provider add
@@ -59,7 +60,7 @@ Launches the wizard to create an execution Profile tied to a specific Provider.
   $ flowforge profile add
   Enter profile name: executor
   Select provider: gemini-main
-  Enter model: gemini-3.1-flash-lite
+  Enter model: gemini-1.5-pro
   ```
 
 ### `flowforge profiles`
@@ -68,7 +69,7 @@ Lists all configured execution profiles.
   ```bash
   $ flowforge profiles
   Available Profiles:
-  - executor (Provider: gemini-main, Model: gemini-3.1-flash-lite)
+  - executor (Provider: gemini-main, Model: gemini-1.5-pro)
   ```
 
 ---
@@ -77,7 +78,7 @@ Lists all configured execution profiles.
 
 ### `flowforge mission new`
 Launches the Interactive Mission Authoring Wizard to create a new requirement.
-- **What it does:** Prompts the developer for a Mission Title, Business Goal, and Priority. It outputs a standardized Mission YAML file into `engineering/missions/backlog/`.
+- **What it does:** Prompts the developer for a Mission Title, Business Goal, and Priority. It outputs a standardized Mission YAML file into `engineering/missions/backlog/`. The wizard supports English prompts and robust cancellation handling.
 - **Example:**
   ```bash
   $ flowforge mission new
@@ -105,7 +106,7 @@ Transitions a mission from the backlog to active status.
 
 ### `flowforge run <MISSION_ID> --profile <PROFILE>`
 Executes a compiled Mission Package using an AI Provider.
-- **What it does:** Invokes the Runtime Engine, which delegates the package to the configured Profile. Parses the AI's XML response to apply file changes and generate an Implementation Report.
+- **What it does:** Invokes the Runtime Engine, which delegates the package to the configured Profile. Parses the AI's XML response to apply file changes and generate an Implementation Report in `engineering/reports/`. The CLI output explicitly lists both `Artifacts Produced (Reports)` and `Files Changed (Code)`.
 - **Example:**
   ```bash
   $ flowforge run PROJECT-001 --profile executor

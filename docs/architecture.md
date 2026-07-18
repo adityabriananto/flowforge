@@ -49,12 +49,15 @@ Profiles map a specific role (e.g., "executor" or "architect") to a specific Pro
 
 ## 5. Engineering Workspace & Detection
 
-The Engineering Workspace is the persistent storage layer (`engineering/` folder and `.flowforge/` system folder). It holds:
+The Engineering Workspace is the persistent storage layer (`engineering/` folder). It holds:
 - **PROJECT_STATE.yaml**: The central, mutable Engineering State.
 - **Missions**: YAML files representing units of work.
-- **Mission Packages**: Compiled instructions in `.flowforge/packages/`.
 - **Reports**: AI-generated Implementation Reports in `engineering/reports/`.
 - **ADRs & RFCs**: Immutable records of architectural decisions.
+
+The `.flowforge/` system folder is ephemeral (automatically git-ignored) and handles:
+- **Mission Packages**: Compiled instructions in `.flowforge/packages/`.
+- **Provider & Profile Configs**: YAML files storing models and API keys (e.g. `api_key`).
 
 FlowForge uses automatic Workspace Detection. Commands like `flowforge run` search upwards for the `.flowforge` directory to ensure they run in the correct context.
 
