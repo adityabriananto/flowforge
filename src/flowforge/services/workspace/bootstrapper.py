@@ -37,6 +37,23 @@ class SmartBootstrapper:
 
         # 3. Create Engineering Workspace Folders
         EngineeringWorkspace.initialize_workspace(base_path)
+        
+        # Also ensure reports folder exists for shared execution reports
+        reports_dir = os.path.join(base_path, "engineering", "reports")
+        os.makedirs(reports_dir, exist_ok=True)
+        
+        # Protect .flowforge from being committed
+        gitignore_path = os.path.join(base_path, ".gitignore")
+        gitignore_content = ""
+        if os.path.exists(gitignore_path):
+            with open(gitignore_path, "r") as f:
+                gitignore_content = f.read()
+        
+        if ".flowforge/" not in gitignore_content:
+            with open(gitignore_path, "a") as f:
+                if gitignore_content and not gitignore_content.endswith("\n"):
+                    f.write("\n")
+                f.write(".flowforge/\n")
 
         # 4. Generate/Install Templates (only if missing)
         cls._install_default_templates(base_path)

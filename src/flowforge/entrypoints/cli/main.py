@@ -466,7 +466,7 @@ def cmd_provider(args):
             prov_name = input(f"Provider (e.g. openai, gemini): ")
             config = ProviderConfig(name=name, provider=prov_name, type=prov_type_sel)
             config.model = input("Model (e.g. gpt-4): ")
-            config.api_key_env = input("API Key ENV (e.g. OPENAI_API_KEY): ")
+            # Note: API key will be added directly into the yaml by the user later
         else:
             prov_name = "custom-cli"
             config = ProviderConfig(name=name, provider=prov_name, type=prov_type_sel)
@@ -476,6 +476,9 @@ def cmd_provider(args):
         
         ProviderManager.add_provider(config)
         print(f"\nProvider '{name}' added successfully.")
+        
+        if prov_type_sel == "api":
+            print(f"\n[ACTION REQUIRED] Please open '.flowforge/providers/{name}.yaml' and add your 'api_key' credential manually.")
         
     elif args.provider_command == "remove":
         if ProviderManager.remove_provider(args.name):

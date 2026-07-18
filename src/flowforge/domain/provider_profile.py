@@ -8,6 +8,7 @@ class ProviderConfig:
     type: str  # 'api' or 'cli'
     model: Optional[str] = None
     api_key_env: Optional[str] = None
+    api_key: Optional[str] = None
     endpoint: Optional[str] = None
     command: Optional[str] = None
     args: Optional[List[str]] = field(default_factory=list)

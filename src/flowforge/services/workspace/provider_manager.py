@@ -37,6 +37,7 @@ class ProviderManager:
         }
         if config.model: data["model"] = config.model
         if config.api_key_env: data["api_key_env"] = config.api_key_env
+        if config.api_key: data["api_key"] = config.api_key
         if config.endpoint: data["endpoint"] = config.endpoint
         if config.command: data["command"] = config.command
         if config.args: data["args"] = config.args

@@ -98,21 +98,22 @@ class SubprocessCLIProviderAdapter(AIProvider):
 
 class GoogleGeminiAPIProviderAdapter(AIProvider):
     """Executes AI providers directly via REST APIs using google-generativeai."""
-    def __init__(self, name_str: str, model: str, api_key_env: str):
+    def __init__(self, name_str: str, model: str, api_key_env: str, api_key: str = None):
         self._name = name_str
         self.model = model
         self.api_key_env = api_key_env
+        self.api_key = api_key
 
     def name(self) -> str:
         return self._name
 
     def health(self) -> Dict[str, Any]:
-        has_key = bool(os.environ.get(self.api_key_env))
+        has_key = bool(self.api_key or os.environ.get(self.api_key_env))
         return {
             "installed": True, 
             "available": has_key, 
             "healthy": has_key, 
-            "error": f"Missing ENV: {self.api_key_env}" if not has_key else None
+            "error": f"Missing API Key in config and ENV: {self.api_key_env}" if not has_key else None
         }
 
     def execute(self, mission_package: MissionPackage, **kwargs) -> Dict[str, Any]:
@@ -122,9 +123,9 @@ class GoogleGeminiAPIProviderAdapter(AIProvider):
         except ImportError:
             return {"status": "FAILED", "summary": "google-genai is not installed. Run 'pip install google-genai'"}
             
-        api_key = os.environ.get(self.api_key_env)
+        api_key = self.api_key or os.environ.get(self.api_key_env)
         if not api_key:
-            return {"status": "FAILED", "summary": f"Missing API Key in environment variable: {self.api_key_env}"}
+            return {"status": "FAILED", "summary": f"Missing API Key in provider config or environment variable: {self.api_key_env}"}
             
         print(f"[FlowForge CLI] Executing API Provider '{self.name()}' via Google Gemini SDK (Model: {self.model})")
         print("[FlowForge CLI] Generating AI Response, please wait...")
@@ -150,7 +151,7 @@ class GoogleGeminiAPIProviderAdapter(AIProvider):
             "    ]]>\n"
             "  </file>\n"
             "</file_changes>\n\n"
-            f"CRITICAL: You MUST output your execution report in your response, wrapped in the XML format above, targeting the exact file path: .flowforge/reports/{mission_id}-Execution-Report.md\n"
+            f"CRITICAL: You MUST output your execution report in your response, wrapped in the XML format above, targeting the exact file path: engineering/reports/{mission_id}-Execution-Report.md\n"
         )
         prompt = f"MISSION PACKAGE:\n\n{payload}"
         
@@ -208,21 +209,22 @@ class GoogleGeminiAPIProviderAdapter(AIProvider):
 
 class OpenAIAPIProviderAdapter(AIProvider):
     """Executes AI providers directly via REST APIs using official openai library."""
-    def __init__(self, name_str: str, model: str, api_key_env: str):
+    def __init__(self, name_str: str, model: str, api_key_env: str, api_key: str = None):
         self._name = name_str
         self.model = model
         self.api_key_env = api_key_env
+        self.api_key = api_key
 
     def name(self) -> str:
         return self._name
 
     def health(self) -> Dict[str, Any]:
-        has_key = bool(os.environ.get(self.api_key_env))
+        has_key = bool(self.api_key or os.environ.get(self.api_key_env))
         return {
             "installed": True, 
             "available": has_key, 
             "healthy": has_key, 
-            "error": f"Missing ENV: {self.api_key_env}" if not has_key else None
+            "error": f"Missing API Key in config and ENV: {self.api_key_env}" if not has_key else None
         }
 
     def execute(self, mission_package: MissionPackage, **kwargs) -> Dict[str, Any]:
@@ -231,9 +233,9 @@ class OpenAIAPIProviderAdapter(AIProvider):
         except ImportError:
             return {"status": "FAILED", "summary": "openai is not installed. Run 'pip install openai'"}
             
-        api_key = os.environ.get(self.api_key_env)
+        api_key = self.api_key or os.environ.get(self.api_key_env)
         if not api_key:
-            return {"status": "FAILED", "summary": f"Missing API Key in environment variable: {self.api_key_env}"}
+            return {"status": "FAILED", "summary": f"Missing API Key in provider config or environment variable: {self.api_key_env}"}
             
         print(f"[FlowForge CLI] Executing API Provider '{self.name()}' via OpenAI SDK (Model: {self.model})")
         print("[FlowForge CLI] Generating AI Response, please wait...")
@@ -261,7 +263,7 @@ class OpenAIAPIProviderAdapter(AIProvider):
             "    ]]>\n"
             "  </file>\n"
             "</file_changes>\n\n"
-            f"CRITICAL: You MUST output your execution report in your response, wrapped in the XML format above, targeting the exact file path: .flowforge/reports/{mission_id}-Execution-Report.md\n"
+            f"CRITICAL: You MUST output your execution report in your response, wrapped in the XML format above, targeting the exact file path: engineering/reports/{mission_id}-Execution-Report.md\n"
         )
         prompt = f"MISSION PACKAGE:\n\n{payload}"
         
