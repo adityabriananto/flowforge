@@ -37,11 +37,16 @@ FlowForge separates the API connection (Provider) from the specific model execut
 ### `flowforge provider add`
 Launches the wizard to configure a new AI Provider (e.g., Gemini, OpenAI, Subprocess).
 - **What it does:** Creates a provider configuration YAML file in `.flowforge/providers/`. Starting in recent updates, you can safely store your raw `api_key` directly in this file since the `.flowforge/` directory is git-ignored, eliminating the need to set environment variables on every terminal session.
+- **Wizard Questions:**
+  1. **Select adapter:** (e.g., `GoogleGeminiAPIProviderAdapter`, `OpenAIAPIProviderAdapter`, `LocalSubprocessAdapter`)
+  2. **Enter connection name:** A unique ID for this connection (e.g., `gemini-main`).
+  3. **Configure properties:** Depending on the adapter, you will be asked for parameters like `api_key` or `command`.
 - **Example:**
   ```bash
   $ flowforge provider add
   Select adapter: GoogleGeminiAPIProviderAdapter
   Enter connection name: gemini-main
+  api_key [current: None]: AIzaSyBx...
   ```
 
 ### `flowforge providers`
@@ -55,6 +60,10 @@ Lists all configured providers.
 
 ### `flowforge profile add`
 Launches the wizard to create an execution Profile tied to a specific Provider.
+- **Wizard Questions:**
+  1. **Enter profile name:** (e.g., `executor`, `reviewer`).
+  2. **Select provider:** Choose from previously configured providers (e.g., `gemini-main`).
+  3. **Enter model:** The exact API model string (e.g., `gemini-1.5-pro`, `gpt-4o`). Note: Using full reasoning models like `gemini-1.5-pro` is strongly recommended for autonomous coding tasks.
 - **Example:**
   ```bash
   $ flowforge profile add
@@ -78,11 +87,21 @@ Lists all configured execution profiles.
 
 ### `flowforge mission new`
 Launches the Interactive Mission Authoring Wizard to create a new requirement.
-- **What it does:** Prompts the developer for a Mission Title, Business Goal, and Priority. It outputs a standardized Mission YAML file into `engineering/missions/backlog/`. The wizard supports English prompts and robust cancellation handling.
+- **What it does:** Prompts the developer for structured inputs to generate a comprehensive Mission YAML file in `engineering/missions/backlog/`. The wizard supports English prompts and robust cancellation handling.
+- **Wizard Questions (Prepare your answers):**
+  1. **Mission Title:** A short, descriptive name for the task (e.g., `Add login page`).
+  2. **Project Goal:** The primary objective of what needs to be achieved in this mission.
+  3. **Business Context:** Why this mission matters or how it fits into the broader application.
+  4. **Target Users:** Who will be using this feature.
+  5. **Priority:** Select between `Low`, `Medium`, or `High`.
 - **Example:**
   ```bash
   $ flowforge mission new
-  Enter title: Add login page
+  Enter title: Implement User Dashboard
+  Enter Project Goal: Create a dashboard to display user statistics.
+  Enter Business Context: Allows admins to track daily active usage.
+  Enter Target Users: System Administrators.
+  Priority (Low/Medium/High): High
   [OK] Created mission PROJECT-001 in backlog.
   ```
 
