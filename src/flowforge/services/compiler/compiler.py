@@ -113,6 +113,11 @@ class MissionPackageCompiler:
 
         # Define Engineering Execution Contract
         execution_contract = {
+            "strict_boundaries": [
+                "You MUST NOT modify files outside of the planned deliverables.",
+                "You MUST NOT modify any files inside the .flowforge/ directory.",
+                "You MUST NOT modify engineering/PROJECT_STATE.yaml, which is managed exclusively by FlowForge CLI."
+            ],
             "required_outputs": [
                 "source_code",
                 "unit_tests",
