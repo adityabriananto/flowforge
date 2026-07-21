@@ -41,8 +41,12 @@ flowforge mission new
 ```
 The Interactive Mission Wizard will prompt you for:
 1. **Mission Title** (e.g., "Implement User Authentication")
-2. **Business Goal** (e.g., "Allow users to log in securely using JWT tokens")
-3. **Priority** (High/Medium/Low)
+2. **Project Goal** (e.g., "Allow users to log in securely using JWT tokens")
+3. **Business Context** (e.g., "Customers need secure access to their private account data without relying on manual admin support")
+4. **Target Users** (e.g., "Registered customers and administrators")
+5. **Priority** (High/Medium/Low)
+
+`Project Goal` and `Business Context` can be detailed, but the CLI prompt accepts single-line input. Write long answers as one clear sentence or separate clauses with commas/semicolons instead of pasting multi-line paragraphs.
 
 ### Why
 FlowForge forces you to declare intent. Instead of writing a complex, hacky prompt telling the AI *how* to code, you simply define the *business objective*. The Planning Engine automatically translates this into a structured Mission Draft YAML inside `engineering/missions/backlog/`.

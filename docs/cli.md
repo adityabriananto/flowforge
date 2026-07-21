@@ -90,16 +90,17 @@ Launches the Interactive Mission Authoring Wizard to create a new requirement.
 - **What it does:** Prompts the developer for structured inputs to generate a comprehensive Mission YAML file in `engineering/missions/backlog/`. The wizard supports English prompts and robust cancellation handling.
 - **Wizard Questions (Prepare your answers):**
   1. **Mission Title:** A short, descriptive name for the task (e.g., `Add login page`).
-  2. **Project Goal:** The primary objective of what needs to be achieved in this mission.
-  3. **Business Context:** Why this mission matters or how it fits into the broader application.
+  2. **Project Goal:** The primary objective of what needs to be achieved in this mission. This can be detailed, but write it as one line because the CLI prompt accepts single-line input.
+  3. **Business Context:** Why this mission matters or how it fits into the broader application. This can also be detailed, but keep it as one line in the CLI.
   4. **Target Users:** Who will be using this feature.
   5. **Priority:** Select between `Low`, `Medium`, or `High`.
+- **Input format note:** For long answers, use a single clear sentence or separate clauses with commas/semicolons. Do not paste multi-line paragraphs into the prompt.
 - **Example:**
   ```bash
   $ flowforge mission new
   Enter title: Implement User Dashboard
-  Enter Project Goal: Create a dashboard to display user statistics.
-  Enter Business Context: Allows admins to track daily active usage.
+  Enter Project Goal: Create a dashboard that displays user statistics, recent activity, and key operational metrics in one place.
+  Enter Business Context: Admins need a fast overview of daily active usage and system health so they can make operational decisions without checking multiple tools.
   Enter Target Users: System Administrators.
   Priority (Low/Medium/High): High
   [OK] Created mission PROJECT-001 in backlog.
