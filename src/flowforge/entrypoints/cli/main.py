@@ -362,7 +362,8 @@ def cmd_mission(args):
                 context=getattr(args, 'context', None),
                 users=getattr(args, 'users', None),
                 priority=getattr(args, 'priority', None),
-                prefix="PROJECT"
+                prefix="PROJECT",
+                auto_accept=getattr(args, 'yes', False)
             ))
             
             if mission:
@@ -605,6 +606,7 @@ def cli_main():
     parser_m_new.add_argument("--context", help="Optional business context of the mission", required=False)
     parser_m_new.add_argument("--users", help="Optional target users for the mission", required=False)
     parser_m_new.add_argument("--priority", help="Optional priority (low/medium/high)", required=False)
+    parser_m_new.add_argument("-y", "--yes", action="store_true", help="Automatically accept the mission draft without prompting")
 
     # Mission List
     mission_subparsers.add_parser("list", help="List all missions grouped by state")

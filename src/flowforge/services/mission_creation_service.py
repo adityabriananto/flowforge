@@ -44,7 +44,8 @@ class MissionCreationService:
         users: Optional[str] = None,
         priority: Optional[str] = None,
         prefix: str = "PROJECT",
-        notes: Optional[str] = None
+        notes: Optional[str] = None,
+        auto_accept: bool = False
     ) -> Optional[Mission]:
         from flowforge.domain.mission_draft import DeveloperInput, MissionDraft, MissionReviewAction
 
@@ -120,7 +121,10 @@ class MissionCreationService:
                 generated_mission=generated_mission
             )
             
-            action = self.review_service.review_mission(draft)
+            if auto_accept:
+                action = MissionReviewAction.ACCEPT
+            else:
+                action = self.review_service.review_mission(draft)
             
             if action == MissionReviewAction.ACCEPT:
                 await self.repository.save(generated_mission)
