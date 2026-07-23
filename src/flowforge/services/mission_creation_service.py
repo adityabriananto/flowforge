@@ -31,7 +31,7 @@ class MissionCreationService:
         return val if val else (current_val or "")
 
     def _validate_priority(self, p: str) -> str:
-        p = p.lower()
+        p = p.strip(" \t\n\r\"'").lower()
         if p in ["low", "medium", "high"]:
             return p
         return ""
