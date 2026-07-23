@@ -31,7 +31,7 @@ class MissionCreationService:
         return val if val else (current_val or "")
 
     def _validate_priority(self, p: str) -> str:
-        p = p.strip(" \t\n\r\"'").lower()
+        p = p.strip(" \t\n\r\"'\\").lower()
         if p in ["low", "medium", "high"]:
             return p
         return ""
@@ -54,11 +54,11 @@ class MissionCreationService:
         context_obj = self.context_builder.build_context()
 
         # Wizard State
-        current_title = title or ""
-        current_goal = goal or ""
-        current_context = context or ""
-        current_users = users or ""
-        current_priority = (priority or "").lower()
+        current_title = (title or "").strip(" \t\n\r\"'\\")
+        current_goal = (goal or "").strip(" \t\n\r\"'\\")
+        current_context = (context or "").strip(" \t\n\r\"'\\")
+        current_users = (users or "").strip(" \t\n\r\"'\\")
+        current_priority = (priority or "").strip(" \t\n\r\"'\\").lower()
         if not self._validate_priority(current_priority):
             current_priority = ""
 

@@ -646,6 +646,9 @@ def cli_main():
     parser_prof_cfg = profile_subparsers.add_parser("configure", help="Configure an existing profile")
     parser_prof_cfg.add_argument("name", help="Name of the profile")
 
+    with open("n8n_debug.txt", "a") as f:
+        f.write(f"sys.argv: {sys.argv}\n")
+    
     args = parser.parse_args()
 
     
