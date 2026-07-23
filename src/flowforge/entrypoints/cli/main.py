@@ -359,6 +359,8 @@ def cmd_mission(args):
             mission = asyncio.run(service.create_mission(
                 title=getattr(args, 'title', None),
                 goal=getattr(args, 'goal', None),
+                context=getattr(args, 'context', None),
+                users=getattr(args, 'users', None),
                 priority=getattr(args, 'priority', None),
                 prefix="PROJECT"
             ))
@@ -600,6 +602,8 @@ def cli_main():
     parser_m_new = mission_subparsers.add_parser("new", help="Create a new mission in backlog")
     parser_m_new.add_argument("--title", help="Optional title of the new mission (triggers non-interactive mode if all args provided)", required=False)
     parser_m_new.add_argument("--goal", help="Optional business goal of the mission", required=False)
+    parser_m_new.add_argument("--context", help="Optional business context of the mission", required=False)
+    parser_m_new.add_argument("--users", help="Optional target users for the mission", required=False)
     parser_m_new.add_argument("--priority", help="Optional priority (low/medium/high)", required=False)
 
     # Mission List

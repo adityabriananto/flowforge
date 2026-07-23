@@ -40,6 +40,8 @@ class MissionCreationService:
         self,
         title: Optional[str] = None,
         goal: Optional[str] = None,
+        context: Optional[str] = None,
+        users: Optional[str] = None,
         priority: Optional[str] = None,
         prefix: str = "PROJECT",
         notes: Optional[str] = None
@@ -48,19 +50,19 @@ class MissionCreationService:
 
         existing_identifiers = await self.repository.list_identifiers()
         next_code = ArtifactIdentityService.generate_next_identity(prefix, existing_identifiers)
-        context = self.context_builder.build_context()
+        context_obj = self.context_builder.build_context()
 
         # Wizard State
         current_title = title or ""
         current_goal = goal or ""
-        current_context = ""
-        current_users = ""
+        current_context = context or ""
+        current_users = users or ""
         current_priority = (priority or "").lower()
         if not self._validate_priority(current_priority):
             current_priority = ""
 
         # Non-interactive mode check
-        is_interactive = not (title and goal and self._validate_priority(priority or ""))
+        is_interactive = not (title and goal and context and users and self._validate_priority(priority or ""))
 
         while True:
             if is_interactive:
@@ -106,7 +108,7 @@ class MissionCreationService:
             )
             
             generated_mission = self.planning_engine.generate_draft(
-                context=context,
+                context=context_obj,
                 developer_input=dev_input,
                 code=next_code,
                 notes=notes
@@ -114,7 +116,7 @@ class MissionCreationService:
             
             draft = MissionDraft(
                 developer_input=dev_input,
-                planning_context=context,
+                planning_context=context_obj,
                 generated_mission=generated_mission
             )
             

@@ -26,6 +26,8 @@ async def test_mission_creation_service_accept(tmp_path):
     mission = await service.create_mission(
         title="Test Mission",
         goal="Do something",
+        context="Business context",
+        users="Target users",
         priority="high"
     )
     
@@ -55,6 +57,8 @@ async def test_mission_creation_service_cancel(tmp_path):
     mission = await service.create_mission(
         title="Test Mission",
         goal="Do something",
+        context="Business context",
+        users="Target users",
         priority="high"
     )
     
